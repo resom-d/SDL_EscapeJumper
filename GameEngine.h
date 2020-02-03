@@ -3,12 +3,23 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include "GameEvents.h"
+#include "GamePlayer.h"
 
-class GameEngine : public gen::GameEvents
+typedef struct
+{
+	SDL_Rect WindowFrame;
+	
+
+} GameProperties;
+
+class GameEngine : public GameEvents
 {
 
 public:
 	GameEngine();
+
+	GameProperties Properties;
+	Uint16 GlobalFrameRate;
 
 	bool OnInit();
 
@@ -33,25 +44,13 @@ public:
 
 protected:
 	SDL_Window* _appWindow;
-	SDL_Renderer* _appRenderer;
-	SDL_Surface* _surf_Display;
+	SDL_Renderer* _gameRenderer;
 	TTF_Font* _uiFont;
-
-	bool _isRunning;
+	GamePlayer player;
+	bool _appIsRunning;
 	int _windowWidth;
 	int _windowHeight;
-	SDL_Point _playerPosition;
-	int _playerSpeed;
-	double _playerRotationAngle;
-	double _playerRotationSpeed;
-
-	bool _playerUp;
-	bool _playerDown;
-	bool _playerLeft;
-	bool _playerRigth;
-	bool _playerRotRight;
-	bool _playerRotLeft;
-
+		
 private:
 
 };
