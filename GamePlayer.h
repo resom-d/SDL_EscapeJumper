@@ -41,6 +41,7 @@ typedef struct
 	PLAYER_MoveStatus LastMovingState;
 
 	std::string Name;
+	Uint16 AnimationRate;
 	int Score;
 	int Speed;
 	double RotationAngle;
@@ -90,5 +91,10 @@ protected:
 	SDL_Texture* _playerTexture;
 	char* _textureResourcePath;
 	SDL_Rect _playerFrameRect;
-
+	Uint16 _currentTileFrame = 0;
+	Uint16 _noOfTileFrames;
+	Uint32 _ticks, _ticks_1n;
+	
+	// Trash, quickies
+	bool wasMovingLeft=false;
 };

@@ -4,9 +4,9 @@
 
 GamePlayer::GamePlayer()
 {
-	
+
 }
-GamePlayer::GamePlayer(SDL_Renderer* rend){}
+GamePlayer::GamePlayer(SDL_Renderer* rend) {}
 
 GamePlayer::GamePlayer(SDL_Renderer* rend, PlayerProps* props)
 {
@@ -33,6 +33,11 @@ int GamePlayer::OnInit(SDL_Renderer* rend)
 	Properties.Frame.w = _playerSurface->w;
 	Properties.HorizontalTileSize = Properties.Frame.w / Properties.HorizontalTiling;
 	Properties.VerticalTileSize = Properties.Frame.h / Properties.VerticalTiling;
+	_noOfTileFrames = Properties.HorizontalTiling * Properties.VerticalTiling;
+
+	_ticks = SDL_GetTicks();
+	_ticks_1n = SDL_GetTicks();
+
 	return 0;
 }
 
@@ -40,8 +45,16 @@ int GamePlayer::OnLoop()
 {
 	if (Properties.IsMovingUp) Properties.Position.y -= Properties.Speed;
 	if (Properties.IsMovingDown) Properties.Position.y += Properties.Speed;
-	if (Properties.IsMovingLeft) Properties.Position.x -= Properties.Speed;
-	if (Properties.IsMovingRight) Properties.Position.x += Properties.Speed;
+	if (Properties.IsMovingLeft)
+	{
+		wasMovingLeft = true;
+		Properties.Position.x -= Properties.Speed;
+	}
+	if (Properties.IsMovingRight)
+	{
+		wasMovingLeft = false;
+		Properties.Position.x += Properties.Speed;
+	}
 
 	if (Properties.IsRotatingLeft)
 	{
@@ -62,21 +75,28 @@ int GamePlayer::OnRender()
 {
 	SDL_Rect sRect =
 	{
-		0,
-		0,
+		 (_currentTileFrame % Properties.HorizontalTiling) * Properties.HorizontalTileSize ,
+		(_currentTileFrame / Properties.HorizontalTiling) * Properties.VerticalTileSize,
 		Properties.HorizontalTileSize,
 		Properties.VerticalTileSize
 	};
-
 	SDL_Rect tRect =
 	{
 		Properties.Position.x - (Properties.HorizontalTileSize >> 1),
 		Properties.Position.y - (Properties.VerticalTileSize >> 1),
-		Properties.HorizontalTileSize, 
+		Properties.HorizontalTileSize,
 		Properties.VerticalTileSize
 	};
 
-	SDL_RendererFlip flip = (Properties.LastMovingState & PLAYER_MOVINGLEFT_STATUS) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+	_ticks = SDL_GetTicks();
+	if (_ticks - _ticks_1n >= Properties.AnimationRate)
+	{
+		_currentTileFrame++;
+		if (_currentTileFrame >= _noOfTileFrames) _currentTileFrame = 0;
+		_ticks_1n = _ticks + (Properties.AnimationRate - (_ticks - _ticks_1n));
+	}
+
+	SDL_RendererFlip flip = wasMovingLeft ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
 	if ((Properties.LastMovingState & PLAYER_MOVINGDOWN_STATUS) == PLAYER_MOVINGDOWN_STATUS) flip = flip | SDL_FLIP_VERTICAL;
 
 	SDL_RenderCopyEx(renderer, _playerTexture, &sRect, &tRect, Properties.RotationAngle, NULL, flip);

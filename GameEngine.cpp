@@ -71,6 +71,7 @@ bool GameEngine::OnInit()
 	_appIsRunning = true;
 	
 	player = GamePlayer(_gameRenderer);
+	player.Properties.AnimationRate = 40;		// t=1000/framesPerSecond e.g. 1000/25 = 40
 	player.Properties.Name = "Mollmops";
 	player.Properties.TextureSourcePath = "Spritesheet_Alien_01.png";
 	player.Properties.HorizontalTiling = 6;
