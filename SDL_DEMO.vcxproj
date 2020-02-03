@@ -156,6 +156,7 @@
     <ClCompile Include="MainApplication.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameEvents.cpp" />
+    <ClCompile Include="TextScroller.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="Akjell.JPG">
@@ -167,6 +168,7 @@
     <ClInclude Include="GamePlayer.h" />
     <ClInclude Include="GameEngine.h" />
     <ClInclude Include="GameEvents.h" />
+    <ClInclude Include="TextScroller.h" />
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="libfreetype-6.dll">

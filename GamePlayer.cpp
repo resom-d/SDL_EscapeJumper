@@ -2,10 +2,13 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
+
+// Player Construction/Destruction
 GamePlayer::GamePlayer()
 {
 
 }
+
 GamePlayer::GamePlayer(SDL_Renderer* rend) {}
 
 GamePlayer::GamePlayer(SDL_Renderer* rend, PlayerProps* props)
@@ -22,6 +25,8 @@ GamePlayer::GamePlayer(SDL_Renderer* rend, PlayerProps* props, const char* textu
 GamePlayer::~GamePlayer()
 {}
 
+
+// Player methods
 int GamePlayer::OnInit(SDL_Renderer* rend)
 {
 	renderer = rend;
@@ -73,19 +78,20 @@ int GamePlayer::OnLoop()
 
 int GamePlayer::OnRender()
 {
+	
 	SDL_Rect sRect =
 	{
-		 (_currentTileFrame % Properties.HorizontalTiling) * Properties.HorizontalTileSize ,
-		(_currentTileFrame / Properties.HorizontalTiling) * Properties.VerticalTileSize,
-		Properties.HorizontalTileSize,
-		Properties.VerticalTileSize
+		 (_currentTileFrame % Properties.HorizontalTiling) * Properties.HorizontalTileSize , // x
+		(_currentTileFrame / Properties.HorizontalTiling) * Properties.VerticalTileSize,			// y
+		Properties.HorizontalTileSize,																						// w
+		Properties.VerticalTileSize																								// h
 	};
 	SDL_Rect tRect =
 	{
-		Properties.Position.x - (Properties.HorizontalTileSize >> 1),
-		Properties.Position.y - (Properties.VerticalTileSize >> 1),
-		Properties.HorizontalTileSize,
-		Properties.VerticalTileSize
+		Properties.Position.x - (Properties.HorizontalTileSize),
+		Properties.Position.y - (Properties.VerticalTileSize),
+		Properties.HorizontalTileSize << 1,
+		Properties.VerticalTileSize << 1
 	};
 
 	_ticks = SDL_GetTicks();

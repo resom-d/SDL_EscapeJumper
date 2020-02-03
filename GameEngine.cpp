@@ -1,4 +1,5 @@
 #include "GameEngine.h"
+#include "TextScroller.h"
 #include <SDL.h>
 #include <SDL.h>
 #include <SDL_image.h>
@@ -9,6 +10,8 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+
+TextScroller T, T1;
 
 GameEngine::GameEngine()
 {
@@ -55,7 +58,7 @@ bool GameEngine::OnInit()
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) 	return false;
 	if (TTF_Init() == -1) return false;
-	if ((_uiFont = TTF_OpenFont("SigmarOne-Regular.ttf", 32)) == nullptr) return false;
+	if ((_uiFont = TTF_OpenFont("SigmarOne-Regular.ttf", 120)) == nullptr) return false;
 
 	if ((_appWindow = SDL_CreateWindow(
 		"Zehnfinger's Game-Engine++ Running",
@@ -69,7 +72,7 @@ bool GameEngine::OnInit()
 	if ((_gameRenderer = SDL_CreateRenderer(_appWindow, -1, SDL_RENDERER_ACCELERATED)) == nullptr) return false;
 
 	_appIsRunning = true;
-	
+
 	player = GamePlayer(_gameRenderer);
 	player.Properties.AnimationRate = 40;		// t=1000/framesPerSecond e.g. 1000/25 = 40
 	player.Properties.Name = "Mollmops";
@@ -79,7 +82,6 @@ bool GameEngine::OnInit()
 	player.Properties.Position.x = Properties.WindowFrame.w >> 1;
 	player.Properties.Position.y = Properties.WindowFrame.h >> 1;
 	player.Properties.RotationAngle = 0.0;
-	player.OnInit(_gameRenderer);
 	player.Properties.IsIdle = true;
 	player.Properties.IsJumping = false;
 	player.Properties.IsLanding = false;
@@ -89,8 +91,14 @@ bool GameEngine::OnInit()
 	player.Properties.IsMovingUp = false;
 	player.Properties.IsRotatingLeft = false;
 	player.Properties.IsRotatingRight = false;
-	player.Properties.Speed = 1;
+	player.Properties.Speed = 2;
 	player.Properties.RotationSpeed = 1.0;
+
+	player.OnInit(_gameRenderer);
+	SDL_Color c = { 252, 186, 3, 255};
+	T.OnInit(_gameRenderer, "Zehnfinger's Game-Engine running. This scroller is here to inform you that the autor now finally halfways got behind what blitting is.", _uiFont, c, 30, 260);
+	c = { 252, 0, 3, 255};
+	T1.OnInit(_gameRenderer, "Just some stupid text to scroll around. ", _uiFont, c, 40, 440);
 
 	return true;
 };
@@ -102,6 +110,8 @@ void GameEngine::OnEvent(SDL_Event* Event)
 
 void GameEngine::OnLoop()
 {
+	T.OnLoop();
+	T1.OnLoop();
 	player.OnLoop();
 };
 
@@ -112,13 +122,14 @@ void GameEngine::OnRender()
 
 	// Render background
 
-	// Render UI
 
+	// Render UI
+	T.OnRender();
 	// Render player(s)
 	player.OnRender();
-
+	T1.OnRender();
 	// Render Effects
-	 
+
 
 	SDL_RenderPresent(_gameRenderer);
 }
@@ -126,6 +137,8 @@ void GameEngine::OnRender()
 void GameEngine::OnCleanup()
 {
 	// don't change order here...
+	T.OnCleanUp();
+	T1.OnCleanUp();
 	player.OnCleanup();
 
 	SDL_DestroyWindow(_appWindow);

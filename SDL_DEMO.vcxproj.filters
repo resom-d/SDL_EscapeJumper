@@ -27,6 +27,9 @@
     <ClCompile Include="GamePlayer.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="TextScroller.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="Akjell.JPG">
@@ -68,6 +71,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="GamePlayer.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="TextScroller.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
