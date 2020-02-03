@@ -73,9 +73,23 @@ bool GameEngine::OnInit()
 	player = GamePlayer(_gameRenderer);
 	player.Properties.Name = "Mollmops";
 	player.Properties.TextureSourcePath = "Spritesheet_Alien_01.png";
-	player.Properties.HorTiling = 4;
-	player.Properties.VerTiling = 4;
-
+	player.Properties.HorizontalTiling = 6;
+	player.Properties.VerticalTiling = 4;
+	player.Properties.Position.x = Properties.WindowFrame.w >> 1;
+	player.Properties.Position.y = Properties.WindowFrame.h >> 1;
+	player.Properties.RotationAngle = 0.0;
+	player.OnInit(_gameRenderer);
+	player.Properties.IsIdle = true;
+	player.Properties.IsJumping = false;
+	player.Properties.IsLanding = false;
+	player.Properties.IsMovingDown = false;
+	player.Properties.IsMovingLeft = false;
+	player.Properties.IsMovingRight = false;
+	player.Properties.IsMovingUp = false;
+	player.Properties.IsRotatingLeft = false;
+	player.Properties.IsRotatingRight = false;
+	player.Properties.Speed = 1;
+	player.Properties.RotationSpeed = 1.0;
 
 	return true;
 };
@@ -87,22 +101,34 @@ void GameEngine::OnEvent(SDL_Event* Event)
 
 void GameEngine::OnLoop()
 {
-
+	player.OnLoop();
 };
 
 void GameEngine::OnRender()
 {
 	SDL_SetRenderDrawColor(_gameRenderer, 80, 80, 80, 255);
 	SDL_RenderClear(_gameRenderer);
+
+	// Render background
+
+	// Render UI
+
+	// Render player(s)
+	player.OnRender();
+
+	// Render Effects
+	 
+
 	SDL_RenderPresent(_gameRenderer);
 }
 
 void GameEngine::OnCleanup()
 {
+	// don't change order here...
+	player.OnCleanup();
 
 	SDL_DestroyWindow(_appWindow);
 	SDL_free(_gameRenderer);
-
 	SDL_Quit();
 };
 
@@ -119,21 +145,21 @@ void GameEngine::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 	if (sym == SDLK_ESCAPE) _appIsRunning = false;
 
 	// player keys
-	/*if (sym == SDLK_d && !_playerLeft) _playerRigth = true;
-	if (sym == SDLK_a && !_playerRigth) _playerLeft = true;
-	if (sym == SDLK_s && !_playerUp) _playerDown = true;
-	if (sym == SDLK_w && !_playerDown) _playerUp = true;
-	if (sym == SDLK_RIGHT && !_playerRotLeft) _playerRotRight = true;
-	if (sym == SDLK_LEFT && !_playerRotRight) _playerRotLeft = true;*/
+	if (sym == SDLK_d && !player.Properties.IsMovingLeft) player.Properties.IsMovingRight = true;
+	if (sym == SDLK_a && !player.Properties.IsMovingRight)player.Properties.IsMovingLeft = true;
+	if (sym == SDLK_s && !player.Properties.IsMovingUp) player.Properties.IsMovingDown = true;
+	if (sym == SDLK_w && !player.Properties.IsMovingDown)player.Properties.IsMovingUp = true;
+	if (sym == SDLK_RIGHT && !player.Properties.IsRotatingLeft) player.Properties.IsRotatingRight = true;
+	if (sym == SDLK_LEFT && !player.Properties.IsRotatingRight) player.Properties.IsRotatingLeft = true;
 }
 
 void GameEngine::OnKeyUp(SDL_Keycode sym, SDL_Keycode mod)
 {
 	// player keys
-	/*if (sym == SDLK_d) _playerRigth = false;
-	if (sym == SDLK_a) _playerLeft = false;
-	if (sym == SDLK_s) _playerDown = false;
-	if (sym == SDLK_w) _playerUp = false;
-	if (sym == SDLK_RIGHT && !_playerRotLeft) _playerRotRight = false;
-	if (sym == SDLK_LEFT && !_playerRotRight) _playerRotLeft = false;*/
+	if (sym == SDLK_d) player.Properties.IsMovingRight = false;
+	if (sym == SDLK_a) player.Properties.IsMovingLeft = false;
+	if (sym == SDLK_s) player.Properties.IsMovingDown = false;
+	if (sym == SDLK_w) player.Properties.IsMovingUp = false;
+	if (sym == SDLK_RIGHT) player.Properties.IsRotatingRight = false;
+	if (sym == SDLK_LEFT) player.Properties.IsRotatingLeft = false;
 }

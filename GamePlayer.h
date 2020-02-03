@@ -34,8 +34,10 @@ typedef struct
 	SDL_Point Position;
 	SDL_Rect Frame;
 	std::string TextureSourcePath;
-	Uint16 HorTiling;
-	Uint16 VerTiling;
+	Uint16 HorizontalTiling;
+	Uint16 VerticalTiling;
+	Uint16 HorizontalTileSize;
+	Uint16 VerticalTileSize;
 	PLAYER_MoveStatus LastMovingState;
 
 	std::string Name;
@@ -70,9 +72,10 @@ public:
 	virtual ~GamePlayer();
 
 	PlayerProps Properties;
-	int OnInit();
-	int OnLoop(PlayerProps* props);
+	int OnInit(SDL_Renderer *rend);
+	int OnLoop();
 	int OnRender();
+	int OnCleanup();
 	int OnExit();
 
 private:
