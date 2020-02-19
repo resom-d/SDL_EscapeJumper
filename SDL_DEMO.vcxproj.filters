@@ -30,11 +30,23 @@
     <ClCompile Include="TextScroller.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="HorizontalScoller.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="UI_Abstract.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="UI_Widget.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="MainUI.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="JumperPlayer.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="Akjell.JPG">
-      <Filter>Ressourcendateien</Filter>
-    </CopyFileToFolders>
     <CopyFileToFolders Include="zlib1.dll">
       <Filter>Ressourcendateien</Filter>
     </CopyFileToFolders>
@@ -76,6 +88,21 @@
     <ClInclude Include="TextScroller.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="HorizontalScoller.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="UI_Abstract.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="UI_Widget.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="MainUI.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="JumperPlayer.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="libjpeg-9.dll">
@@ -83,9 +110,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="ball.png">
-      <Filter>Ressourcendateien</Filter>
-    </Image>
     <Image Include="Spritesheet_Alien_01.png">
       <Filter>Ressourcendateien</Filter>
     </Image>

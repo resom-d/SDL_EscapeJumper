@@ -11,8 +11,6 @@
 #include <iostream>
 #include <sstream>
 
-TextScroller T, T1;
-
 GameEngine::GameEngine()
 {
 	GlobalFrameRate = 60;
@@ -61,7 +59,7 @@ bool GameEngine::OnInit()
 	if ((_uiFont = TTF_OpenFont("SigmarOne-Regular.ttf", 120)) == nullptr) return false;
 
 	if ((_appWindow = SDL_CreateWindow(
-		"Zehnfinger's Game-Engine++ Running",
+		"EscapeJumper - ein Zehnfinger Spiel",
 		Properties.WindowFrame.x,
 		Properties.WindowFrame.y,
 		Properties.WindowFrame.w,
@@ -69,36 +67,19 @@ bool GameEngine::OnInit()
 		SDL_WINDOW_SHOWN)
 		) == nullptr) return false;
 
-	if ((_gameRenderer = SDL_CreateRenderer(_appWindow, -1, SDL_RENDERER_ACCELERATED)) == nullptr) return false;
+	if ((_renderer = SDL_CreateRenderer(_appWindow, -1, SDL_RENDERER_ACCELERATED)) == nullptr) return false;
+
+	if (SDL_NumJoysticks() > 0) _gamePad = SDL_JoystickOpen(0);
+
+	_player.OnInit(_renderer);
+	_mainUI.OnInit(_renderer);
+	_scroller.OnInit(_renderer);
+	_scroller.MatrixSetup.DisplayRect.y = 150;
+
+	OnInitPlayer();
 
 	_appIsRunning = true;
-
-	player = GamePlayer(_gameRenderer);
-	player.Properties.AnimationRate = 40;		// t=1000/framesPerSecond e.g. 1000/25 = 40
-	player.Properties.Name = "Mollmops";
-	player.Properties.TextureSourcePath = "Spritesheet_Alien_01.png";
-	player.Properties.HorizontalTiling = 6;
-	player.Properties.VerticalTiling = 4;
-	player.Properties.Position.x = Properties.WindowFrame.w >> 1;
-	player.Properties.Position.y = Properties.WindowFrame.h >> 1;
-	player.Properties.RotationAngle = 0.0;
-	player.Properties.IsIdle = true;
-	player.Properties.IsJumping = false;
-	player.Properties.IsLanding = false;
-	player.Properties.IsMovingDown = false;
-	player.Properties.IsMovingLeft = false;
-	player.Properties.IsMovingRight = false;
-	player.Properties.IsMovingUp = false;
-	player.Properties.IsRotatingLeft = false;
-	player.Properties.IsRotatingRight = false;
-	player.Properties.Speed = 2;
-	player.Properties.RotationSpeed = 1.0;
-
-	player.OnInit(_gameRenderer);
-	SDL_Color c = { 252, 186, 3, 255};
-	T.OnInit(_gameRenderer, "Zehnfinger's Game-Engine running. This scroller is here to inform you that the autor now finally halfways got behind what blitting is.", _uiFont, c, 30, 260);
-	c = { 252, 0, 3, 255};
-	T1.OnInit(_gameRenderer, "Just some stupid text to scroll around. ", _uiFont, c, 40, 440);
+	GameStatus = Running;
 
 	return true;
 };
@@ -106,45 +87,134 @@ bool GameEngine::OnInit()
 void GameEngine::OnEvent(SDL_Event* Event)
 {
 	GameEvents::OnEvent(Event);
+	if (GameStatus == Running) _player.OnEvent(Event);
 };
 
 void GameEngine::OnLoop()
 {
-	T.OnLoop();
-	T1.OnLoop();
-	player.OnLoop();
+	if (GameStatus == Running)
+	{
+		_player.OnLoop();
+		_scroller.OnLoop();
+		OnCollisionCheck();
+	}
 };
 
 void GameEngine::OnRender()
 {
-	SDL_SetRenderDrawColor(_gameRenderer, 80, 80, 80, 255);
-	SDL_RenderClear(_gameRenderer);
+	SDL_SetRenderDrawColor(_renderer, 40, 40, 40, 255);
+	SDL_RenderClear(_renderer);
 
 	// Render background
+	_scroller.OnRender();
 
-
-	// Render UI
-	T.OnRender();
 	// Render player(s)
-	player.OnRender();
-	T1.OnRender();
+	_player.OnRender();
+
 	// Render Effects
 
+	// Render UI
+	_mainUI.OnRender(_player.Name, _player.Score, GameStatus == GameOver);
 
-	SDL_RenderPresent(_gameRenderer);
+	// do it! do it !
+	SDL_RenderPresent(_renderer);
 }
 
 void GameEngine::OnCleanup()
 {
-	// don't change order here...
-	T.OnCleanUp();
-	T1.OnCleanUp();
-	player.OnCleanup();
+	_scroller.OnCleanUp();
+	_player.OnCleanup();
 
 	SDL_DestroyWindow(_appWindow);
-	SDL_free(_gameRenderer);
+	SDL_free(_renderer);
 	SDL_Quit();
-};
+}
+
+void GameEngine::OnCollisionCheck()
+{
+	int playerScreenColumn, playerScreenRow;
+	int playerEdgeT, playerEdgeL, playerEdgeR, playerEdgeB;
+	int obstEdgeT, obstEdgeL, obstEdgeR, obstEdgeB;
+
+	playerScreenColumn = (_player.DisplayRect.x - _scroller.MatrixSetup.ScreenOffsX) / (_scroller.MatrixSetup.BlockSize + _scroller.MatrixSetup.BlockSpacing);
+	playerScreenRow = (_player.DisplayRect.y - 150) / (_scroller.MatrixSetup.BlockSize + _scroller.MatrixSetup.BlockSpacing);
+
+	playerEdgeT = _player.DisplayRect.y;
+	playerEdgeB = _player.DisplayRect.y + _scroller.MatrixSetup.BlockSize;
+	playerEdgeL = _player.DisplayRect.x;
+	playerEdgeR = _player.DisplayRect.x + _scroller.MatrixSetup.BlockSize;
+
+	// Draw a grid
+	// Check if row and column of player make sense - exit if not.
+	if (playerScreenColumn < 0 || playerScreenRow < 0 || playerScreenColumn > _scroller.MatrixSetup.DisplayColumns || playerScreenRow > _scroller.MatrixSetup.DisplayRows) return;
+	// Check 9 possible zones
+	for (int x = 0; x <=1; x++)
+	{
+		for (int y = 0; y <= 1; y++)
+		{
+			if (playerScreenColumn == 0 && x == 0) continue;
+			if (playerScreenColumn >= _scroller.MatrixSetup.DisplayColumns - 1 && x == 2) continue;
+			if (playerScreenRow == 0 && y == 0) continue;
+			if (playerScreenRow >= _scroller.MatrixSetup.DisplayRows - 1 && y == 2) continue;
+
+			int alpha = _scroller.ColumnContainer[playerScreenColumn + _scroller.ColumnPosition + x][playerScreenRow + y].Color.a;
+
+			obstEdgeT = (y + playerScreenRow) * (_scroller.MatrixSetup.BlockSize + _scroller.MatrixSetup.BlockSpacing) + 150;
+			obstEdgeB = obstEdgeT + _scroller.MatrixSetup.BlockSize;
+			obstEdgeL = (_scroller.MatrixSetup.ScreenOffsX - _scroller.ScrollPosition) + ((x + playerScreenColumn) * (_scroller.MatrixSetup.BlockSize + _scroller.MatrixSetup.BlockSpacing));
+			obstEdgeR = obstEdgeL + _scroller.MatrixSetup.BlockSize;
+
+			if (playerEdgeT > obstEdgeB || playerEdgeB < obstEdgeT || playerEdgeL > obstEdgeR || playerEdgeR < obstEdgeL) continue;
+
+
+			if (alpha < 1) continue;
+			GameStatus = GameOver;
+
+		}
+	}
+
+}
+
+void GameEngine::OnInitPlayer()
+{
+	_player.AnimationRate = 40;		// t=1000/framesPerSecond e.g. 1000/25 = 40
+	_player.Name = "Mollmops";
+	_player.TextureSourcePath = "Spritesheet_Alien_01.png";
+	_player.HorizontalTiling = 6;
+	_player.VerticalTiling = 4;
+	_player.Speed = 2;
+	_player.Score = 0;
+
+	_player.MinPosition.x = _scroller.MatrixSetup.ScreenOffsX;
+	_player.MaxPosition.x = _scroller.MatrixSetup.ScreenOffsX + ((_scroller.MatrixSetup.DisplayColumns - 1) * (_scroller.MatrixSetup.BlockSize + _scroller.MatrixSetup.BlockSpacing));;
+	_player.MinPosition.y = 150; // Bottom of Top-UI
+	_player.MaxPosition.y = 150 + ((_scroller.MatrixSetup.DisplayRows - 1) * (_scroller.MatrixSetup.BlockSize + _scroller.MatrixSetup.BlockSpacing));
+
+	_player.DisplayRect.w = _scroller.MatrixSetup.BlockSize;
+	_player.DisplayRect.h = _scroller.MatrixSetup.BlockSize;
+	_player.DisplayRect.x = _scroller.MatrixSetup.ScreenOffsX ;
+	_player.DisplayRect.y = _player.MinPosition.y;
+
+	_player.MotionHor = None;
+	_player.MotionVer = None;
+	_player.IsTop = false;
+	_player.IsBottom = false;
+	_player.isLeft = false;
+	_player.IsRight = false;
+
+}
+
+void GameEngine::OnGameRestart()
+{
+	OnInitPlayer();
+	_scroller.ColumnPosition = 0;
+	_scroller.ScrollPosition = 0;
+
+	_player.Score = 0;
+	_player.Speed = 2;
+	GameStatus = Running;
+}
+
 
 // Overrides from GameEvents
 
@@ -157,23 +227,20 @@ void GameEngine::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 {
 	// global keys
 	if (sym == SDLK_ESCAPE) _appIsRunning = false;
+	if (sym == SDLK_SPACE)
+	{
+		if (GameStatus == Running) GameStatus = Paused;
+		else if (GameStatus == Paused) GameStatus = Running;
+	}
+	if (sym == SDLK_F1) OnGameRestart();
 
-	// player keys
-	if (sym == SDLK_d && !player.Properties.IsMovingLeft) player.Properties.IsMovingRight = true;
-	if (sym == SDLK_a && !player.Properties.IsMovingRight)player.Properties.IsMovingLeft = true;
-	if (sym == SDLK_s && !player.Properties.IsMovingUp) player.Properties.IsMovingDown = true;
-	if (sym == SDLK_w && !player.Properties.IsMovingDown)player.Properties.IsMovingUp = true;
-	if (sym == SDLK_RIGHT && !player.Properties.IsRotatingLeft) player.Properties.IsRotatingRight = true;
-	if (sym == SDLK_LEFT && !player.Properties.IsRotatingRight) player.Properties.IsRotatingLeft = true;
 }
 
 void GameEngine::OnKeyUp(SDL_Keycode sym, SDL_Keycode mod)
 {
 	// player keys
-	if (sym == SDLK_d) player.Properties.IsMovingRight = false;
-	if (sym == SDLK_a) player.Properties.IsMovingLeft = false;
-	if (sym == SDLK_s) player.Properties.IsMovingDown = false;
-	if (sym == SDLK_w) player.Properties.IsMovingUp = false;
-	if (sym == SDLK_RIGHT) player.Properties.IsRotatingRight = false;
-	if (sym == SDLK_LEFT) player.Properties.IsRotatingLeft = false;
+	if (GameStatus == Running)
+	{
+
+	}
 }

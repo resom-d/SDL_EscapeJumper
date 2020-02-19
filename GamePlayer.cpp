@@ -99,7 +99,9 @@ int GamePlayer::OnRender()
 	{
 		_currentTileFrame++;
 		if (_currentTileFrame >= _noOfTileFrames) _currentTileFrame = 0;
-		_ticks_1n = _ticks + (Properties.AnimationRate - (_ticks - _ticks_1n));
+		int diff = (Properties.AnimationRate - (_ticks - _ticks_1n));
+		if (diff < 0) diff = 0;
+		_ticks_1n = _ticks + diff ;
 	}
 
 	SDL_RendererFlip flip = wasMovingLeft ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;

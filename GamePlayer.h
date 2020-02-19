@@ -4,7 +4,7 @@
 #include <string>
 
 // indicate the players status
-typedef enum
+typedef enum MoveState
 {
 	PLAYER_UNDEF_STATUS = 0,
 	PLAYER_IDLE_STATUS = 1,
@@ -18,15 +18,15 @@ typedef enum
 	PLAYER_MOVINGDOWN_STATUS = 1 << 8,
 	PLAYER_ROTATINGLEFT_STATUS = 1 << 9,
 	PLAYER_ROTATINGRIGHT_STATUS = 1 << 10
-} PLAYER_MoveStatus;
+} ;
 // make flags useable via | and & operators
-inline PLAYER_MoveStatus operator|(PLAYER_MoveStatus a, PLAYER_MoveStatus b)
+inline MoveState operator|(MoveState a, MoveState b)
 {
-	return static_cast<PLAYER_MoveStatus>(static_cast<long>(a) | static_cast<long>(b));
+	return static_cast<MoveState>(static_cast<long>(a) | static_cast<long>(b));
 }
-inline PLAYER_MoveStatus operator&(PLAYER_MoveStatus a, PLAYER_MoveStatus b)
+inline MoveState operator&(MoveState a, MoveState b)
 {
-	return static_cast<PLAYER_MoveStatus>(static_cast<long>(a)& static_cast<long>(b));
+	return static_cast<MoveState>(static_cast<long>(a)& static_cast<long>(b));
 }
 
 typedef struct
@@ -38,7 +38,7 @@ typedef struct
 	Uint16 VerticalTiling;
 	Uint16 HorizontalTileSize;
 	Uint16 VerticalTileSize;
-	PLAYER_MoveStatus LastMovingState;
+	MoveState LastMovingState;
 
 	std::string Name;
 	Uint16 AnimationRate;

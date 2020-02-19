@@ -13,7 +13,7 @@ class TextScroller
 public:
 	TextScroller();
 
-	void OnInit(SDL_Renderer* rend, const char* msg, TTF_Font* font, SDL_Color clr, Uint16 speed, Uint16 yPos);
+	void OnInit(SDL_Renderer* rend, const char* msg, TTF_Font* font, SDL_Color clr, Uint16 speed, SDL_Rect *destRect);
 	void OnLoop();
 	void OnRender();
 	void OnCleanUp();
@@ -25,13 +25,13 @@ protected:
 	SDL_Renderer* renderer;
 	SDL_Surface* txtSurface;
 	SDL_Texture* txtTexture;
+	SDL_Rect surfaceSize;
 	TTF_Font *font;
 	SDL_Color fontColor = { 0, 0, 0, 255 };
 	Uint16 speed=80;
-	Uint16 y_pos;
+	SDL_Rect destRect;
 	int currentPosition=0;
 	Uint32 ticks, ticks_1n;
-	SDL_Rect surfaceSize;
 	bool isEnabled = false;
 };
 

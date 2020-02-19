@@ -1,5 +1,6 @@
 #include "GameEngine.h"
 
+
 GameEvents::GameEvents()
 {}
 GameEvents::~GameEvents() {};
@@ -181,12 +182,12 @@ void GameEvents::OnJoyAxis(Uint8 which, Uint8 axis, Sint16 value)
 
 void GameEvents::OnJoyButtonDown(Uint8 which, Uint8 button)
 {
-	//Pure virtual, do nothing
+	std::cout << "joybutton down event." << std::endl;
 }
 
 void GameEvents::OnJoyButtonUp(Uint8 which, Uint8 button)
 {
-	//Pure virtual, do nothing
+	std::cout << "joybutton up event." << std::endl;
 }
 
 void GameEvents::OnJoyHat(Uint8 which, Uint8 hat, Uint8 value)
