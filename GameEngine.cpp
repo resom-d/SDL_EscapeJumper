@@ -1,15 +1,5 @@
 #include "GameEngine.h"
-#include "TextScroller.h"
-#include <SDL.h>
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string>
-#include <iostream>
-#include <sstream>
+
 
 GameEngine::GameEngine()
 {
@@ -38,6 +28,8 @@ int GameEngine::OnExecute()
 		OnLoop();
 		// do all rendering
 		OnRender();
+		// cleanup after rendering. clear 
+		OnPostRender();
 
 		// make sure we are running at a constant frame rate
 		timerFPS_n = SDL_GetTicks();
@@ -56,9 +48,8 @@ bool GameEngine::OnInit()
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) 	return false;
 	if (TTF_Init() == -1) return false;
-	if ((_uiFont = TTF_OpenFont("SigmarOne-Regular.ttf", 120)) == nullptr) return false;
 
-	if ((_appWindow = SDL_CreateWindow(
+	if ((AppWindow = SDL_CreateWindow(
 		"EscapeJumper - ein Zehnfinger Spiel",
 		Properties.WindowFrame.x,
 		Properties.WindowFrame.y,
@@ -67,19 +58,49 @@ bool GameEngine::OnInit()
 		SDL_WINDOW_SHOWN)
 		) == nullptr) return false;
 
-	if ((_renderer = SDL_CreateRenderer(_appWindow, -1, SDL_RENDERER_ACCELERATED)) == nullptr) return false;
+	if ((Renderer = SDL_CreateRenderer(AppWindow, -1, SDL_RENDERER_ACCELERATED)) == nullptr) return false;
 
-	if (SDL_NumJoysticks() > 0) _gamePad = SDL_JoystickOpen(0);
+	if (SDL_NumJoysticks() > 0) GamePad = SDL_JoystickOpen(0);
 
-	_player.OnInit(_renderer);
-	_mainUI.OnInit(_renderer);
-	_scroller.OnInit(_renderer);
-	_scroller.MatrixSetup.DisplayRect.y = 150;
+
+	// Configure Map
+	MapSetup.Cols = 100;
+	MapSetup.Rows = 20;
+	MapSetup.BlockSize = 35;
+	MapSetup.BlockSpacing = 1;
+	MapSetup.DisplayColumns = 40;
+	MapSetup.DisplayRows = 20;
+	int screenWidth, screenHeight;
+	SDL_GetRendererOutputSize(Renderer, &screenWidth, &screenHeight);
+	MapSetup.ScreenOffsX = (screenWidth - ((MapSetup.BlockSize + MapSetup.BlockSpacing) * MapSetup.DisplayColumns)) / 2;
+	MapSetup.DisplayRect.y = 160;
+	MapSetup.DisplayRect = { MapSetup.ScreenOffsX, 160, (MapSetup.BlockSize + MapSetup.BlockSpacing) * MapSetup.DisplayColumns + 1, (MapSetup.BlockSize + MapSetup.BlockSpacing) * MapSetup.DisplayRows + 1};
+
+	// Allocate memory for a 2D matrix of tiles
+	Map = (MatrixRectItem**)malloc(MapSetup.Cols * sizeof(MatrixRectItem*));
+	for (int cols = 0; cols < MapSetup.Cols; cols++)
+	{
+		Map[cols] = (MatrixRectItem*)malloc(MapSetup.Rows * sizeof(MatrixRectItem*));
+	}
+	// fill the matrix with alpha 0 to make items invisible
+	for (int y = 0; y < MapSetup.Rows; y++)
+	{
+		for (int x = 0; x < MapSetup.Cols; x++)
+		{
+			Map[x][y].BorderColor.a = 0;
+			Map[x][y].FillColor.a = 0;
+		}
+	}
+
+	Player.OnInit(Renderer);
+	MainUI.OnInit(Renderer);
+	Scroller.OnInit(Renderer, &MapSetup, Map);
+	Editor.OnInit(AppWindow, Renderer, Map, &MapSetup);
 
 	OnInitPlayer();
 
 	_appIsRunning = true;
-	GameStatus = Running;
+	GameStatus = GameState_LevelEdit;
 
 	return true;
 };
@@ -87,47 +108,69 @@ bool GameEngine::OnInit()
 void GameEngine::OnEvent(SDL_Event* Event)
 {
 	GameEvents::OnEvent(Event);
-	if (GameStatus == Running) _player.OnEvent(Event);
+
+	if (GameStatus == GameState_Running) Player.OnEvent(Event);
+	if (GameStatus == GameState_LevelEdit) Editor.OnEvent(Event);
 };
 
 void GameEngine::OnLoop()
 {
-	if (GameStatus == Running)
+	if (GameStatus == GameState_Running)
 	{
-		_player.OnLoop();
-		_scroller.OnLoop();
-		OnCollisionCheck();
+		Player.OnLoop();
+		Scroller.OnLoop();
+		//OnCollisionCheck();
+	}
+
+	if (GameStatus == GameState_LevelEdit)
+	{
+		Editor.OnLoop();
 	}
 };
 
 void GameEngine::OnRender()
 {
-	SDL_SetRenderDrawColor(_renderer, 40, 40, 40, 255);
-	SDL_RenderClear(_renderer);
+	SDL_SetRenderDrawColor(Renderer, 40, 40, 40, 255);
+	SDL_RenderClear(Renderer);
 
-	// Render background
-	_scroller.OnRender();
+	
+	if (GameStatus == GameState_Running || GameStatus == GameState_Paused || GameStatus == GameState_GameOver)
+	{
+		// Render background
+		Scroller.OnRender();
+		// Render player(s)
+		Player.OnRender();		
+	}
 
-	// Render player(s)
-	_player.OnRender();
-
-	// Render Effects
+	if (GameStatus == GameState_LevelEdit)
+	{
+		Editor.OnRender();
+	}
 
 	// Render UI
-	_mainUI.OnRender(_player.Name, _player.Score, GameStatus == GameOver);
+	MainUI.OnRender(Player.Name, Player.Score, GameStatus == GameState_GameOver);
 
 	// do it! do it !
-	SDL_RenderPresent(_renderer);
+	SDL_RenderPresent(Renderer);
+
+}
+
+void GameEngine::OnPostRender()
+{
+	MainUI.OnPostRender();
 }
 
 void GameEngine::OnCleanup()
 {
-	_scroller.OnCleanUp();
-	_player.OnCleanup();
+	Editor.OnCleanUp();
+	Scroller.OnCleanUp();
+	Player.OnCleanup();
+	MainUI.OnCleanup();
 
-	SDL_DestroyWindow(_appWindow);
-	SDL_free(_renderer);
+	SDL_DestroyWindow(AppWindow);
+	SDL_free(Renderer);
 	SDL_Quit();
+
 }
 
 void GameEngine::OnCollisionCheck()
@@ -136,39 +179,39 @@ void GameEngine::OnCollisionCheck()
 	int playerEdgeT, playerEdgeL, playerEdgeR, playerEdgeB;
 	int obstEdgeT, obstEdgeL, obstEdgeR, obstEdgeB;
 
-	playerScreenColumn = (_player.DisplayRect.x - _scroller.MatrixSetup.ScreenOffsX) / (_scroller.MatrixSetup.BlockSize + _scroller.MatrixSetup.BlockSpacing);
-	playerScreenRow = (_player.DisplayRect.y - 150) / (_scroller.MatrixSetup.BlockSize + _scroller.MatrixSetup.BlockSpacing);
+	playerScreenColumn = (Player.DisplayRect.x - MapSetup.ScreenOffsX) / (MapSetup.BlockSize + MapSetup.BlockSpacing);
+	playerScreenRow = (Player.DisplayRect.y - 150) / (MapSetup.BlockSize + MapSetup.BlockSpacing);
 
-	playerEdgeT = _player.DisplayRect.y;
-	playerEdgeB = _player.DisplayRect.y + _scroller.MatrixSetup.BlockSize;
-	playerEdgeL = _player.DisplayRect.x;
-	playerEdgeR = _player.DisplayRect.x + _scroller.MatrixSetup.BlockSize;
+	playerEdgeT = Player.DisplayRect.y;
+	playerEdgeB = Player.DisplayRect.y + MapSetup.BlockSize;
+	playerEdgeL = Player.DisplayRect.x;
+	playerEdgeR = Player.DisplayRect.x + MapSetup.BlockSize;
 
 	// Draw a grid
 	// Check if row and column of player make sense - exit if not.
-	if (playerScreenColumn < 0 || playerScreenRow < 0 || playerScreenColumn > _scroller.MatrixSetup.DisplayColumns || playerScreenRow > _scroller.MatrixSetup.DisplayRows) return;
+	if (playerScreenColumn < 0 || playerScreenRow < 0 || playerScreenColumn > MapSetup.DisplayColumns || playerScreenRow > MapSetup.DisplayRows) return;
 	// Check 9 possible zones
-	for (int x = 0; x <=1; x++)
+	for (int x = 0; x <= 1; x++)
 	{
 		for (int y = 0; y <= 1; y++)
 		{
 			if (playerScreenColumn == 0 && x == 0) continue;
-			if (playerScreenColumn >= _scroller.MatrixSetup.DisplayColumns - 1 && x == 2) continue;
+			if (playerScreenColumn >= MapSetup.DisplayColumns - 1 && x == 2) continue;
 			if (playerScreenRow == 0 && y == 0) continue;
-			if (playerScreenRow >= _scroller.MatrixSetup.DisplayRows - 1 && y == 2) continue;
+			if (playerScreenRow >= MapSetup.DisplayRows - 1 && y == 2) continue;
 
-			int alpha = _scroller.ColumnContainer[playerScreenColumn + _scroller.ColumnPosition + x][playerScreenRow + y].Color.a;
+			int alpha = Scroller.MapMatrix[playerScreenColumn + Scroller.ColumnPosition + x][playerScreenRow + y].FillColor.a;
 
-			obstEdgeT = (y + playerScreenRow) * (_scroller.MatrixSetup.BlockSize + _scroller.MatrixSetup.BlockSpacing) + 150;
-			obstEdgeB = obstEdgeT + _scroller.MatrixSetup.BlockSize;
-			obstEdgeL = (_scroller.MatrixSetup.ScreenOffsX - _scroller.ScrollPosition) + ((x + playerScreenColumn) * (_scroller.MatrixSetup.BlockSize + _scroller.MatrixSetup.BlockSpacing));
-			obstEdgeR = obstEdgeL + _scroller.MatrixSetup.BlockSize;
+			obstEdgeT = (y + playerScreenRow) * (MapSetup.BlockSize + MapSetup.BlockSpacing) + 150;
+			obstEdgeB = obstEdgeT + MapSetup.BlockSize;
+			obstEdgeL = (MapSetup.ScreenOffsX - Scroller.ScrollPosition) + ((x + playerScreenColumn) * (MapSetup.BlockSize + MapSetup.BlockSpacing));
+			obstEdgeR = obstEdgeL + MapSetup.BlockSize;
 
 			if (playerEdgeT > obstEdgeB || playerEdgeB < obstEdgeT || playerEdgeL > obstEdgeR || playerEdgeR < obstEdgeL) continue;
 
 
 			if (alpha < 1) continue;
-			GameStatus = GameOver;
+			GameStatus = GameState_GameOver;
 
 		}
 	}
@@ -177,42 +220,43 @@ void GameEngine::OnCollisionCheck()
 
 void GameEngine::OnInitPlayer()
 {
-	_player.AnimationRate = 40;		// t=1000/framesPerSecond e.g. 1000/25 = 40
-	_player.Name = "Mollmops";
-	_player.TextureSourcePath = "Spritesheet_Alien_01.png";
-	_player.HorizontalTiling = 6;
-	_player.VerticalTiling = 4;
-	_player.Speed = 2;
-	_player.Score = 0;
+	Player.AnimationRate = 40;		// t=1000/framesPerSecond e.g. 1000/25 = 40
+	Player.Name = "Mollmops";
+	Player.TextureSourcePath = "Spritesheet_Alien_01.png";
+	Player.HorizontalTiling = 6;
+	Player.VerticalTiling = 4;
+	Player.Speed = 2;
+	Player.Score = 0;
 
-	_player.MinPosition.x = _scroller.MatrixSetup.ScreenOffsX;
-	_player.MaxPosition.x = _scroller.MatrixSetup.ScreenOffsX + ((_scroller.MatrixSetup.DisplayColumns - 1) * (_scroller.MatrixSetup.BlockSize + _scroller.MatrixSetup.BlockSpacing));;
-	_player.MinPosition.y = 150; // Bottom of Top-UI
-	_player.MaxPosition.y = 150 + ((_scroller.MatrixSetup.DisplayRows - 1) * (_scroller.MatrixSetup.BlockSize + _scroller.MatrixSetup.BlockSpacing));
+	Player.MinPosition.x = MapSetup.ScreenOffsX;
+	Player.MaxPosition.x = MapSetup.ScreenOffsX + ((MapSetup.DisplayColumns - 1) * (MapSetup.BlockSize + MapSetup.BlockSpacing));;
+	Player.MinPosition.y = MapSetup.DisplayRect.y; // Bottom of Top-UI
+	Player.MaxPosition.y = MapSetup.DisplayRect.y + ((MapSetup.DisplayRows - 1) * (MapSetup.BlockSize + MapSetup.BlockSpacing));
 
-	_player.DisplayRect.w = _scroller.MatrixSetup.BlockSize;
-	_player.DisplayRect.h = _scroller.MatrixSetup.BlockSize;
-	_player.DisplayRect.x = _scroller.MatrixSetup.ScreenOffsX ;
-	_player.DisplayRect.y = _player.MinPosition.y;
+	Player.DisplayRect.w = MapSetup.BlockSize;
+	Player.DisplayRect.h = MapSetup.BlockSize;
+	Player.DisplayRect.x = MapSetup.ScreenOffsX;
+	Player.DisplayRect.y = Player.MinPosition.y;
 
-	_player.MotionHor = None;
-	_player.MotionVer = None;
-	_player.IsTop = false;
-	_player.IsBottom = false;
-	_player.isLeft = false;
-	_player.IsRight = false;
+	Player.MotionHor = None;
+	Player.MotionVer = None;
+	Player.IsTop = false;
+	Player.IsBottom = false;
+	Player.isLeft = false;
+	Player.IsRight = false;
 
 }
 
 void GameEngine::OnGameRestart()
 {
 	OnInitPlayer();
-	_scroller.ColumnPosition = 0;
-	_scroller.ScrollPosition = 0;
 
-	_player.Score = 0;
-	_player.Speed = 2;
-	GameStatus = Running;
+	Scroller.ScrollPosition = 0;
+	Scroller.ColumnPosition = 0;
+
+	Player.Score = 0;
+	Player.Speed = 2;
+	GameStatus = GameState_Running;
 }
 
 
@@ -229,17 +273,21 @@ void GameEngine::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 	if (sym == SDLK_ESCAPE) _appIsRunning = false;
 	if (sym == SDLK_SPACE)
 	{
-		if (GameStatus == Running) GameStatus = Paused;
-		else if (GameStatus == Paused) GameStatus = Running;
+		if (GameStatus == GameState_Running) GameStatus = GameState_Paused;
+		else if (GameStatus == GameState_Paused) GameStatus = GameState_Running;
 	}
-	if (sym == SDLK_F1) OnGameRestart();
-
+	if (sym == SDLK_F1) GameStatus = GameState_MainScreen;
+	if (sym == SDLK_F3) OnGameRestart();
+	if (sym == SDLK_F4)
+	{
+		if (GameStatus == GameState_MainScreen) GameStatus = GameState_LevelEdit;
+	}
 }
 
 void GameEngine::OnKeyUp(SDL_Keycode sym, SDL_Keycode mod)
 {
 	// player keys
-	if (GameStatus == Running)
+	if (GameStatus == GameState_Running)
 	{
 
 	}

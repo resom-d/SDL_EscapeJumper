@@ -1,6 +1,8 @@
 #pragma once
 #include <SDL.h>
 #include <SDL_ttf.h>
+#include <string>
+#include <vector>
 #include "UI_Abstract.h"
 
 class MainUI
@@ -12,6 +14,7 @@ public:
 	void OnLoop();
 	void OnEvent();
 	void OnRender(std::string  playerName, int playerScore, bool gameOver);
+	void OnPostRender();
 	void OnCleanup();
 
 	SDL_Renderer* _renderer;

@@ -1,5 +1,5 @@
 #include "MainUI.h"
-#include <string>
+
 
 MainUI::MainUI()
 {}
@@ -10,7 +10,7 @@ void MainUI::OnInit(SDL_Renderer* renderer)
 
 	int screenWidth, screenHeight;
 	SDL_GetRendererOutputSize(_renderer, &screenWidth, &screenHeight);
-	DisplayRect = { 0,0, screenWidth, 120 };
+	DisplayRect = { 0,0, screenWidth, 150 };
 	_fontBig = TTF_OpenFont("SigmarOne-Regular.ttf", 48);
 	_fontMedium = TTF_OpenFont("SigmarOne-Regular.ttf", 36);
 	_fontSmall = TTF_OpenFont("SigmarOne-Regular.ttf", 24);
@@ -47,6 +47,7 @@ void MainUI::OnRender(std::string playerName, int playerScore, bool gameOver)
 	};
 
 	SDL_RenderCopy(_renderer, texGameName, &srcRect, &destRect);
+	SDL_FreeSurface(surfGameName);
 
 	// Player-Name
 	surfPlayerName = TTF_RenderText_Solid(_fontMedium, playerName.c_str(), SDL_Color{ 0, 0, 0, 255 });
@@ -68,6 +69,7 @@ void MainUI::OnRender(std::string playerName, int playerScore, bool gameOver)
 	};
 
 	SDL_RenderCopy(_renderer, texPlayerName, &srcRect, &destRect);
+	SDL_FreeSurface(surfPlayerName);
 
 	// Player-Score
 	surfPlayerScore = TTF_RenderText_Solid(_fontMedium, std::to_string(playerScore).c_str(), SDL_Color{ 0, 0, 0, 255 });
@@ -89,11 +91,12 @@ void MainUI::OnRender(std::string playerName, int playerScore, bool gameOver)
 	};
 
 	SDL_RenderCopy(_renderer, texPlayerScore, &srcRect, &destRect);
+	SDL_FreeSurface(surfPlayerScore);
 
 	// GameOver
 	if (gameOver)
 	{
-		surfGameOver = TTF_RenderText_Solid(_fontGameOver," Game Over", SDL_Color{ 0, 0, 0, 255 });
+		surfGameOver = TTF_RenderText_Solid(_fontGameOver, " Game Over", SDL_Color{ 0, 0, 0, 255 });
 		texGameOver = SDL_CreateTextureFromSurface(_renderer, surfGameOver);
 
 		srcRect =
@@ -113,22 +116,22 @@ void MainUI::OnRender(std::string playerName, int playerScore, bool gameOver)
 
 		SDL_RenderSetClipRect(_renderer, NULL);
 		SDL_RenderCopy(_renderer, texGameOver, &srcRect, &destRect);
+		SDL_FreeSurface(surfGameOver);
+		
 		SDL_RenderSetClipRect(_renderer, &DisplayRect);
 	}
-	
-	SDL_RenderPresent(_renderer);
 
+	
+}
+
+void MainUI::OnPostRender()
+{
+	SDL_DestroyTexture(texGameName);
+	SDL_DestroyTexture(texGameOver);
+	SDL_DestroyTexture(texPlayerName);
+	SDL_DestroyTexture(texPlayerScore);
 }
 
 void MainUI::OnCleanup()
 {
-	SDL_free(surfGameName);
-	SDL_free(surfGameOver);
-	SDL_free(surfPlayerName);
-	SDL_free(surfPlayerScore);
-
-	SDL_free(texGameName);
-	SDL_free(texGameOver);
-	SDL_free(texPlayerName);
-	SDL_free(texPlayerScore);
 }

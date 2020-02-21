@@ -1,30 +1,20 @@
 #pragma once
 
 #include <SDL.h>
+#include <SDL_image.h>
 #include <SDL_ttf.h>
-#include "GameEvents.h"
-#include "GamePlayer.h"
-#include "HorizontalScoller.h"
+#include <string>
+#include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
+#include "GameTypes.h"
+#include "GameEvents.h"
+#include "GamePlayer.h"
+#include "HorizontalScoller.h"
 #include "MainUI.h"
 #include"JumperPlayer.h"
-
-typedef struct
-{
-	SDL_Rect WindowFrame;
-
-
-} GameProperties;
-
-typedef enum GameState
-{
-	Idle,
-	GameOver,
-	Running,
-	Paused
-};
+#include "LevelEditor.h"
 
 class GameEngine : public GameEvents
 {
@@ -33,7 +23,18 @@ public:
 	GameEngine();
 
 	GameProperties Properties;
+	bool _appIsRunning;
 	Uint16 GlobalFrameRate;
+	GameState GameStatus = GameState_Running;
+	SDL_Window* AppWindow;
+	SDL_Renderer* Renderer;
+	MainUI MainUI;
+	LevelEditor Editor;
+	MatrixSetup MapSetup;
+	MatrixRectItem** Map;
+	JumperPlayer Player;
+	HorizontalScoller Scroller;
+	SDL_Joystick* GamePad = NULL;
 
 	bool OnInit();
 
@@ -44,6 +45,8 @@ public:
 	void OnLoop();
 
 	void OnRender();
+
+	void OnPostRender();
 
 	void OnCleanup();
 
@@ -61,20 +64,8 @@ public:
 
 	void OnKeyUp(SDL_Keycode sym, SDL_Keycode mod);
 
-
+	
 private:
-	bool _appIsRunning;
-
-	GameState GameStatus = Running;
-	SDL_Window* _appWindow;
-	SDL_Renderer* _renderer;
-	TTF_Font* _uiFont;
-
-	MainUI _mainUI;
-	JumperPlayer _player;
-	HorizontalScoller _scroller;
-
-	SDL_Joystick* _gamePad = NULL;
 
 protected:
 

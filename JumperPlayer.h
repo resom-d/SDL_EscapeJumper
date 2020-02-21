@@ -2,13 +2,8 @@
 #include <SDL.h>
 #include <string>
 #include "GameEvents.h"
+#include "GameTypes.h"
 
-typedef enum MotionState
-{
-	None = 0,
-	Plus,
-	Minus
-};
 
 class JumperPlayer : GameEvents
 {

@@ -156,10 +156,12 @@
     <ClCompile Include="GamePlayer.cpp" />
     <ClCompile Include="HorizontalScoller.cpp" />
     <ClCompile Include="JumperPlayer.cpp" />
+    <ClCompile Include="LevelEditor.cpp" />
     <ClCompile Include="MainApplication.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameEvents.cpp" />
     <ClCompile Include="MainUI.cpp" />
+    <ClCompile Include="SDL_AdditionalPrimitives.cpp" />
     <ClCompile Include="TextScroller.cpp" />
     <ClCompile Include="UI_Abstract.cpp" />
     <ClCompile Include="UI_Widget.cpp" />
@@ -168,9 +170,12 @@
     <ClInclude Include="GamePlayer.h" />
     <ClInclude Include="GameEngine.h" />
     <ClInclude Include="GameEvents.h" />
+    <ClInclude Include="GameTypes.h" />
     <ClInclude Include="HorizontalScoller.h" />
     <ClInclude Include="JumperPlayer.h" />
+    <ClInclude Include="LevelEditor.h" />
     <ClInclude Include="MainUI.h" />
+    <ClInclude Include="SDLAdditionalPrimitives.h" />
     <ClInclude Include="TextScroller.h" />
     <ClInclude Include="UI_Abstract.h" />
     <ClInclude Include="UI_Widget.h" />

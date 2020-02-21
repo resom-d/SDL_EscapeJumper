@@ -45,6 +45,12 @@
     <ClCompile Include="JumperPlayer.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="LevelEditor.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="SDL_AdditionalPrimitives.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="zlib1.dll">
@@ -101,6 +107,15 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="JumperPlayer.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelEditor.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="GameTypes.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="SDLAdditionalPrimitives.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
