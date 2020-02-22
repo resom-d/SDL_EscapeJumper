@@ -37,12 +37,13 @@ typedef struct MatrixSetup
 	Uint16 DisplayRows = 20;
 	SDL_Rect DisplayRect = { 1, 1, 1,1 };
 	int ScreenOffsX;
+	SDL_Color Background;
 };
 
 typedef struct MatrixRectItem
 {
-	SDL_Color BorderColor;
-	SDL_Color FillColor;
+	int BorderColor;
+	int FillColor;
 };
 
 typedef enum EditorMode

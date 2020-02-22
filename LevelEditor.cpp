@@ -13,23 +13,25 @@ void LevelEditor::OnInit(SDL_Window* win, SDL_Renderer* rend, MatrixRectItem** m
 	_colorIndexFill = 0;
 
 	// make some default colors
-	ColorPalettte.push_back({ 255,255,255,255 });
-	ColorPalettte.push_back({ 0,0,0,255 });
-	ColorPalettte.push_back({ 0,0,255,255 });
-	ColorPalettte.push_back({ 0,255,0,255 });
-	ColorPalettte.push_back({ 255,0,0,255 });
-	ColorPalettte.push_back({ 255, 238, 0,255 });
-	ColorPalettte.push_back({ 7, 230, 170,255 });
-	ColorPalettte.push_back({ 7, 208, 230,255 });
-	ColorPalettte.push_back({ 255, 3, 230, 255 });
-	ColorPalettte.push_back({ 255, 183, 0,255 });
+	ColorPalette.push_back({ 255,255,255,0 }); // Default with zero alpha at position 0
+	ColorPalette.push_back({ 255,255,255,255 });
+	ColorPalette.push_back({ 0,0,0,255 });
+	ColorPalette.push_back({ 0,0,255,255 });
+	ColorPalette.push_back({ 0,255,0,255 });
+	ColorPalette.push_back({ 255,0,0,255 });
+	ColorPalette.push_back({ 255, 238, 0,255 });
+	ColorPalette.push_back({ 7, 230, 170,255 });
+	ColorPalette.push_back({ 7, 208, 230,255 });
+	ColorPalette.push_back({ 255, 3, 230, 255 });
+	ColorPalette.push_back({ 255, 183, 0,255 });
 	// Assign active colors
-	list<SDL_Color>::iterator iter = ColorPalettte.begin();
+	list<SDL_Color>::iterator iter = ColorPalette.begin();
+	iter++;
 	ActiveFillColor = *iter++;
-	_colorIndexFill = 0;
+	_colorIndexFill = 1;
 	ActiveBorderColor = *iter;
-	_colorIndexBorder = 1;
-		
+	_colorIndexBorder = 2;
+
 	/*MapSetup->Rows = 100;
 	MapSetup->Cols = 1000;
 	MapSetup->DisplayRows = 20;
@@ -59,9 +61,6 @@ void LevelEditor::OnInit(SDL_Window* win, SDL_Renderer* rend, MatrixRectItem** m
 	//		MapMatrix[x][y].FillColor.a = 0;
 	//	}
 	//}
-
-
-
 }
 
 void LevelEditor::OnLoop()
@@ -69,35 +68,75 @@ void LevelEditor::OnLoop()
 
 void LevelEditor::OnRender()
 {
-	// Show the Map
+	SDL_RenderSetClipRect(_renderer, NULL);
+
+	// Display active color on left side
 	SDL_Rect rect;
+	rect.x = 10;
+	rect.y = 180;
+	rect.w = MapSetup->BlockSize;
+	rect.h = MapSetup->BlockSize;
+
+	SDL_SetRenderDrawColor(
+		_renderer,
+		ActiveFillColor.r,
+		ActiveFillColor.g,
+		ActiveFillColor.b,
+		ActiveFillColor.a
+	);
+	SDL_RenderFillRect(_renderer, &rect);
+
+	SDL_SetRenderDrawColor(
+		_renderer,
+		ActiveBorderColor.r,
+		ActiveBorderColor.g,
+		ActiveBorderColor.b,
+		ActiveBorderColor.a
+	);
+	SDL_RenderDrawRect(_renderer, &rect);
+
+	SDL_RenderSetClipRect(_renderer, &MapSetup->DisplayRect);
+	SDL_SetRenderDrawColor(_renderer,
+		MapSetup->Background.r,
+		MapSetup->Background.g,
+		MapSetup->Background.b,
+		MapSetup->Background.a
+	);
+	SDL_RenderFillRect(_renderer, &MapSetup->DisplayRect);
+
+	list<SDL_Color>::iterator iter = ColorPalette.begin();
+	// Show the Map
 	for (int x = 0; x < MapSetup->DisplayColumns; x++)
 	{
 		for (int y = 0; y < MapSetup->DisplayRows; y++)
 		{
-			if (MapMatrix[ColumnPosition + x][y + RowPosition].FillColor.a < 1) continue;
+			iter = ColorPalette.begin();
+			std::advance(iter, MapMatrix[ColumnPosition + x][y + RowPosition].FillColor);
+			if (iter->a < 1) continue;
+
 			rect.x = MapSetup->ScreenOffsX + (x * (MapSetup->BlockSize + MapSetup->BlockSpacing));
 			rect.y = MapSetup->DisplayRect.y + (y * (MapSetup->BlockSize + MapSetup->BlockSpacing));
 			rect.w = MapSetup->BlockSize;
 			rect.h = MapSetup->BlockSize;
 
 			SDL_RenderSetClipRect(_renderer, &rect);
-
 			SDL_SetRenderDrawColor(
 				_renderer,
-				MapMatrix[ColumnPosition + x][y + RowPosition].FillColor.r,
-				MapMatrix[ColumnPosition + x][y + RowPosition].FillColor.g,
-				MapMatrix[ColumnPosition + x][y + RowPosition].FillColor.b,
-				MapMatrix[ColumnPosition + x][y + RowPosition].FillColor.a
+				iter->r,
+				iter->g,
+				iter->b,
+				iter->a
 			);
 			SDL_RenderFillRect(_renderer, &rect);
 
+			iter = ColorPalette.begin();
+			std::advance(iter, MapMatrix[ColumnPosition + x][y + RowPosition].BorderColor);
 			SDL_SetRenderDrawColor(
 				_renderer,
-				MapMatrix[ColumnPosition + x][y + RowPosition].BorderColor.r,
-				MapMatrix[ColumnPosition + x][y + RowPosition].BorderColor.g,
-				MapMatrix[ColumnPosition + x][y + RowPosition].BorderColor.b,
-				MapMatrix[ColumnPosition + x][y + RowPosition].BorderColor.a
+				iter->r,
+				iter->g,
+				iter->b,
+				iter->a
 			);
 
 			SDL_RenderDrawRect(_renderer, &rect);
@@ -107,10 +146,9 @@ void LevelEditor::OnRender()
 
 	SDL_RenderSetClipRect(_renderer, &MapSetup->DisplayRect);
 	SDL_SetRenderDrawColor(_renderer, 255, 255, 255, 255);
-
 	// Draw a grid
 	int x1, y1, x2, y2;
-	//Draw horizontal Gridlines
+	// horizontal Gridlines
 	for (int x = 0; x < MapSetup->DisplayRows + 1; x++)
 	{
 		x1 = MapSetup->DisplayRect.x;
@@ -119,7 +157,7 @@ void LevelEditor::OnRender()
 		y2 = y1;
 		SDL_RenderDrawLine(_renderer, x1, y1, x2, y2);
 	}
-	//Draw vertical Gridlines
+	// vertical Gridlines
 	for (int y = 0; y < MapSetup->DisplayColumns + 1; y++)
 	{
 		x1 = MapSetup->DisplayRect.x + (y * (MapSetup->BlockSize + MapSetup->BlockSpacing));
@@ -140,7 +178,49 @@ void LevelEditor::OnLoadMap()
 {}
 
 void LevelEditor::OnSaveMap()
-{}
+{
+	ofstream theFile;
+	theFile.open("Level-001");
+	theFile << "<- Zehnfinger Game-Engine Level-File for MatrixRectItems" << endl << endl;;
+	
+	theFile << "<- Map-Setup" << endl;
+	theFile << "MXC:," << to_string(MapSetup->Cols) << endl;
+	theFile << "MXR:," << to_string(MapSetup->Rows) << endl;
+	theFile << "MXDC:," << to_string(MapSetup->DisplayColumns) << endl;
+	theFile << "MXDR:," << to_string(MapSetup->DisplayRows) << endl;
+	theFile << "MXBZ:," << to_string(MapSetup->BlockSize) << endl;
+	theFile << "MXBS:," << to_string(MapSetup->BlockSpacing) << endl;
+	theFile << "MXFR:," << to_string(MapSetup->Background.r) << endl;
+	theFile << "MXFG:," << to_string(MapSetup->Background.g) << endl;
+	theFile << "MXFB:," << to_string(MapSetup->Background.b) << endl;
+	theFile << "MXFA:," << to_string(MapSetup->Background.a) << endl << endl;
+		
+	theFile << "<- Color-Pallete:" << endl;
+	for (_colorPalletIterator = ColorPalette.begin(); _colorPalletIterator != ColorPalette.end(); _colorPalletIterator++)
+	{
+		theFile << "C:"  << ","
+			<< to_string(_colorPalletIterator->r) << ","
+			<< to_string( _colorPalletIterator->g) << "," 
+			<< to_string(_colorPalletIterator->b) << "," 
+			<< to_string(_colorPalletIterator->a) << endl;
+	}
+
+	theFile <<endl << "<- MATRIX-ITEMS" << endl;
+	for (int x = 0; x < MapSetup->Cols; x++)
+	{
+		for (int y = 0; y < MapSetup->Cols; y++)
+		{
+			theFile << "M:" << ","
+				<< to_string(MapMatrix[x][y].FillColor) << ","
+				<< to_string(MapMatrix[x][y].BorderColor) << ","
+				<< to_string(x) << "," << to_string(y) 
+				<< endl;
+		}
+	}
+
+	theFile.close();
+
+}
 
 void LevelEditor::OnClearMap()
 {}
@@ -204,9 +284,13 @@ void LevelEditor::OnEvent(SDL_Event* event)
 
 void LevelEditor::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 {
-	list<SDL_Color>::iterator iter = ColorPalettte.begin();
+	list<SDL_Color>::iterator iter = ColorPalette.begin();
 	switch (sym)
 	{
+	case SDLK_q:
+		OnSaveMap();
+		break;
+
 	case SDLK_LEFT:
 		ColumnPosition--;
 		if (ColumnPosition < 0) ColumnPosition = 0;
@@ -214,7 +298,7 @@ void LevelEditor::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 
 	case SDLK_RIGHT:
 		ColumnPosition++;
-		if (ColumnPosition >= MapSetup->Cols - MapSetup->DisplayColumns - 1) ColumnPosition = MapSetup->Cols - MapSetup->DisplayColumns - 1;
+		if (ColumnPosition > MapSetup->Cols - MapSetup->DisplayColumns - 1) ColumnPosition = MapSetup->Cols - MapSetup->DisplayColumns - 1;
 		break;
 
 	case SDLK_UP:
@@ -224,7 +308,7 @@ void LevelEditor::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 
 	case SDLK_DOWN:
 		RowPosition++;
-		if (RowPosition >= MapSetup->Rows - MapSetup->DisplayRows - 1) RowPosition = MapSetup->Rows - MapSetup->DisplayRows - 1;
+		if (RowPosition > MapSetup->Rows - MapSetup->DisplayRows) RowPosition = MapSetup->Rows - MapSetup->DisplayRows;
 		break;
 
 	case SDLK_d:
@@ -252,32 +336,32 @@ void LevelEditor::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 		break;
 
 	case SDLK_1:
-		if (--_colorIndexFill < 0) _colorIndexFill = 0;
-		advance(iter, _colorIndexFill);
+		if (--_colorIndexFill < 1) _colorIndexFill = 1;
+		std::advance(iter, _colorIndexFill);
 		ActiveFillColor = *iter;
 		break;
 
 	case SDLK_2:
-		if (++_colorIndexFill > ColorPalettte.size() - 1) _colorIndexFill = ColorPalettte.size() - 1;
-		advance(iter, _colorIndexFill);
+		if (++_colorIndexFill > ColorPalette.size() - 1) _colorIndexFill = ColorPalette.size() - 1;
+		std::advance(iter, _colorIndexFill);
 		ActiveFillColor = *(iter);
 		break;
 
 	case SDLK_3:
-		if (--_colorIndexBorder < 0) _colorIndexBorder = 0;
-		advance(iter, _colorIndexBorder);
+		if (--_colorIndexBorder < 1) _colorIndexBorder = 1;
+		std::advance(iter, _colorIndexBorder);
 		ActiveBorderColor = *iter;
 		break;
 
 	case SDLK_4:
-		if (++_colorIndexBorder > ColorPalettte.size() - 1) _colorIndexBorder = ColorPalettte.size() - 1;
-		advance(iter, _colorIndexBorder);
+		if (++_colorIndexBorder > ColorPalette.size() - 1) _colorIndexBorder = ColorPalette.size() - 1;
+		std::advance(iter, _colorIndexBorder);
 		ActiveBorderColor = *iter;
 		break;
 
 	case SDLK_0:
 		_colorIndexFill = 9;
-		advance(iter, _colorIndexFill);
+		std::advance(iter, _colorIndexFill);
 		ActiveFillColor = *iter;
 		break;
 	}
@@ -292,6 +376,8 @@ void LevelEditor::OnMouseMove(int mX, int mY, int relX, int relY, bool Left, boo
 	if (x > MapSetup->DisplayColumns - 1 || x < 0) return;
 	int y = (mY - MapSetup->DisplayRect.y) / (MapSetup->BlockSize + MapSetup->BlockSpacing);
 	if (y > MapSetup->DisplayRows - 1 || y < 0) return;
+	ActiveIndex.x = x;
+	ActiveIndex.y = y;
 
 	if (Mode == EditorMode_Select)
 	{
@@ -312,24 +398,22 @@ void LevelEditor::OnMouseMove(int mX, int mY, int relX, int relY, bool Left, boo
 
 	if (Mode == EditorMode_Draw && _drawActive)
 	{
-		MapMatrix[ColumnPosition + x][y + RowPosition].FillColor = ActiveFillColor;
-		MapMatrix[ColumnPosition + x][y + RowPosition].BorderColor = ActiveBorderColor;
+		MapMatrix[ColumnPosition + x][y + RowPosition].FillColor = _colorIndexFill;;
+		MapMatrix[ColumnPosition + x][y + RowPosition].BorderColor = _colorIndexBorder;
 	}
+
 	if (Mode == EditorMode_Erase && _drawActive)
 	{
-		MapMatrix[ColumnPosition + x][y + RowPosition].BorderColor.a = 0;
-		MapMatrix[ColumnPosition + x][y + RowPosition].FillColor.a = 0;
+		MapMatrix[ColumnPosition + x][y + RowPosition].FillColor = 0;
 	}
 }
 
 void LevelEditor::OnLeftButtonDown(int mX, int mY)
 {
-
 	int x = (mX - MapSetup->DisplayRect.x) / (MapSetup->BlockSize + MapSetup->BlockSpacing);
 	if (x > MapSetup->DisplayColumns - 1 || x < 0) return;
 	int y = (mY - MapSetup->DisplayRect.y) / (MapSetup->BlockSize + MapSetup->BlockSpacing);
 	if (y > MapSetup->DisplayRows - 1 || y < 0) return;
-
 	ActiveIndex.x = x;
 	ActiveIndex.y = y;
 
@@ -341,35 +425,17 @@ void LevelEditor::OnLeftButtonDown(int mX, int mY)
 		DrawCollection.push_back(MapMatrix[x][y]);
 	}
 
-
 	if (Mode == EditorMode_Draw)
 	{
-		int alpha = ActiveFillColor.a;
-		int red = ActiveFillColor.r;
-		int green = ActiveFillColor.g;
-		int blue = ActiveFillColor.b;
-
-		MapMatrix[ColumnPosition + x][y + RowPosition].FillColor.a = alpha;
-		MapMatrix[ColumnPosition + x][y + RowPosition].FillColor.r = red;
-		MapMatrix[ColumnPosition + x][y + RowPosition].FillColor.g = green;
-		MapMatrix[ColumnPosition + x][y + RowPosition].FillColor.b = blue;
-
-		alpha = ActiveBorderColor.a;
-		red = ActiveBorderColor.r;
-		green = ActiveBorderColor.g;
-		blue = ActiveBorderColor.b;
-
-		MapMatrix[ColumnPosition + x][y + RowPosition].BorderColor.a = alpha;
-		MapMatrix[ColumnPosition + x][y + RowPosition].BorderColor.r = red;
-		MapMatrix[ColumnPosition + x][y + RowPosition].BorderColor.g = green;
-		MapMatrix[ColumnPosition + x][y + RowPosition].BorderColor.b = blue;
+		MapMatrix[ColumnPosition + x][y + RowPosition].FillColor = _colorIndexFill;
+		MapMatrix[ColumnPosition + x][y + RowPosition].BorderColor = _colorIndexBorder;
 	}
 
 	if (Mode == EditorMode_Erase)
 	{
-		MapMatrix[ColumnPosition + x][y + RowPosition].FillColor.a = 0;
+		MapMatrix[ColumnPosition + x][y + RowPosition].FillColor = 0;
 	}
-	
+
 }
 
 void LevelEditor::OnRightButtonDown(int mX, int mY)

@@ -1,4 +1,4 @@
-#include "SDLAdditionalPrimitives.h"
+#include "SDL_AdditionalPrimitives.h"
 
 
 void SDL_RenderSetPixel(SDL_Renderer* renderer, int x, int y, Uint8 red, Uint8 green, Uint8 blue, Uint8 alpha)
@@ -51,7 +51,7 @@ void SDL_RenderDrawCircle(SDL_Renderer* renderer, int n_cx, int n_cy, int radius
 			--x;
 			error -= x;
 			error -= x;
-		}		
+		}
 	}
 }
 
@@ -61,7 +61,7 @@ void SDL_RenderFillCircle(SDL_Renderer* renderer, int cx, int cy, int radius, Ui
 	// method than just changing this value.  See how pixels are
 	// altered at the following web page for tips:
 	//   http://www.libsdl.org/intro.en/usingvideo.html
-	
+
 	for (double dy = 1; dy <= radius; dy += 1.0)
 	{
 		// This loop is unrolled a bit, only iterating through half of the
@@ -77,8 +77,25 @@ void SDL_RenderFillCircle(SDL_Renderer* renderer, int cx, int cy, int radius, Ui
 		SDL_SetRenderDrawColor(renderer, red, green, blue, alpha);
 		SDL_RenderDrawLine(renderer, cx - dx, cy + dy - radius, cx + dx, cy + dy - radius);
 		SDL_RenderDrawLine(renderer, cx - dx, cy - dy + radius, cx + dx, cy - dy + radius);
-			
+
 	}
+}
+
+void SDL_RenderDrawBorder(SDL_Renderer* rend, SDL_Rect* rect, Uint16 borderWidth, SDL_Color* color)
+{
+	SDL_Rect drect = *rect;
+
+	for (int i = 0; i < borderWidth; i++)
+	{
+		SDL_SetRenderDrawColor(rend, color->r, color->g, color->b, color->a);
+		SDL_RenderSetClipRect(rend, &drect);
+		SDL_RenderDrawRect(rend, &drect);
+		drect.x++;
+		drect.y++;
+		drect.h -= 2;
+		drect.w -= 2;
+	}
+	SDL_RenderSetClipRect(rend, nullptr);
 }
 
 SDL_Texture* SD_RenderLoadTexture(SDL_Renderer* renderer, std::string path)

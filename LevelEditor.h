@@ -1,7 +1,9 @@
 #pragma once
 #include "GameTypes.h"
 #include <SDL.h>
+#include <string>
 #include <iostream>
+#include <fstream>
 #include <list>
 #include <algorithm>
 using namespace std;
@@ -16,7 +18,7 @@ public:
 	MatrixSetup* MapSetup;
 	MatrixRectItem** MapMatrix;
 	list<MatrixRectItem> DrawCollection;
-	list<SDL_Color> ColorPalettte;
+	list<SDL_Color> ColorPalette;
 	SDL_Color ActiveFillColor;
 	SDL_Color ActiveBorderColor;
 	SDL_Point ActiveIndex;
@@ -61,4 +63,6 @@ private:
 	bool _drawActive;
 	int _colorIndexFill;
 	int _colorIndexBorder;
+	list<SDL_Color>::iterator _colorPalletIterator;
+	
 };

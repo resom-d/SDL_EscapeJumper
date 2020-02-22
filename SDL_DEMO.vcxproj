@@ -164,6 +164,7 @@
     <ClCompile Include="SDL_AdditionalPrimitives.cpp" />
     <ClCompile Include="TextScroller.cpp" />
     <ClCompile Include="UI_Abstract.cpp" />
+    <ClCompile Include="UI_Editor.cpp" />
     <ClCompile Include="UI_Widget.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -175,9 +176,11 @@
     <ClInclude Include="JumperPlayer.h" />
     <ClInclude Include="LevelEditor.h" />
     <ClInclude Include="MainUI.h" />
-    <ClInclude Include="SDLAdditionalPrimitives.h" />
+    <ClInclude Include="SDL_AdditionalPrimitives.h" />
     <ClInclude Include="TextScroller.h" />
     <ClInclude Include="UI_Abstract.h" />
+    <ClInclude Include="UI_Editor.h" />
+    <ClInclude Include="UI_Types.h" />
     <ClInclude Include="UI_Widget.h" />
   </ItemGroup>
   <ItemGroup>
@@ -215,6 +218,7 @@
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
+    <CopyFileToFolders Include="Resources\IconBar_48px.png" />
     <Image Include="Spritesheet_Alien_01.png" />
     <Image Include="Spritesheet_Alien_02.png" />
   </ItemGroup>

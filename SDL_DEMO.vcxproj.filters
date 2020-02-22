@@ -51,6 +51,9 @@
     <ClCompile Include="SDL_AdditionalPrimitives.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="UI_Editor.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="zlib1.dll">
@@ -78,6 +81,9 @@
       <Filter>Ressourcendateien</Filter>
     </CopyFileToFolders>
     <CopyFileToFolders Include="SigmarOne-Regular.ttf">
+      <Filter>Ressourcendateien</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Resources\IconBar_48px.png">
       <Filter>Ressourcendateien</Filter>
     </CopyFileToFolders>
   </ItemGroup>
@@ -115,7 +121,13 @@
     <ClInclude Include="GameTypes.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="SDLAdditionalPrimitives.h">
+    <ClInclude Include="UI_Editor.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="UI_Types.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL_AdditionalPrimitives.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

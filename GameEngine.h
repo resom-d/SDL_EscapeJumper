@@ -15,6 +15,7 @@
 #include "MainUI.h"
 #include"JumperPlayer.h"
 #include "LevelEditor.h"
+#include "UI_Editor.h"
 
 class GameEngine : public GameEvents
 {
@@ -29,6 +30,7 @@ public:
 	SDL_Window* AppWindow;
 	SDL_Renderer* Renderer;
 	MainUI MainUI;
+	UI_Editor EditorUI;
 	LevelEditor Editor;
 	MatrixSetup MapSetup;
 	MatrixRectItem** Map;

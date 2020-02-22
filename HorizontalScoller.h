@@ -1,9 +1,11 @@
 #pragma once
 
-#include <SDL.h>
-#include <iostream>
-#include <SDL_image.h>
 #include "GameTypes.h"
+#include <SDL.h>
+#include <SDL_image.h>
+#include <iostream>
+#include <list>
+using namespace std;
 
 class HorizontalScoller
 {
@@ -16,7 +18,8 @@ public:
 	int ScrollSpeed = 1;
 	MatrixSetup* MapSetup;
 	MatrixRectItem** MapMatrix;
-	
+	list<SDL_Color> ColorPalette;
+	bool LevelDone = false;
 	// Game functions
 	void OnInit(SDL_Renderer* renderer, MatrixSetup* setup, MatrixRectItem** map);
 	void InitScollerContent();

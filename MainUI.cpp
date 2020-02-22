@@ -19,6 +19,9 @@ void MainUI::OnInit(SDL_Renderer* renderer)
 
 void MainUI::OnRender(std::string playerName, int playerScore, bool gameOver)
 {
+	int h, w;
+	SDL_GetRendererOutputSize(_renderer, &w, &h);
+
 	if (_renderer == nullptr) return;
 	SDL_RenderSetClipRect(_renderer, &DisplayRect);
 	// Give us Background and a Boarder
@@ -96,7 +99,7 @@ void MainUI::OnRender(std::string playerName, int playerScore, bool gameOver)
 	// GameOver
 	if (gameOver)
 	{
-		surfGameOver = TTF_RenderText_Solid(_fontGameOver, " Game Over", SDL_Color{ 0, 0, 0, 255 });
+		surfGameOver = TTF_RenderText_Solid(_fontGameOver, " Game Over", SDL_Color{ 255, 0, 0, 255 });
 		texGameOver = SDL_CreateTextureFromSurface(_renderer, surfGameOver);
 
 		srcRect =
@@ -109,7 +112,8 @@ void MainUI::OnRender(std::string playerName, int playerScore, bool gameOver)
 
 		destRect =
 		{
-			300, 450,
+			(w/2 - surfGameOver->w/2),
+			150 + ((h-150)/2 - (surfGameOver->h/2)), 
 			surfGameOver->w,
 			surfGameOver->h
 		};

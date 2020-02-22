@@ -1,44 +1,45 @@
 #pragma once
+#include "UI_Types.h"
+#include "SDL_AdditionalPrimitives.h"
 #include <SDL.h>
-
-// Handle the Widget Status
-typedef enum WidgetState
-{
-	Focused = 0,
-	Active = 1 << 0,
-	Visible = 1 << 1, 
-	InputActive = 1 << 2
-};
-
-// Event Callback Prototype
+#include <iostream>
+#include <list>
+using namespace std;
 
 class UI_Widget
 {
 public:
 	UI_Widget();
 
-	virtual void OnInit(SDL_Renderer* renderer) = 0;
-	virtual void OnLoop() = 0;
-	virtual void OnEvent() = 0;
-	virtual void OnRender() = 0;
-	virtual void OnCleanup() = 0;
-
-	// Widget Events
-	static void ActivatedCallback(UI_Widget *, void*);
-	virtual void Activated(UI_Widget*, void*)=0;
-	
-
-	static void DeactivatedCallback(UI_Widget*, void*);
-	virtual void Deactivated(UI_Widget*, void*) = 0;
-	
-	virtual void Focused(UI_Widget*, void*) = 0;
-	virtual void LostFocus(UI_Widget*, void*) = 0;
-	
-	virtual void Shown(UI_Widget*, void*) = 0;
-	virtual void Hidden(UI_Widget*, void*) = 0;
-
 	WidgetState State = Visible ;
 	SDL_Rect DisplayRect;
+	Uint16 BorderWidth;
+	SDL_Color FillColor;
+	SDL_Color BorderColor;
+	SDL_Color FillColorActive;
+	SDL_Color BorderColorActive;
+	SDL_Color FillColorHover;
+	SDL_Color BorderColorHover;
+	
+	void OnInit(SDL_Renderer* renderer);
+	void OnLoop();
+	void OnEvent(SDL_Event*);
+	void OnRender();
+	void OnCleanup();
+	
+	void ConnectEvent(WidgetEventType, WidgetEventCallback);
+	void DisconnectEvent(WidgetEventType, WidgetEventCallback);
+
+	void OnMouseButtonDown(SDL_MouseButtonEvent button);
+
+private:
+	SDL_Renderer* _renderer;
+
+protected:
+	list<WidgetEventCallback> _onClickCallbacks;
+	list<WidgetEventCallback> _onHoverCallbacks;
+	list<WidgetEventCallback> _onKeyDownCallbacks;
+	list<WidgetEventCallback>::iterator _onEventIter;
 };
 
-typedef void(*WidgetEvent)(UI_Widget*, void*);
+
