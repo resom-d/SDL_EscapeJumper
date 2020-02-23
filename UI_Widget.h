@@ -2,44 +2,61 @@
 #include "UI_Types.h"
 #include "SDL_AdditionalPrimitives.h"
 #include <SDL.h>
+#include <stdio.h>
 #include <iostream>
 #include <list>
 using namespace std;
+
+typedef enum WIDGET_ALIGNMENT
+{
+	TOP = 0,
+	BOTTOM,
+	LEFT,
+	RIGHT,
+	CENTER
+};
+
 
 class UI_Widget
 {
 public:
 	UI_Widget();
-
+	
 	WidgetState State = Visible ;
+	Uint16 ActionCode;
 	SDL_Rect DisplayRect;
 	Uint16 BorderWidth;
-	SDL_Color FillColor;
-	SDL_Color BorderColor;
+	Uint16 Margin=0, Padding=0;
+	SDL_Color FillColor = { 200,200,200,255 };
+	SDL_Color BorderColor = {0, 0, 0,255 };
 	SDL_Color FillColorActive;
 	SDL_Color BorderColorActive;
 	SDL_Color FillColorHover;
-	SDL_Color BorderColorHover;
-	
-	void OnInit(SDL_Renderer* renderer);
-	void OnLoop();
-	void OnEvent(SDL_Event*);
-	void OnRender();
-	void OnCleanup();
-	
-	void ConnectEvent(WidgetEventType, WidgetEventCallback);
-	void DisconnectEvent(WidgetEventType, WidgetEventCallback);
+	SDL_Color BorderColorHover;	
+	WIDGET_ALIGNMENT HorizontalAlignment;
+	WIDGET_ALIGNMENT VerticalAlignment;
+	WIDGET_ALIGNMENT HorizontalContentAlignment;
+	WIDGET_ALIGNMENT VerticalContentAlignment;
 
-	void OnMouseButtonDown(SDL_MouseButtonEvent button);
+	// Methods
+	virtual void OnInit(SDL_Renderer* renderer);
+	virtual void OnInit(SDL_Renderer* renderer, Uint16 actionCode);
+	virtual void OnLoop();
+	virtual void OnEvent(SDL_Event*);
+	virtual void OnRender();
+	virtual void OnCleanup();
+
+	virtual void OnMouseButtonDown(SDL_MouseButtonEvent button);
 
 private:
-	SDL_Renderer* _renderer;
 
 protected:
-	list<WidgetEventCallback> _onClickCallbacks;
-	list<WidgetEventCallback> _onHoverCallbacks;
-	list<WidgetEventCallback> _onKeyDownCallbacks;
-	list<WidgetEventCallback>::iterator _onEventIter;
+	SDL_Renderer* _renderer;
+	SDL_Color _fillColor;
+	SDL_Color _borderColor;
+	SDL_Event _event;
+	Uint32 _eventType;
+
 };
 
 

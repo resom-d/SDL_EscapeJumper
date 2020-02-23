@@ -81,9 +81,13 @@ void SDL_RenderFillCircle(SDL_Renderer* renderer, int cx, int cy, int radius, Ui
 	}
 }
 
-void SDL_RenderDrawBorder(SDL_Renderer* rend, SDL_Rect* rect, Uint16 borderWidth, SDL_Color* color)
+void SDL_RenderDrawBorder(SDL_Renderer* rend, SDL_Rect rect, Uint16 borderWidth, SDL_Color* color)
 {
-	SDL_Rect drect = *rect;
+	SDL_Rect drect;
+	drect.x = rect.x;
+	drect.y = rect.y;
+	drect.w = rect.w;
+	drect.h = rect.h;
 
 	for (int i = 0; i < borderWidth; i++)
 	{
@@ -96,6 +100,11 @@ void SDL_RenderDrawBorder(SDL_Renderer* rend, SDL_Rect* rect, Uint16 borderWidth
 		drect.w -= 2;
 	}
 	SDL_RenderSetClipRect(rend, nullptr);
+}
+
+void SDL_RenderSetDrawColor(SDL_Renderer* rend, SDL_Color col)
+{
+	SDL_SetRenderDrawColor(rend, col.r, col.g, col.b, col.a);
 }
 
 SDL_Texture* SD_RenderLoadTexture(SDL_Renderer* renderer, std::string path)
@@ -124,4 +133,3 @@ SDL_Texture* SD_RenderLoadTexture(SDL_Renderer* renderer, std::string path)
 
 	return newTexture;
 }
-

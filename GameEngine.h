@@ -23,6 +23,7 @@ class GameEngine : public GameEvents
 public:
 	GameEngine();
 
+	Uint16 UI_Height;
 	GameProperties Properties;
 	bool _appIsRunning;
 	Uint16 GlobalFrameRate;
@@ -30,7 +31,6 @@ public:
 	SDL_Window* AppWindow;
 	SDL_Renderer* Renderer;
 	MainUI MainUI;
-	UI_Editor EditorUI;
 	LevelEditor Editor;
 	MatrixSetup MapSetup;
 	MatrixRectItem** Map;

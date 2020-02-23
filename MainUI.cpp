@@ -10,7 +10,7 @@ void MainUI::OnInit(SDL_Renderer* renderer)
 
 	int screenWidth, screenHeight;
 	SDL_GetRendererOutputSize(_renderer, &screenWidth, &screenHeight);
-	DisplayRect = { 0,0, screenWidth, 150 };
+	
 	_fontBig = TTF_OpenFont("SigmarOne-Regular.ttf", 48);
 	_fontMedium = TTF_OpenFont("SigmarOne-Regular.ttf", 36);
 	_fontSmall = TTF_OpenFont("SigmarOne-Regular.ttf", 24);

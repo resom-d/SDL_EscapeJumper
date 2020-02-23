@@ -1,5 +1,6 @@
 #pragma once
 #include "GameTypes.h"
+#include "UI_Editor.h"
 #include <SDL.h>
 #include <string>
 #include <iostream>
@@ -14,11 +15,14 @@ public:
 
 	LevelEditor();
 
+	UI_Editor UI;
 	EditorMode Mode = EditorMode_Draw;
 	MatrixSetup* MapSetup;
 	MatrixRectItem** MapMatrix;
 	list<MatrixRectItem> DrawCollection;
 	list<SDL_Color> ColorPalette;
+	SDL_Rect DisplayRect;
+	Uint16 UI_Height = 200;
 	SDL_Color ActiveFillColor;
 	SDL_Color ActiveBorderColor;
 	SDL_Point ActiveIndex;

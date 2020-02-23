@@ -48,10 +48,12 @@ typedef struct MatrixRectItem
 
 typedef enum EditorMode
 {
+	EditorMode_Draw = 1,
 	EditorMode_Select,
-	EditorMode_Draw,
 	EditorMode_Erase,
 	EditorMode_Copy,
 	EditorMode_Move,
-	EditorMode_Fill
+	EditorMode_Fill,
+	EditorMode_BlockscrollLeft,
+	EditorMode_BlockscrollRight
 };

@@ -1,9 +1,13 @@
 #pragma once
 #include <SDL.h>
 #include <SDL_ttf.h>
+#include <stdio.h>
 #include <string>
 #include <vector>
 #include "UI_Types.h"
+using namespace std;
+
+const Uint32 UI_EDITOR_EVENT_TYPE = 40000;
 
 // Handle the Widget Status
 typedef enum WidgetState
@@ -20,7 +24,3 @@ typedef enum WidgetEventType
 	MouseDown,
 	
 };
-
-// Basic Widget Event
-typedef void(*WidgetEventCallback)(void*, void*);
-

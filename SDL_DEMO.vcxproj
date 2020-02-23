@@ -164,6 +164,7 @@
     <ClCompile Include="SDL_AdditionalPrimitives.cpp" />
     <ClCompile Include="TextScroller.cpp" />
     <ClCompile Include="UI_Abstract.cpp" />
+    <ClCompile Include="UI_Button.cpp" />
     <ClCompile Include="UI_Editor.cpp" />
     <ClCompile Include="UI_Widget.cpp" />
   </ItemGroup>
@@ -179,6 +180,7 @@
     <ClInclude Include="SDL_AdditionalPrimitives.h" />
     <ClInclude Include="TextScroller.h" />
     <ClInclude Include="UI_Abstract.h" />
+    <ClInclude Include="UI_Button.h" />
     <ClInclude Include="UI_Editor.h" />
     <ClInclude Include="UI_Types.h" />
     <ClInclude Include="UI_Widget.h" />

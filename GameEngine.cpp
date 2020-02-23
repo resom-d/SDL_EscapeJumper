@@ -8,6 +8,7 @@ GameEngine::GameEngine()
 	Properties.WindowFrame.y = 50;
 	Properties.WindowFrame.w = 1600;
 	Properties.WindowFrame.h = 900;
+
 }
 
 
@@ -47,6 +48,8 @@ int GameEngine::OnExecute()
 
 bool GameEngine::OnInit()
 {
+	UI_Height = 200;
+
 	// Configure Map
 	MapSetup.Cols = 1000;
 	MapSetup.Rows = 20;
@@ -58,22 +61,22 @@ bool GameEngine::OnInit()
 	MapSetup.DisplayRect =
 	{
 		MapSetup.ScreenOffsX,
-		150,
+		 UI_Height,
 		(MapSetup.BlockSize + MapSetup.BlockSpacing) * MapSetup.DisplayColumns + 1,
 		(MapSetup.BlockSize + MapSetup.BlockSpacing) * MapSetup.DisplayRows + 1
 	};
 	MapSetup.Background = { 22, 28, 13, 255 };
-	
+
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) 	return false;
 	if (TTF_Init() == -1) return false;
 	if (SDL_NumJoysticks() > 0) GamePad = SDL_JoystickOpen(0);
-	   	 
+
 	if ((AppWindow = SDL_CreateWindow(
 		"EscapeJumper - Ein Zehnfinger Spiel",
 		Properties.WindowFrame.x,
 		Properties.WindowFrame.y,
 		MapSetup.DisplayRect.w,
-		MapSetup.DisplayRect.h + 150,
+		MapSetup.DisplayRect.h + UI_Height,
 		SDL_WINDOW_SHOWN)
 		) == nullptr) return false;
 
@@ -85,7 +88,7 @@ bool GameEngine::OnInit()
 	{
 		Map[cols] = (MatrixRectItem*)malloc(MapSetup.Rows * sizeof(MatrixRectItem*));
 	}
-	
+
 	// fill the matrix with alpha 0 to make items invisible
 	for (int x = 0; x < MapSetup.Cols; x++)
 	{
@@ -97,14 +100,22 @@ bool GameEngine::OnInit()
 	}
 
 	Player.OnInit(Renderer);
-	MainUI.OnInit(Renderer);
-	EditorUI.OnInit(Renderer);
-	Scroller.OnInit(Renderer, &MapSetup, Map);
-	Editor.OnInit(AppWindow, Renderer, Map, &MapSetup);
+	OnInitPlayer();
 
+	MainUI.DisplayRect = { 0,0,MapSetup.DisplayRect.w, UI_Height };
+	MainUI.OnInit(Renderer);
+
+	Scroller.OnInit(Renderer, &MapSetup, Map);
 	Scroller.ScrollSpeed = 1;
 
-	OnInitPlayer();
+	Editor.DisplayRect = {
+		0,
+		0,
+		MapSetup.DisplayRect.w,
+		MapSetup.DisplayRect.w + UI_Height
+	};
+	Editor.OnInit(AppWindow, Renderer, Map, &MapSetup);
+
 
 	_appIsRunning = true;
 	GameStatus = GameState_LevelEdit;
@@ -120,7 +131,6 @@ void GameEngine::OnEvent(SDL_Event* Event)
 	if (GameStatus == GameState_LevelEdit)
 	{
 		Editor.OnEvent(Event);
-		EditorUI.OnEvent(Event);
 	}
 };
 
@@ -153,7 +163,11 @@ void GameEngine::OnRender()
 
 	if (GameStatus == GameState_Running || GameStatus == GameState_Paused || GameStatus == GameState_GameOver)
 	{
+		// Render UI
+		MainUI.OnRender(Player.Name, Player.Score, GameStatus == GameState_GameOver);
 		// Render background
+
+		// Render Scoller
 		Scroller.OnRender();
 		// Render player(s)
 		Player.OnRender();
@@ -164,11 +178,8 @@ void GameEngine::OnRender()
 		Editor.OnRender();
 	}
 
-	// Render UI
-	//MainUI.OnRender(Player.Name, Player.Score, GameStatus == GameState_GameOver);
-	EditorUI.OnRender();
 
-	// do it! do it !
+	// Hey, Renderer! Do it! Do it !
 	SDL_RenderPresent(Renderer);
 
 }

@@ -32,6 +32,9 @@ void LevelEditor::OnInit(SDL_Window* win, SDL_Renderer* rend, MatrixRectItem** m
 	ActiveBorderColor = *iter;
 	_colorIndexBorder = 2;
 
+	UI.DisplayRect = { 0,0, DisplayRect.w, UI_Height };
+	UI.OnInit(_renderer);
+
 	/*MapSetup->Rows = 100;
 	MapSetup->Cols = 1000;
 	MapSetup->DisplayRows = 20;
@@ -69,32 +72,11 @@ void LevelEditor::OnLoop()
 void LevelEditor::OnRender()
 {
 	SDL_RenderSetClipRect(_renderer, NULL);
-
-	// Display active color on left side
 	SDL_Rect rect;
-	rect.x = 10;
-	rect.y = 180;
-	rect.w = MapSetup->BlockSize;
-	rect.h = MapSetup->BlockSize;
 
-	SDL_SetRenderDrawColor(
-		_renderer,
-		ActiveFillColor.r,
-		ActiveFillColor.g,
-		ActiveFillColor.b,
-		ActiveFillColor.a
-	);
-	SDL_RenderFillRect(_renderer, &rect);
+	UI.OnRender();
 
-	SDL_SetRenderDrawColor(
-		_renderer,
-		ActiveBorderColor.r,
-		ActiveBorderColor.g,
-		ActiveBorderColor.b,
-		ActiveBorderColor.a
-	);
-	SDL_RenderDrawRect(_renderer, &rect);
-
+	// Fill the background
 	SDL_RenderSetClipRect(_renderer, &MapSetup->DisplayRect);
 	SDL_SetRenderDrawColor(_renderer,
 		MapSetup->Background.r,
@@ -114,7 +96,7 @@ void LevelEditor::OnRender()
 			std::advance(iter, MapMatrix[ColumnPosition + x][y + RowPosition].FillColor);
 			if (iter->a < 1) continue;
 
-			rect.x = MapSetup->ScreenOffsX + (x * (MapSetup->BlockSize + MapSetup->BlockSpacing));
+			rect.x = MapSetup->ScreenOffsX  +(x * (MapSetup->BlockSize + MapSetup->BlockSpacing));
 			rect.y = MapSetup->DisplayRect.y + (y * (MapSetup->BlockSize + MapSetup->BlockSpacing));
 			rect.w = MapSetup->BlockSize;
 			rect.h = MapSetup->BlockSize;
@@ -182,7 +164,7 @@ void LevelEditor::OnSaveMap()
 	ofstream theFile;
 	theFile.open("Level-001");
 	theFile << "<- Zehnfinger Game-Engine Level-File for MatrixRectItems" << endl << endl;;
-	
+
 	theFile << "<- Map-Setup" << endl;
 	theFile << "MXC:," << to_string(MapSetup->Cols) << endl;
 	theFile << "MXR:," << to_string(MapSetup->Rows) << endl;
@@ -194,18 +176,18 @@ void LevelEditor::OnSaveMap()
 	theFile << "MXFG:," << to_string(MapSetup->Background.g) << endl;
 	theFile << "MXFB:," << to_string(MapSetup->Background.b) << endl;
 	theFile << "MXFA:," << to_string(MapSetup->Background.a) << endl << endl;
-		
+
 	theFile << "<- Color-Pallete:" << endl;
 	for (_colorPalletIterator = ColorPalette.begin(); _colorPalletIterator != ColorPalette.end(); _colorPalletIterator++)
 	{
-		theFile << "C:"  << ","
+		theFile << "C:" << ","
 			<< to_string(_colorPalletIterator->r) << ","
-			<< to_string( _colorPalletIterator->g) << "," 
-			<< to_string(_colorPalletIterator->b) << "," 
+			<< to_string(_colorPalletIterator->g) << ","
+			<< to_string(_colorPalletIterator->b) << ","
 			<< to_string(_colorPalletIterator->a) << endl;
 	}
 
-	theFile <<endl << "<- MATRIX-ITEMS" << endl;
+	theFile << endl << "<- MATRIX-ITEMS" << endl;
 	for (int x = 0; x < MapSetup->Cols; x++)
 	{
 		for (int y = 0; y < MapSetup->Cols; y++)
@@ -213,7 +195,7 @@ void LevelEditor::OnSaveMap()
 			theFile << "M:" << ","
 				<< to_string(MapMatrix[x][y].FillColor) << ","
 				<< to_string(MapMatrix[x][y].BorderColor) << ","
-				<< to_string(x) << "," << to_string(y) 
+				<< to_string(x) << "," << to_string(y)
 				<< endl;
 		}
 	}
@@ -229,6 +211,33 @@ void LevelEditor::OnEvent(SDL_Event* event)
 {
 	switch (event->type)
 	{
+		// From Level-Editor
+	case 40001:
+		switch (event->user.code)
+		{
+		case 1:
+			Mode = EditorMode_Draw;
+			break;
+		case 2:
+			Mode = EditorMode_Erase;
+			break;
+		case 3:
+			
+				break;
+		case 4:
+			
+			break;
+		case 5:
+			ColumnPosition--;
+			if (ColumnPosition < 0) ColumnPosition = 0;
+			break;
+		case 6:
+			ColumnPosition++;
+			if (ColumnPosition > MapSetup->Cols - MapSetup->DisplayColumns - 1) ColumnPosition = MapSetup->Cols - MapSetup->DisplayColumns - 1;
+			break;
+
+		}
+
 	case SDL_KEYDOWN:
 		OnKeyDown(event->key.keysym.sym, event->key.keysym.mod);
 		break;
@@ -237,49 +246,51 @@ void LevelEditor::OnEvent(SDL_Event* event)
 		OnKeyUp(event->key.keysym.sym, event->key.keysym.mod);
 		break;
 
-	case SDL_MOUSEMOTION: {
+	case SDL_MOUSEMOTION:
 		OnMouseMove(event->motion.x, event->motion.y, event->motion.xrel, event->motion.yrel, (event->motion.state & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0, (event->motion.state & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0, (event->motion.state & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0);
 		break;
-	}
 
-	case SDL_MOUSEBUTTONDOWN: {
+	case SDL_MOUSEBUTTONDOWN:
 		switch (event->button.button)
 		{
-		case SDL_BUTTON_LEFT: {
+		case SDL_BUTTON_LEFT:
 			OnLeftButtonDown(event->button.x, event->button.y);
 			break;
-		}
-		case SDL_BUTTON_RIGHT: {
+
+		case SDL_BUTTON_RIGHT:
 			OnRightButtonDown(event->button.x, event->button.y);
 			break;
-		}
-		case SDL_BUTTON_MIDDLE: {
+
+		case SDL_BUTTON_MIDDLE:
 			OnMiddleButtonDown(event->button.x, event->button.y);
 			break;
-		}
+
 		}
 		break;
-	}
 
 	case SDL_MOUSEBUTTONUP: {
 		switch (event->button.button)
 		{
-		case SDL_BUTTON_LEFT: {
+		case SDL_BUTTON_LEFT:
 			OnLeftButtonUp(event->button.x, event->button.y);
 			break;
-		}
-		case SDL_BUTTON_RIGHT: {
+
+		case SDL_BUTTON_RIGHT:
 			OnRightButtonUp(event->button.x, event->button.y);
 			break;
-		}
-		case SDL_BUTTON_MIDDLE: {
+
+		case SDL_BUTTON_MIDDLE:
 			OnMiddleButtonUp(event->button.x, event->button.y);
 			break;
-		}
+
 		}
 		break;
 	}
+
+
 	}
+
+	UI.OnEvent(event);
 }
 
 void LevelEditor::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
@@ -372,6 +383,8 @@ void LevelEditor::OnKeyUp(SDL_Keycode sym, SDL_Keycode mod)
 
 void LevelEditor::OnMouseMove(int mX, int mY, int relX, int relY, bool Left, bool Right, bool Middle)
 {
+	if (mX < MapSetup->DisplayRect.x || mX > MapSetup->DisplayRect.x + MapSetup->DisplayRect.w || mY < MapSetup->DisplayRect.y || mY > MapSetup->DisplayRect.y + MapSetup->DisplayRect.h) return;
+	
 	int x = (mX - MapSetup->DisplayRect.x) / (MapSetup->BlockSize + MapSetup->BlockSpacing);
 	if (x > MapSetup->DisplayColumns - 1 || x < 0) return;
 	int y = (mY - MapSetup->DisplayRect.y) / (MapSetup->BlockSize + MapSetup->BlockSpacing);
@@ -410,8 +423,9 @@ void LevelEditor::OnMouseMove(int mX, int mY, int relX, int relY, bool Left, boo
 
 void LevelEditor::OnLeftButtonDown(int mX, int mY)
 {
+	if (mX < MapSetup->DisplayRect.x || mX > MapSetup->DisplayRect.x + MapSetup->DisplayRect.w || mY < MapSetup->DisplayRect.y || mY > MapSetup->DisplayRect.y + MapSetup->DisplayRect.h) return;
 	int x = (mX - MapSetup->DisplayRect.x) / (MapSetup->BlockSize + MapSetup->BlockSpacing);
-	if (x > MapSetup->DisplayColumns - 1 || x < 0) return;
+	if (x > MapSetup->DisplayColumns - 1 ||  mX < DisplayRect.x ) return;
 	int y = (mY - MapSetup->DisplayRect.y) / (MapSetup->BlockSize + MapSetup->BlockSpacing);
 	if (y > MapSetup->DisplayRows - 1 || y < 0) return;
 	ActiveIndex.x = x;
