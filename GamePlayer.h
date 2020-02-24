@@ -29,7 +29,7 @@ inline MoveState operator&(MoveState a, MoveState b)
 	return static_cast<MoveState>(static_cast<long>(a)& static_cast<long>(b));
 }
 
-typedef struct
+typedef struct PlayerProps
 {
 	SDL_Point Position;
 	SDL_Rect Frame;
@@ -58,7 +58,7 @@ typedef struct
 	bool IsRotatingLeft;
 	bool IsRotatingRight;
 
-} PlayerProps;
+} ;
 
 class GamePlayer
 {

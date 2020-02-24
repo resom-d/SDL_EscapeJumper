@@ -13,11 +13,16 @@ void HorizontalScoller::OnInit(SDL_Renderer* renderer, MatrixSetup* setup, Matri
 
 	// make some default colors
 	ColorPalette.push_back({ 255,255,255,0 }); // Default with zero alpha at position 0
-	ColorPalette.push_back({ 255,255,255,255 });
-	ColorPalette.push_back({ 0,0,0,255 });
-	ColorPalette.push_back({ 0,0,255,255 });
-	ColorPalette.push_back({ 0,255,0,255 });
-	ColorPalette.push_back({ 255,0,0,255 });
+	ColorPalette.push_back({ 255,255,255,55 });
+	ColorPalette.push_back({ 0,0,0,55 });
+	ColorPalette.push_back({ 0,0,255,55 });
+	ColorPalette.push_back({ 0,255,0,55 });
+	ColorPalette.push_back({ 255,0,0,55 });
+	ColorPalette.push_back({ 255, 238, 0,255 });
+	ColorPalette.push_back({ 7, 230, 170,255 });
+	ColorPalette.push_back({ 7, 208, 230,255 });
+	ColorPalette.push_back({ 255, 3, 230, 255 });
+	ColorPalette.push_back({ 255, 183, 0,255 });
 	ColorPalette.push_back({ 255, 238, 0,255 });
 	ColorPalette.push_back({ 7, 230, 170,255 });
 	ColorPalette.push_back({ 7, 208, 230,255 });
@@ -79,12 +84,14 @@ void HorizontalScoller::OnRender()
 
 			SDL_RenderSetClipRect(_renderer, &MapSetup->DisplayRect);
 			SDL_SetRenderDrawColor(_renderer, iter->r, iter->g, iter->b, iter->a);
+			SDL_SetRenderDrawBlendMode(_renderer, SDL_BLENDMODE_BLEND);
 			SDL_RenderFillRect(_renderer, &rect);
+			SDL_SetRenderDrawBlendMode(_renderer, SDL_BLENDMODE_NONE);
 
 			iter = ColorPalette.begin();
 			advance(iter, MapMatrix[ColumnPosition + x][y].BorderColor);
-			SDL_SetRenderDrawColor(_renderer, iter->r, iter->g, iter->b, iter->a);
-			SDL_RenderDrawRect(_renderer, &rect);
+			SDL_Color c = { iter->r, iter->g, iter->b, iter->a };
+			SDL_RenderDrawBorder(_renderer, rect, 2, &c);
 
 		}
 	}

@@ -16,7 +16,7 @@ public:
 	LevelEditor();
 
 	UI_Editor UI;
-	EditorMode Mode = EditorMode_Draw;
+	EDITOR_ACTION Mode = EDITOR_DRAWMODE;
 	MatrixSetup* MapSetup;
 	MatrixRectItem** MapMatrix;
 	list<MatrixRectItem> DrawCollection;

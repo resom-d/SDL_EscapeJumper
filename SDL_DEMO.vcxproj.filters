@@ -57,6 +57,9 @@
     <ClCompile Include="UI_Button.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="UI_Container.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="zlib1.dll">
@@ -134,6 +137,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="UI_Button.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="UI_Container.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

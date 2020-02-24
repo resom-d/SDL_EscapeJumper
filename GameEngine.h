@@ -16,6 +16,8 @@
 #include"JumperPlayer.h"
 #include "LevelEditor.h"
 #include "UI_Editor.h"
+#include "TextScroller.h"
+
 
 class GameEngine : public GameEvents
 {
@@ -36,6 +38,8 @@ public:
 	MatrixRectItem** Map;
 	JumperPlayer Player;
 	HorizontalScoller Scroller;
+	TextScroller TextScoller;
+
 	SDL_Joystick* GamePad = NULL;
 
 	bool OnInit();
@@ -68,6 +72,7 @@ public:
 
 	
 private:
+	TTF_Font* _font;
 
 protected:
 

@@ -22,8 +22,7 @@ private:
 
 protected:
 	char* theMessage;
-	SDL_Renderer* renderer;
-	SDL_Surface* txtSurface;
+	SDL_Renderer* _renderer;
 	SDL_Texture* txtTexture;
 	SDL_Rect surfaceSize;
 	TTF_Font *font;

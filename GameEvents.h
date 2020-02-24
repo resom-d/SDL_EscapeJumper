@@ -1,11 +1,14 @@
 #pragma once
 #include <SDL.h>
 
+
+
 class GameEvents
 {
 
 public:
 	GameEvents();
+
 
 	virtual ~GameEvents();
 

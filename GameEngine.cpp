@@ -48,14 +48,20 @@ int GameEngine::OnExecute()
 
 bool GameEngine::OnInit()
 {
+	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) 	return false;
+	if (TTF_Init() == -1) return false;
+	if (SDL_NumJoysticks() > 0) GamePad = SDL_JoystickOpen(0);
+		
+	_font = TTF_OpenFont("SigmarOne-Regular.ttf", 46);
+
 	UI_Height = 200;
 
 	// Configure Map
-	MapSetup.Cols = 1000;
+	MapSetup.Cols = 200;
 	MapSetup.Rows = 20;
 	MapSetup.DisplayColumns = 40;
 	MapSetup.BlockSpacing = 1;
-	MapSetup.BlockSize = 45;
+	MapSetup.BlockSize = 35;
 	MapSetup.DisplayRows = 20;
 	MapSetup.ScreenOffsX = 0;
 	MapSetup.DisplayRect =
@@ -67,9 +73,6 @@ bool GameEngine::OnInit()
 	};
 	MapSetup.Background = { 22, 28, 13, 255 };
 
-	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) 	return false;
-	if (TTF_Init() == -1) return false;
-	if (SDL_NumJoysticks() > 0) GamePad = SDL_JoystickOpen(0);
 
 	if ((AppWindow = SDL_CreateWindow(
 		"EscapeJumper - Ein Zehnfinger Spiel",
@@ -108,6 +111,16 @@ bool GameEngine::OnInit()
 	Scroller.OnInit(Renderer, &MapSetup, Map);
 	Scroller.ScrollSpeed = 1;
 
+	SDL_Rect r = { 200, (MapSetup.DisplayRect.h >> 1) - 20, MapSetup.DisplayRect.w, 0 };
+
+	TextScoller.OnInit(Renderer,
+		"EscapeJumper - Ein Zehnfinger Spiel",
+		_font,
+		{0,0,0,255},
+		1,
+		&r
+	);
+
 	Editor.DisplayRect = {
 		0,
 		0,
@@ -136,6 +149,11 @@ void GameEngine::OnEvent(SDL_Event* Event)
 
 void GameEngine::OnLoop()
 {
+	if (GameStatus == GameState_MainScreen)
+	{
+		TextScoller.OnLoop();
+	}
+
 	if (GameStatus == GameState_Running)
 	{
 		Player.OnLoop();
@@ -157,9 +175,14 @@ void GameEngine::OnLoop()
 
 void GameEngine::OnRender()
 {
-	SDL_SetRenderDrawColor(Renderer, 140, 140, 140, 255);
+	SDL_SetRenderDrawBlendMode(Renderer, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 255);
 	SDL_RenderClear(Renderer);
 
+	if (GameStatus == GameState_MainScreen)
+	{
+		TextScoller.OnRender();
+	}
 
 	if (GameStatus == GameState_Running || GameStatus == GameState_Paused || GameStatus == GameState_GameOver)
 	{
@@ -195,7 +218,7 @@ void GameEngine::OnCleanup()
 	Scroller.OnCleanUp();
 	Player.OnCleanup();
 	MainUI.OnCleanup();
-
+	TextScoller.OnCleanUp();
 	SDL_DestroyWindow(AppWindow);
 	SDL_free(Renderer);
 	SDL_Quit();
@@ -300,7 +323,7 @@ void GameEngine::OnExit()
 void GameEngine::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 {
 	// global keys
-	if (sym == SDLK_ESCAPE && GameStatus != GameState_LevelEdit) _appIsRunning = false;
+	if (sym == SDLK_ESCAPE) _appIsRunning = false;
 	if (sym == SDLK_SPACE)
 	{
 		if (GameStatus == GameState_Running) GameStatus = GameState_Paused;
@@ -308,10 +331,8 @@ void GameEngine::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 	}
 	if (sym == SDLK_F1) GameStatus = GameState_MainScreen;
 	if (sym == SDLK_F3) OnGameRestart();
-	if (sym == SDLK_F4)
-	{
-		if (GameStatus == GameState_MainScreen) GameStatus = GameState_LevelEdit;
-	}
+	if (sym == SDLK_F4) GameStatus = GameState_LevelEdit;
+	
 }
 
 void GameEngine::OnKeyUp(SDL_Keycode sym, SDL_Keycode mod)
