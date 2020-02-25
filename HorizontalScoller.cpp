@@ -10,14 +10,15 @@ void HorizontalScoller::OnInit(SDL_Renderer* renderer, MatrixSetup* setup, Matri
 	_renderer = renderer;
 	MapSetup = setup;
 	MapMatrix = map;
+	ScrollPosition = 20;
 
 	// make some default colors
 	ColorPalette.push_back({ 255,255,255,0 }); // Default with zero alpha at position 0
-	ColorPalette.push_back({ 255,255,255,55 });
-	ColorPalette.push_back({ 0,0,0,55 });
-	ColorPalette.push_back({ 0,0,255,55 });
-	ColorPalette.push_back({ 0,255,0,55 });
-	ColorPalette.push_back({ 255,0,0,55 });
+	ColorPalette.push_back({ 255,255,255,255 });
+	ColorPalette.push_back({ 0,0,0,255 });
+	ColorPalette.push_back({ 0,0,255,255 });
+	ColorPalette.push_back({ 0,255,0,255 });
+	ColorPalette.push_back({ 255,0,0,255 });
 	ColorPalette.push_back({ 255, 238, 0,255 });
 	ColorPalette.push_back({ 7, 230, 170,255 });
 	ColorPalette.push_back({ 7, 208, 230,255 });
@@ -45,7 +46,9 @@ void HorizontalScoller::OnLoop()
 		ScrollPosition = ScrollPosition % (MapSetup->BlockSpacing + MapSetup->BlockSpacing);
 		if (++ColumnPosition >= MapSetup->Cols - MapSetup->DisplayColumns - 1)
 		{
-			LevelDone = true;
+			ColumnPosition = 0;
+			ScrollPosition = 0;
+			//LevelDone = true;
 		}
 	}
 

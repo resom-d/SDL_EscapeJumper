@@ -11,21 +11,21 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, list<SDL_Color> colors)
 	_activeTool = EDITOR_DRAWMODE;	
 
 	btnSetDrawMode.EventType = EDITOR_EVENT_TYPE;
-	btnSetEraseMode.EventType = EDITOR_EVENT_TYPE;
+	btnSetBlockdrawMode.EventType = EDITOR_EVENT_TYPE;
 	btnScrollLeft.EventType = EDITOR_EVENT_TYPE;
 	btnScrollRight.EventType = EDITOR_EVENT_TYPE;
 	btnScrollBlockLeft.EventType = EDITOR_EVENT_TYPE;
 	btnScrollBlockRight.EventType = EDITOR_EVENT_TYPE;
 
 	btnSetDrawMode.ActionCode = EDITOR_DRAWMODE;
-	btnSetEraseMode.ActionCode = EDITOR_ERASEMODE;
+	btnSetBlockdrawMode.ActionCode = EDITOR_BORDERDRAWMODE;
 	btnScrollLeft.ActionCode = EDITOR_SCROLL_BLOCK_LEFT;
 	btnScrollRight.ActionCode = EDITOR_SCROLL_BLOCK_RIGHT;
 	btnScrollBlockLeft.ActionCode = EDITOR_SCROLL_BLOCK_START;
 	btnScrollBlockRight.ActionCode = EDITOR_SCROLL_BLOCK_END;
 
-	FillColor = { 252, 186, 3 };
-	BorderColor = { 201, 252, 255, 255 };
+	FillColor = { 235, 210, 52, 255 };
+	BorderColor = { 255, 255, 255, 255 };
 
 	SDL_Texture* orgTex = SDL_GetRenderTarget(_renderer);
 
@@ -33,10 +33,10 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, list<SDL_Color> colors)
 	SDL_Rect destRect = { 0,0, 48,48 };
 	ConfigureWidgets(&srcRect, &destRect);
 
-	// ColorPallet
-	ColorWidgetsContainer.Orientation = HORIZONTAL;
-	ColorWidgetsContainer.BorderWidth = 2;
-	ColorWidgetsContainer.DisplayRect =
+	// Fill-ColorPallet
+	FillColorWidgets.Orientation = HORIZONTAL;
+	FillColorWidgets.BorderWidth = 2;
+	FillColorWidgets.DisplayRect =
 	{
 		DisplayRect.x + 5,
 		DisplayRect.y + 60,
@@ -58,10 +58,40 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, list<SDL_Color> colors)
 		btn.BorderWidth = 1;
 		btn.DisplayRect.w = 30;
 		btn.DisplayRect.h = 30;
-		ColorWidgetsContainer.AddChild(btn);
+		FillColorWidgets.AddChild(btn);
 		x++;
 	}
-	ColorWidgetsContainer.OnInit(_renderer, 24);
+	FillColorWidgets.OnInit(_renderer, 24);
+
+	// Border-ColorPallet
+	BorderColorWidgets.Orientation = HORIZONTAL;
+	BorderColorWidgets.BorderWidth = 2;
+	BorderColorWidgets.DisplayRect =
+	{
+		DisplayRect.x + 5,
+		DisplayRect.y + 115,
+		0,
+		44
+	};
+	x = 0;
+	for (_colorPaletteIter = _colorPalette.begin(); _colorPaletteIter != _colorPalette.end(); _colorPaletteIter++)
+	{
+		UI_Button btn;
+		btn.ActionCode = EDITOR_SET_BORDER_COLOR;
+		btn.EventType = UI_EDITOR_EVENT_TYPE;
+		Userdata data;
+		data.ColorIndex = x;
+		data.Color = *_colorPaletteIter;
+		btn.UserData = data;
+		btn.FillColor = *_colorPaletteIter;
+		btn.Margin = 5;
+		btn.BorderWidth = 1;
+		btn.DisplayRect.w = 30;
+		btn.DisplayRect.h = 30;
+		BorderColorWidgets.AddChild(btn);
+		x++;
+	}
+	BorderColorWidgets.OnInit(_renderer, 24);
 
 	// Cleanup
 	SDL_RenderSetScale(_renderer, 1.0, 1.0);
@@ -91,9 +121,9 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	btnSetDrawMode.DisplayRect = { 5,5, 50, 50 };
 	btnSetDrawMode.BorderWidth = 2;
 
-	btnSetEraseMode.OnInit(_renderer, texSetEraseMode, "ERASE");
-	btnSetEraseMode.DisplayRect = { 65, 5, 50, 50 };
-	btnSetEraseMode.BorderWidth = 2;
+	btnSetBlockdrawMode.OnInit(_renderer, texSetBlockdrawMode, "ERASE");
+	btnSetBlockdrawMode.DisplayRect = { 65, 5, 50, 50 };
+	btnSetBlockdrawMode.BorderWidth = 2;
 	
 	
 	btnScrollBlockLeft.OnInit(_renderer, texSetBlockscrollStart, "|<");
@@ -117,7 +147,7 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	btnScrollRight.ActionCode = EDITOR_SCROLL_BLOCK_END;
 
 	Buttons.push_back(btnSetDrawMode);
-	Buttons.push_back(btnSetEraseMode);
+	Buttons.push_back(btnSetBlockdrawMode);
 	Buttons.push_back(btnSetBorderDrawmode);
 	Buttons.push_back(btnScrollLeft);
 	Buttons.push_back(btnScrollRight);
@@ -130,8 +160,8 @@ void UI_Editor::LoadTextures(const SDL_Rect* destRect, const SDL_Rect* srcRect)
 	texSetDrawMode = SDL_CreateTexture(_renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
 	CreateWidgetTexture(_renderer, "Resources/icons/Draw.png", texSetDrawMode, *srcRect, *destRect);
 
-	texSetEraseMode = SDL_CreateTexture(_renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
-	CreateWidgetTexture(_renderer, "Resources/icons/Erase.png", texSetEraseMode, *srcRect, *destRect);
+	texSetBlockdrawMode = SDL_CreateTexture(_renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_renderer, "Resources/icons/Blockdraw.png", texSetBlockdrawMode, *srcRect, *destRect);
 
 	texSetBlockscrollStart = SDL_CreateTexture(_renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
 	CreateWidgetTexture(_renderer, "Resources/icons/BlockscrollLeft.png", texSetBlockscrollStart, *srcRect, *destRect);
@@ -151,7 +181,7 @@ void UI_Editor::OnLoop()
 	list<UI_Button>::iterator iter = Buttons.begin();
 	iter->IsActive = _activeTool == EDITOR_DRAWMODE;
 	advance(iter, 1);
-	iter->IsActive = _activeTool == EDITOR_ERASEMODE;
+	iter->IsActive = _activeTool == EDITOR_BORDERDRAWMODE;
 }
 
 void UI_Editor::OnEvent(SDL_Event* event)
@@ -161,11 +191,12 @@ void UI_Editor::OnEvent(SDL_Event* event)
 		_widgetsIter->OnEvent(event);
 	}
 	
-	ColorWidgetsContainer.OnEvent(event);
+	FillColorWidgets.OnEvent(event);
+	BorderColorWidgets.OnEvent(event);
 	
 	if (event->type == EDITOR_EVENT_TYPE)
 	{
-		if (event->user.code == EDITOR_DRAWMODE || event->user.code == EDITOR_ERASEMODE)
+		if (event->user.code == EDITOR_DRAWMODE || event->user.code == EDITOR_BORDERDRAWMODE)
 		{
 			_activeTool = (EDITOR_ACTION) event->user.code;
 		}
@@ -201,7 +232,8 @@ void UI_Editor::OnRender()
 		_widgetsIter->OnRender();
 	}
 
-	ColorWidgetsContainer.OnRender();
+	FillColorWidgets.OnRender();
+	BorderColorWidgets.OnRender();
 }
 
 void UI_Editor::OnPostRender()

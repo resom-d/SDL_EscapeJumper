@@ -10,7 +10,7 @@ public:
 	GameEvents();
 
 
-	virtual ~GameEvents();
+	//virtual ~GameEvents();
 
 	virtual void OnEvent(SDL_Event* Event);
 

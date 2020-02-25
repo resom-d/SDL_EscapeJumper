@@ -51,7 +51,7 @@ bool GameEngine::OnInit()
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) 	return false;
 	if (TTF_Init() == -1) return false;
 	if (SDL_NumJoysticks() > 0) GamePad = SDL_JoystickOpen(0);
-		
+
 	_font = TTF_OpenFont("SigmarOne-Regular.ttf", 46);
 
 	UI_Height = 200;
@@ -71,7 +71,7 @@ bool GameEngine::OnInit()
 		(MapSetup.BlockSize + MapSetup.BlockSpacing) * MapSetup.DisplayColumns + 1,
 		(MapSetup.BlockSize + MapSetup.BlockSpacing) * MapSetup.DisplayRows + 1
 	};
-	MapSetup.Background = { 22, 28, 13, 255 };
+	MapSetup.Background = { 0,0,0, 255 };
 
 
 	if ((AppWindow = SDL_CreateWindow(
@@ -92,7 +92,7 @@ bool GameEngine::OnInit()
 		Map[cols] = (MatrixRectItem*)malloc(MapSetup.Rows * sizeof(MatrixRectItem*));
 	}
 
-	// fill the matrix with alpha 0 to make items invisible
+	// fill the matrix with color 0 to make items invisible
 	for (int x = 0; x < MapSetup.Cols; x++)
 	{
 		for (int y = 0; y < MapSetup.Rows; y++)
@@ -110,16 +110,17 @@ bool GameEngine::OnInit()
 
 	Scroller.OnInit(Renderer, &MapSetup, Map);
 	Scroller.ScrollSpeed = 1;
+	Scroller.ScrollPosition = 20;
 
 	SDL_Rect r = { 200, (MapSetup.DisplayRect.h >> 1) - 20, MapSetup.DisplayRect.w, 0 };
 
-	TextScoller.OnInit(Renderer,
+	/*TextScoller.OnInit(Renderer,
 		"EscapeJumper - Ein Zehnfinger Spiel",
 		_font,
 		{0,0,0,255},
 		1,
 		&r
-	);
+	);*/
 
 	Editor.DisplayRect = {
 		0,
@@ -158,7 +159,7 @@ void GameEngine::OnLoop()
 	{
 		Player.OnLoop();
 		Scroller.OnLoop();
-		//OnCollisionCheck();
+		OnCollisionCheck();
 
 		if (Scroller.LevelDone)
 		{
@@ -181,7 +182,7 @@ void GameEngine::OnRender()
 
 	if (GameStatus == GameState_MainScreen)
 	{
-		TextScoller.OnRender();
+		//TextScoller.OnRender();
 	}
 
 	if (GameStatus == GameState_Running || GameStatus == GameState_Paused || GameStatus == GameState_GameOver)
@@ -220,7 +221,7 @@ void GameEngine::OnCleanup()
 	MainUI.OnCleanup();
 	TextScoller.OnCleanUp();
 	SDL_DestroyWindow(AppWindow);
-	SDL_free(Renderer);
+	SDL_DestroyRenderer(Renderer);
 	SDL_Quit();
 
 }
@@ -232,39 +233,46 @@ void GameEngine::OnCollisionCheck()
 	int obstEdgeT, obstEdgeL, obstEdgeR, obstEdgeB;
 
 	playerScreenColumn = (Player.DisplayRect.x - MapSetup.ScreenOffsX) / (MapSetup.BlockSize + MapSetup.BlockSpacing);
-	playerScreenRow = (Player.DisplayRect.y - 150) / (MapSetup.BlockSize + MapSetup.BlockSpacing);
+	playerScreenRow = (Player.DisplayRect.y - 200) / (MapSetup.BlockSize + MapSetup.BlockSpacing);
 
 	playerEdgeT = Player.DisplayRect.y;
 	playerEdgeB = Player.DisplayRect.y + MapSetup.BlockSize;
 	playerEdgeL = Player.DisplayRect.x;
 	playerEdgeR = Player.DisplayRect.x + MapSetup.BlockSize;
 
-	// Draw a grid
 	// Check if row and column of player make sense - exit if not.
 	if (playerScreenColumn < 0 || playerScreenRow < 0 || playerScreenColumn > MapSetup.DisplayColumns || playerScreenRow > MapSetup.DisplayRows) return;
 	// Check 9 possible zones
-	for (int x = 0; x <= 1; x++)
+	for (int x = -1; x <= 1; x++)
 	{
-		for (int y = 0; y <= 1; y++)
+		for (int y = -1; y <= 1; y++)
 		{
-			if (playerScreenColumn == 0 && x == 0) continue;
-			if (playerScreenColumn >= MapSetup.DisplayColumns - 1 && x == 2) continue;
-			if (playerScreenRow == 0 && y == 0) continue;
-			if (playerScreenRow >= MapSetup.DisplayRows - 1 && y == 2) continue;
+			int obstX = playerScreenColumn + x + Scroller.ColumnPosition +1;
+			int obstY = playerScreenRow + y;
 
-			list<SDL_Color>::iterator iter = Scroller.ColorPalette.begin();
-			int alpha = iter->a;
+			if (obstX < 0 || obstY < 0 || obstX > MapSetup.Cols || obstY > MapSetup.Rows) continue;
 
-			obstEdgeT = (y + playerScreenRow) * (MapSetup.BlockSize + MapSetup.BlockSpacing) + 150;
-			obstEdgeB = obstEdgeT + MapSetup.BlockSize;
-			obstEdgeL = (MapSetup.ScreenOffsX - Scroller.ScrollPosition) + ((x + playerScreenColumn) * (MapSetup.BlockSize + MapSetup.BlockSpacing));
-			obstEdgeR = obstEdgeL + MapSetup.BlockSize;
+			if (Map[obstX][obstY].FillColor == 0) continue;
 
-			if (playerEdgeT > obstEdgeB || playerEdgeB < obstEdgeT || playerEdgeL > obstEdgeR || playerEdgeR < obstEdgeL) continue;
+			obstEdgeT = MapSetup.DisplayRect.y +  ((playerScreenRow + y) * (MapSetup.BlockSize + MapSetup.BlockSpacing));
+			obstEdgeL = MapSetup.DisplayRect.x + ((playerScreenColumn + x + 1) * (MapSetup.BlockSize + MapSetup.BlockSpacing)) - Scroller.ScrollPosition;
 
+			SDL_Rect rObst = 
+			{ 
+				obstEdgeL,
+				obstEdgeT, 
+				MapSetup.BlockSize,
+			    MapSetup.BlockSize 
+			};
 
-			if (alpha < 1) continue;
-			GameStatus = GameState_GameOver;
+			SDL_Rect result;
+
+			if (SDL_IntersectRect(&Player.DisplayRect, &rObst, &result))
+			{
+				GameStatus = GameState_GameOver;
+
+			}
+
 
 		}
 	}
@@ -278,7 +286,7 @@ void GameEngine::OnInitPlayer()
 	Player.TextureSourcePath = "Spritesheet_Alien_01.png";
 	Player.HorizontalTiling = 6;
 	Player.VerticalTiling = 4;
-	Player.Speed = 2;
+	Player.Speed = 4;
 	Player.Score = 0;
 
 	Player.MinPosition.x = MapSetup.ScreenOffsX + 1;
@@ -332,7 +340,7 @@ void GameEngine::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 	if (sym == SDLK_F1) GameStatus = GameState_MainScreen;
 	if (sym == SDLK_F3) OnGameRestart();
 	if (sym == SDLK_F4) GameStatus = GameState_LevelEdit;
-	
+
 }
 
 void GameEngine::OnKeyUp(SDL_Keycode sym, SDL_Keycode mod)

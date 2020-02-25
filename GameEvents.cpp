@@ -1,9 +1,9 @@
 #include "GameEngine.h"
 
 
-GameEvents::GameEvents()
-{}
-GameEvents::~GameEvents() {};
+GameEvents::GameEvents() {};
+
+//GameEvents::~GameEvents() {};
 
 void GameEvents::OnEvent(SDL_Event* Event)
 {

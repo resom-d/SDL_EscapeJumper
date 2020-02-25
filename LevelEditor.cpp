@@ -11,14 +11,16 @@ void LevelEditor::OnInit(SDL_Window* win, SDL_Renderer* rend, MatrixRectItem** m
 	_renderer = rend;
 	_colorIndexBorder = 1;
 	_colorIndexFill = 2;
+	_blockdrawStart = { -1, -1 };
+	_blockdrawEnd = { -1, -1 };
 
 	// make some default colors
 	ColorPalette.push_back({ 255,255,255,0 }); // Default with zero alpha at position 0
-	ColorPalette.push_back({ 255,255,255,55 });
-	ColorPalette.push_back({ 0,0,0,55 });
-	ColorPalette.push_back({ 0,0,255,55 });
-	ColorPalette.push_back({ 0,255,0,55 });
-	ColorPalette.push_back({ 255,0,0,55 });
+	ColorPalette.push_back({ 255,255,255,255 });
+	ColorPalette.push_back({ 0,0,0,255 });
+	ColorPalette.push_back({ 0,0,255,255 });
+	ColorPalette.push_back({ 0,255,0,255 });
+	ColorPalette.push_back({ 255,0,0,255 });
 	ColorPalette.push_back({ 255, 238, 0,255 });
 	ColorPalette.push_back({ 7, 230, 170,255 });
 	ColorPalette.push_back({ 7, 208, 230,255 });
@@ -158,6 +160,21 @@ void LevelEditor::OnRender()
 		SDL_RenderDrawLine(_renderer, x1, y1, x2, y2);
 	}
 
+	// Show boxselect border
+	if (Mode == EDITOR_BORDERDRAWMODE && (_drawActive || _eraseActive))
+	{
+		int minX, minY, maxX, maxY;
+
+		minX = _blockdrawStartScreen.x > _blockdrawEndScreen.x ? _blockdrawEndScreen.x : _blockdrawStartScreen.x;
+		minY = _blockdrawStartScreen.y > _blockdrawEndScreen.y ? _blockdrawEndScreen.y : _blockdrawStartScreen.y;
+		maxX = _blockdrawStartScreen.x < _blockdrawEndScreen.x ? _blockdrawEndScreen.x : _blockdrawStartScreen.x;
+		maxY = _blockdrawStartScreen.y < _blockdrawEndScreen.y ? _blockdrawEndScreen.y : _blockdrawStartScreen.y;
+
+		SDL_Rect rect = { minX, minY, maxX - minX, maxY - minY };
+		SDL_SetRenderDrawColor(_renderer, 0, 255, 0, 255);
+		SDL_RenderSetClipRect(_renderer, &rect);
+		SDL_RenderDrawRect(_renderer, &rect);
+	}
 }
 
 void LevelEditor::OnCleanUp()
@@ -220,13 +237,16 @@ void LevelEditor::OnEvent(SDL_Event* event)
 {
 	if (event->type == EDITOR_EVENT_TYPE)
 	{
+		Userdata ud;
+		list<SDL_Color>::iterator iter;
+
 		switch (event->user.code)
 		{
 		case EDITOR_DRAWMODE:
 			Mode = EDITOR_DRAWMODE;
 			break;
-		case EDITOR_ERASEMODE:
-			Mode = EDITOR_ERASEMODE;
+		case EDITOR_BORDERDRAWMODE:
+			Mode = EDITOR_BORDERDRAWMODE;
 			break;
 
 		case EDITOR_SCROLL_BLOCK_START:
@@ -234,32 +254,42 @@ void LevelEditor::OnEvent(SDL_Event* event)
 			break;
 
 		case EDITOR_SCROLL_BLOCK_END:
-			ColumnPosition = MapSetup->Cols - MapSetup->DisplayColumns-1;
+			ColumnPosition = MapSetup->Cols - MapSetup->DisplayColumns - 1;
 			break;
 
 		case EDITOR_SCROLL_BLOCK_LEFT:
 			ColumnPosition--;
 			if (ColumnPosition < 0) ColumnPosition = 0;
 			break;
-		
+
 		case EDITOR_SCROLL_BLOCK_RIGHT:
 			ColumnPosition++;
 			if (ColumnPosition > MapSetup->Cols - MapSetup->DisplayColumns - 1) ColumnPosition = MapSetup->Cols - MapSetup->DisplayColumns - 1;
 			break;
 
 		case EDITOR_SET_FILL_COLOR:
-			Userdata ci = *(Userdata*)event->user.data2;
-			if (ci.ColorIndex < 0 || ci.ColorIndex > ColorPalette.size() - 1) return;
+			ud = *(Userdata*)event->user.data2;
+			if (ud.ColorIndex < 0 || ud.ColorIndex > ColorPalette.size() - 1) return;
 
-			list<SDL_Color>::iterator iter = ColorPalette.begin();
-			advance(iter, ci.ColorIndex);
+			iter = ColorPalette.begin();
+			advance(iter, ud.ColorIndex);
 			ActiveFillColor = *iter;
-			_colorIndexFill = ci.ColorIndex;
+			_colorIndexFill = ud.ColorIndex;
+			break;
+
+		case EDITOR_SET_BORDER_COLOR:
+			ud = *(Userdata*)event->user.data2;
+			if (ud.ColorIndex < 0 || ud.ColorIndex > ColorPalette.size() - 1) return;
+
+			iter = ColorPalette.begin();
+			advance(iter, ud.ColorIndex);
+			ActiveBorderColor = *iter;
+			_colorIndexBorder = ud.ColorIndex;
 			break;
 		}
 
 	}
-	
+
 	switch (event->type)
 	{
 	case SDL_KEYDOWN:
@@ -388,29 +418,6 @@ void LevelEditor::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 void LevelEditor::OnKeyUp(SDL_Keycode sym, SDL_Keycode mod)
 {}
 
-void LevelEditor::OnMouseMove(int mX, int mY, int relX, int relY, bool Left, bool Right, bool Middle)
-{
-	if (mX < MapSetup->DisplayRect.x || mX > MapSetup->DisplayRect.x + MapSetup->DisplayRect.w || mY < MapSetup->DisplayRect.y || mY > MapSetup->DisplayRect.y + MapSetup->DisplayRect.h) return;
-
-	int x = (mX - MapSetup->DisplayRect.x) / (MapSetup->BlockSize + MapSetup->BlockSpacing);
-	if (x > MapSetup->DisplayColumns - 1 || x < 0) return;
-	int y = (mY - MapSetup->DisplayRect.y) / (MapSetup->BlockSize + MapSetup->BlockSpacing);
-	if (y > MapSetup->DisplayRows - 1 || y < 0) return;
-	ActiveIndex.x = x;
-	ActiveIndex.y = y;
-		
-
-	if (Mode == EDITOR_DRAWMODE && _drawActive)
-	{
-		MapMatrix[ColumnPosition + x][y + RowPosition].FillColor = _colorIndexFill;;
-		MapMatrix[ColumnPosition + x][y + RowPosition].BorderColor = _colorIndexBorder;
-	}
-
-	if (Mode == EDITOR_ERASEMODE && _drawActive)
-	{
-		MapMatrix[ColumnPosition + x][y + RowPosition].FillColor = 0;
-	}
-}
 
 void LevelEditor::OnLeftButtonDown(int mX, int mY)
 {
@@ -424,34 +431,159 @@ void LevelEditor::OnLeftButtonDown(int mX, int mY)
 
 	_drawActive = true;
 
-	
-
 	if (Mode == EDITOR_DRAWMODE)
 	{
+		_blockdrawStart = { -1, -1 };
+		_blockdrawEnd = { -1, -1 };
+
+		_drawActive = true;
+		_eraseActive = false;
 		MapMatrix[ColumnPosition + x][y + RowPosition].FillColor = _colorIndexFill;
 		MapMatrix[ColumnPosition + x][y + RowPosition].BorderColor = _colorIndexBorder;
 	}
 
-	if (Mode == EDITOR_ERASEMODE)
+	if (Mode == EDITOR_BORDERDRAWMODE)
 	{
-		MapMatrix[ColumnPosition + x][y + RowPosition].FillColor = 0;
+		_blockdrawStart.x = x;
+		_blockdrawStart.y = y;
+		_blockdrawEnd.x = -1;
+		_blockdrawEnd.y = -1;
+
+		_blockdrawStartScreen.x = mX;
+		_blockdrawStartScreen.y = mY;
+		_blockdrawEndScreen.x = mX;
+		_blockdrawEndScreen.y = mY;
+	}
+
+}
+
+void LevelEditor::OnLeftButtonUp(int mX, int mY)
+{
+	_drawActive = false;
+
+	if (mX < MapSetup->DisplayRect.x || mX > MapSetup->DisplayRect.x + MapSetup->DisplayRect.w || mY < MapSetup->DisplayRect.y || mY > MapSetup->DisplayRect.y + MapSetup->DisplayRect.h) return;
+	int x = (mX - MapSetup->DisplayRect.x) / (MapSetup->BlockSize + MapSetup->BlockSpacing);
+	if (x > MapSetup->DisplayColumns - 1 || mX < DisplayRect.x) return;
+	int y = (mY - MapSetup->DisplayRect.y) / (MapSetup->BlockSize + MapSetup->BlockSpacing);
+	if (y > MapSetup->DisplayRows - 1 || y < 0) return;
+
+	if (Mode == EDITOR_BORDERDRAWMODE)
+	{
+		if (_blockdrawStart.x < 0 || _blockdrawStart.y < 0) return;
+		_blockdrawEnd.x = x;
+		_blockdrawEnd.y = y;
+		FillArea(_blockdrawStart, _blockdrawEnd, {ColumnPosition, RowPosition}, _colorIndexFill, _colorIndexBorder);
 	}
 
 }
 
 void LevelEditor::OnRightButtonDown(int mX, int mY)
-{}
+{
+	_eraseActive = true;
+	_drawActive = false;
+
+	if (mX < MapSetup->DisplayRect.x || mX > MapSetup->DisplayRect.x + MapSetup->DisplayRect.w || mY < MapSetup->DisplayRect.y || mY > MapSetup->DisplayRect.y + MapSetup->DisplayRect.h) return;
+	int x = (mX - MapSetup->DisplayRect.x) / (MapSetup->BlockSize + MapSetup->BlockSpacing);
+	if (x > MapSetup->DisplayColumns - 1 || mX < DisplayRect.x) return;
+	int y = (mY - MapSetup->DisplayRect.y) / (MapSetup->BlockSize + MapSetup->BlockSpacing);
+	if (y > MapSetup->DisplayRows - 1 || y < 0) return;
+	
+	if (Mode == EDITOR_DRAWMODE)
+	{
+		MapMatrix[ColumnPosition + x][y + RowPosition].FillColor = 0;
+	}
+
+	if (Mode == EDITOR_BORDERDRAWMODE)
+	{
+		_blockdrawStart.x = x;
+		_blockdrawStart.y = y;
+		_blockdrawEnd.x = -1;
+		_blockdrawEnd.y = -1;
+
+		_blockdrawStartScreen.x = mX;
+		_blockdrawStartScreen.y = mY;
+		_blockdrawEndScreen.x = mX;
+		_blockdrawEndScreen.y = mY;
+	}
+}
+
+void LevelEditor::OnRightButtonUp(int mX, int mY)
+{
+	_eraseActive = false;
+	_drawActive = false;
+
+	if (mX < MapSetup->DisplayRect.x || mX > MapSetup->DisplayRect.x + MapSetup->DisplayRect.w || mY < MapSetup->DisplayRect.y || mY > MapSetup->DisplayRect.y + MapSetup->DisplayRect.h) return;
+	int x = (mX - MapSetup->DisplayRect.x) / (MapSetup->BlockSize + MapSetup->BlockSpacing);
+	if (x > MapSetup->DisplayColumns - 1 || mX < DisplayRect.x) return;
+	int y = (mY - MapSetup->DisplayRect.y) / (MapSetup->BlockSize + MapSetup->BlockSpacing);
+	if (y > MapSetup->DisplayRows - 1 || y < 0) return;
+	
+	if (Mode == EDITOR_BORDERDRAWMODE)
+	{
+		if (_blockdrawStart.x < 0 || _blockdrawStart.y < 0) return;
+		_blockdrawEnd.x = x;
+		_blockdrawEnd.y = y;
+		FillArea(_blockdrawStart, _blockdrawEnd, { ColumnPosition, RowPosition }, 0, 0);
+	}
+}
 
 void LevelEditor::OnMiddleButtonDown(int mX, int mY)
 {}
 
-void LevelEditor::OnLeftButtonUp(int mX, int mY)
-{
-	_drawActive = false;
-}
-
-void LevelEditor::OnRightButtonUp(int mX, int mY)
-{}
-
 void LevelEditor::OnMiddleButtonUp(int mX, int mY)
 {}
+
+void LevelEditor::OnMouseMove(int mX, int mY, int relX, int relY, bool Left, bool Right, bool Middle)
+{
+	if (mX < MapSetup->DisplayRect.x || mX > MapSetup->DisplayRect.x + MapSetup->DisplayRect.w || mY < MapSetup->DisplayRect.y || mY > MapSetup->DisplayRect.y + MapSetup->DisplayRect.h) return;
+
+	int x = (mX - MapSetup->DisplayRect.x) / (MapSetup->BlockSize + MapSetup->BlockSpacing);
+	if (x > MapSetup->DisplayColumns - 1 || x < 0) return;
+	int y = (mY - MapSetup->DisplayRect.y) / (MapSetup->BlockSize + MapSetup->BlockSpacing);
+	if (y > MapSetup->DisplayRows - 1 || y < 0) return;
+	ActiveIndex.x = x;
+	ActiveIndex.y = y;
+
+	if (Mode == EDITOR_DRAWMODE)
+	{
+		if (_drawActive)
+		{
+			MapMatrix[ColumnPosition + x][y + RowPosition].FillColor = _colorIndexFill;;
+			MapMatrix[ColumnPosition + x][y + RowPosition].BorderColor = _colorIndexBorder;
+		}
+		if (_eraseActive)
+		{
+			MapMatrix[ColumnPosition + x][y + RowPosition].FillColor = 0;
+			MapMatrix[ColumnPosition + x][y + RowPosition].BorderColor = 0;
+		}
+	}
+	
+	if (Mode == EDITOR_BORDERDRAWMODE)
+	{		
+			_blockdrawEnd = { x, y };
+			_blockdrawEndScreen = { mX, mY };
+	}
+
+}
+
+void LevelEditor::FillArea(SDL_Point p1, SDL_Point p2, SDL_Point offs, Uint16 cf, Uint16 cb)
+{
+	int minX, minY, maxX, maxY;
+
+	minX = p1.x > p2.x ? p2.x : p1.x;
+	minY = p1.y > p2.y ? p2.y : p1.y;
+	maxX = p1.x < p2.x ? p2.x : p1.x;
+	maxY = p1.y < p2.y ? p2.y : p1.y;
+
+	for (int x = minX; x <= maxX; x++)
+	{
+		for (int y = minY; y <= maxY; y++)
+		{
+			MapMatrix[x+offs.x][y+offs.y].FillColor = cf;
+			MapMatrix[x+offs.x][y+offs.y].BorderColor = cb;
+		}
+	}
+
+	_blockdrawStart = { -1, -1 };
+	_blockdrawEnd = { -1, -1 };
+}

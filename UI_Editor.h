@@ -20,7 +20,8 @@ public:
 	SDL_Color BorderColor = { 0,0,0, 255 };
 	SDL_Color FillColor = { 255, 254, 219, 255 };
 	list<UI_Button> Buttons;
-	UI_Container ColorWidgetsContainer;
+	UI_Container FillColorWidgets;
+	UI_Container BorderColorWidgets;
 	TTF_Font* _fontBig;
 	TTF_Font* _fontMedium;
 	TTF_Font* _fontSmall;
@@ -42,7 +43,7 @@ private:
 	SDL_Surface* surf;
 	SDL_Texture* tex;
 	SDL_Texture* texSetDrawMode;
-	SDL_Texture* texSetEraseMode;
+	SDL_Texture* texSetBlockdrawMode;
 	SDL_Texture* texScrollLeft;
 	SDL_Texture* texScrollRight;
 	SDL_Texture* texScrollBlockLeft;
@@ -57,7 +58,7 @@ private:
 	list<UI_Widget>::iterator _colorWidgetsIter;
 	UI_Button btnSetDrawMode;
 	UI_Button btnSetBorderDrawmode;
-	UI_Button btnSetEraseMode;
+	UI_Button btnSetBlockdrawMode;
 	UI_Button btnScrollLeft;
 	UI_Button btnScrollRight;
 	UI_Button btnScrollBlockLeft;
