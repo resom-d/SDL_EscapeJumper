@@ -12,7 +12,7 @@ private:
 public:
 	std::string TextureSourcePath;
 
-	SDL_Renderer* _renderer;
+	SDL_Renderer* _rend;
 	SDL_Point MaxPosition;
 	SDL_Point MinPosition;
 	SDL_Rect DisplayRect;

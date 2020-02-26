@@ -13,11 +13,12 @@ public:
 	UI_Button();
 	
 
+	virtual void OnInit(SDL_Renderer* rend, string text);
 	virtual void OnInit(SDL_Renderer* rend, SDL_Texture* surf);
 	virtual void OnInit(SDL_Renderer* rend, SDL_Texture* surf,  string text);
-	virtual void OnInit(SDL_Renderer* rend, string text);
 
 	virtual void OnRender(void);
+	virtual void OnCleanup(void);
 
 private:
 	SDL_Texture* _texture = nullptr;

@@ -8,7 +8,7 @@ void LevelEditor::OnInit(SDL_Window* win, SDL_Renderer* rend, MatrixRectItem** m
 	MapSetup = setup;
 	MapMatrix = map;
 	_appWindow = win;
-	_renderer = rend;
+	_rend = rend;
 	_colorIndexBorder = 1;
 	_colorIndexFill = 2;
 	_blockdrawStart = { -1, -1 };
@@ -40,7 +40,7 @@ void LevelEditor::OnInit(SDL_Window* win, SDL_Renderer* rend, MatrixRectItem** m
 	_colorIndexBorder = 2;
 
 	UI.DisplayRect = { 0,0, DisplayRect.w, UI_Height };
-	UI.OnInit(_renderer, ColorPalette);
+	UI.OnInit(_rend, ColorPalette);
 
 	/*MapSetup->Rows = 100;
 	MapSetup->Cols = 1000;
@@ -80,20 +80,20 @@ void LevelEditor::OnLoop()
 
 void LevelEditor::OnRender()
 {
-	SDL_RenderSetClipRect(_renderer, NULL);
+	SDL_RenderSetClipRect(_rend, NULL);
 	SDL_Rect rect;
 
 	UI.OnRender();
 
 	// Fill the background
-	SDL_RenderSetClipRect(_renderer, &MapSetup->DisplayRect);
-	SDL_SetRenderDrawColor(_renderer,
+	SDL_RenderSetClipRect(_rend, &MapSetup->DisplayRect);
+	SDL_SetRenderDrawColor(_rend,
 		MapSetup->Background.r,
 		MapSetup->Background.g,
 		MapSetup->Background.b,
 		MapSetup->Background.a
 	);
-	SDL_RenderFillRect(_renderer, &MapSetup->DisplayRect);
+	SDL_RenderFillRect(_rend, &MapSetup->DisplayRect);
 
 	list<SDL_Color>::iterator iter = ColorPalette.begin();
 	// Show the Map
@@ -110,35 +110,35 @@ void LevelEditor::OnRender()
 			rect.w = MapSetup->BlockSize;
 			rect.h = MapSetup->BlockSize;
 
-			SDL_RenderSetClipRect(_renderer, &rect);
+			SDL_RenderSetClipRect(_rend, &rect);
 			SDL_SetRenderDrawColor(
-				_renderer,
+				_rend,
 				iter->r,
 				iter->g,
 				iter->b,
 				iter->a
 			);
-			SDL_SetRenderDrawBlendMode(_renderer, SDL_BLENDMODE_BLEND);
-			SDL_RenderFillRect(_renderer, &rect);
-			SDL_SetRenderDrawBlendMode(_renderer, SDL_BLENDMODE_NONE);
+			SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
+			SDL_RenderFillRect(_rend, &rect);
+			SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_NONE);
 
 			iter = ColorPalette.begin();
 			std::advance(iter, MapMatrix[ColumnPosition + x][y + RowPosition].BorderColor);
 			SDL_SetRenderDrawColor(
-				_renderer,
+				_rend,
 				iter->r,
 				iter->g,
 				iter->b,
 				iter->a
 			);
 
-			SDL_RenderDrawRect(_renderer, &rect);
+			SDL_RenderDrawRect(_rend, &rect);
 
 		}
 	}
 
-	SDL_RenderSetClipRect(_renderer, &MapSetup->DisplayRect);
-	SDL_SetRenderDrawColor(_renderer, 255, 255, 255, 255);
+	SDL_RenderSetClipRect(_rend, &MapSetup->DisplayRect);
+	SDL_SetRenderDrawColor(_rend, 255, 255, 255, 255);
 	// Draw a grid
 	int x1, y1, x2, y2;
 	// horizontal Gridlines
@@ -148,7 +148,7 @@ void LevelEditor::OnRender()
 		x2 = x1 + MapSetup->DisplayRect.w;
 		y1 = MapSetup->DisplayRect.y + (x * (MapSetup->BlockSize + MapSetup->BlockSpacing));
 		y2 = y1;
-		SDL_RenderDrawLine(_renderer, x1, y1, x2, y2);
+		SDL_RenderDrawLine(_rend, x1, y1, x2, y2);
 	}
 	// vertical Gridlines
 	for (int y = 0; y < MapSetup->DisplayColumns + 1; y++)
@@ -157,7 +157,7 @@ void LevelEditor::OnRender()
 		x2 = x1;
 		y1 = MapSetup->DisplayRect.y;
 		y2 = y1 + MapSetup->DisplayRect.h;
-		SDL_RenderDrawLine(_renderer, x1, y1, x2, y2);
+		SDL_RenderDrawLine(_rend, x1, y1, x2, y2);
 	}
 
 	// Show boxselect border
@@ -171,14 +171,15 @@ void LevelEditor::OnRender()
 		maxY = _blockdrawStartScreen.y < _blockdrawEndScreen.y ? _blockdrawEndScreen.y : _blockdrawStartScreen.y;
 
 		SDL_Rect rect = { minX, minY, maxX - minX, maxY - minY };
-		SDL_SetRenderDrawColor(_renderer, 0, 255, 0, 255);
-		SDL_RenderSetClipRect(_renderer, &rect);
-		SDL_RenderDrawRect(_renderer, &rect);
+		SDL_SetRenderDrawColor(_rend, 0, 255, 0, 255);
+		SDL_RenderSetClipRect(_rend, &rect);
+		SDL_RenderDrawRect(_rend, &rect);
 	}
 }
 
 void LevelEditor::OnCleanUp()
 {
+	UI.OnCleanup();
 	free(MapMatrix);
 }
 

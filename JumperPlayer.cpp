@@ -2,10 +2,10 @@
 
 int JumperPlayer::OnInit(SDL_Renderer* rend)
 {
-	_renderer = rend;
+	_rend = rend;
 
 	int screenWidth, screenHeight;
-	SDL_GetRendererOutputSize(_renderer, &screenWidth, &screenHeight);
+	SDL_GetRendererOutputSize(_rend, &screenWidth, &screenHeight);
 
 	return 0;
 }
@@ -58,11 +58,11 @@ int JumperPlayer::OnLoop()
 
 int JumperPlayer::OnRender()
 {
-	SDL_RenderSetClipRect(_renderer, &DisplayRect);
-	SDL_SetRenderDrawColor(_renderer, 24, 141, 199, 255);
-	SDL_RenderFillRect(_renderer, &DisplayRect);
-	SDL_SetRenderDrawColor(_renderer, 0, 0, 0, 255);
-	SDL_RenderDrawRect(_renderer, &DisplayRect);
+	SDL_RenderSetClipRect(_rend, &DisplayRect);
+	SDL_SetRenderDrawColor(_rend, 24, 141, 199, 255);
+	SDL_RenderFillRect(_rend, &DisplayRect);
+	SDL_SetRenderDrawColor(_rend, 0, 0, 0, 255);
+	SDL_RenderDrawRect(_rend, &DisplayRect);
 
 	return 0;
 }

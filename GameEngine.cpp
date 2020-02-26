@@ -62,9 +62,7 @@ bool GameEngine::OnInit()
 	if (TTF_Init() == -1) return false;
 	if (SDL_NumJoysticks() > 0) GamePad = SDL_JoystickOpen(0);
 
-	_font = TTF_OpenFont("Resources/fonts/NovaMono-Regular.ttf", 36);
-
-
+	
 	UI_Height = 200;
 
 	// Configure Map
@@ -97,7 +95,8 @@ bool GameEngine::OnInit()
 	if ((Renderer = SDL_CreateRenderer(AppWindow, -1, SDL_RENDERER_ACCELERATED)) == nullptr) return false;
 
 	// Create a texure map from a string 
-	chars = SDL_AdditionalFunctions::GetTexturesFromString(Renderer, " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜßabcdefghijklmnopqrstuvwxyzäöü,.;:*#-_|<>^°?=()!\"§$%&/()@€~", _font);
+	_font = TTF_OpenFont("Resources/fonts/NovaMono-Regular.ttf", 36);
+	CharMap = SDL_Extras::SDL_GetTexturesFromString(Renderer, " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜßabcdefghijklmnopqrstuvwxyzäöü,.;:*#-_|<>^°?=()!\"§$%&/()@€~", _font);
 	
 	// Allocate memory for a 2D matrix of tiles
 	Map = (MatrixRectItem**)malloc(MapSetup.Cols * sizeof(MatrixRectItem*));
@@ -120,7 +119,7 @@ bool GameEngine::OnInit()
 	OnInitPlayer();
 
 	MainUI.DisplayRect = { 0,0,MapSetup.DisplayRect.w, UI_Height };
-	MainUI.OnInit(Renderer);
+	MainUI.OnInit(Renderer, CharMap);
 
 	Scroller.OnInit(Renderer, &MapSetup, Map);
 	Scroller.ScrollSpeed = 4;
@@ -145,21 +144,25 @@ bool GameEngine::OnInit()
 	};
 	Editor.OnInit(AppWindow, Renderer, Map, &MapSetup);
 
+	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+	tune = Mix_LoadMUS("Resources/music/The impossible Mission.mp3");
+	Mix_PlayMusic(tune, -1);
 
 	_appIsRunning = true;
 	GameStatus = GameState_MainScreen;
 
+
 	return true;
 };
 
-void GameEngine::OnEvent(SDL_Event* Event)
+void GameEngine::OnEvent(SDL_Event* event)
 {
-	GameEvents::OnEvent(Event);
-
-	if (GameStatus == GameState_Running) Player.OnEvent(Event);
+	GameEvents::OnEvent(event);
+	if (GameStatus == GameState_MainScreen) MainUI.OnEvent(event);
+	if (GameStatus == GameState_Running) Player.OnEvent(event);
 	if (GameStatus == GameState_LevelEdit)
 	{
-		Editor.OnEvent(Event);
+		Editor.OnEvent(event);
 	}
 };
 
@@ -209,9 +212,10 @@ void GameEngine::OnRender()
 
 	if (GameStatus == GameState_MainScreen)
 	{
-		SDL_AdditionalFunctions::SDL_RenderStringAt(Renderer, "Zehnfinger", { 180, 100 }, chars, 100);
-		SDL_AdditionalFunctions::SDL_RenderStringAt(Renderer, "Präsentiert:", { 120, 200 }, chars, 100);
-		SDL_AdditionalFunctions::SDL_RenderStringAt(Renderer, "ESCAPE JUMPER", { 100, 400 }, chars, 100);
+		/*SDL_Extras::SDL_RenderStringAt(Renderer, "Zehnfinger", { 180, 100 }, CharMap, 100, nullptr);
+		SDL_Extras::SDL_RenderStringAt(Renderer, "Präsentiert:", { 120, 200 }, CharMap, 100, nullptr);
+		SDL_Extras::SDL_RenderStringAt(Renderer, "ESCAPE JUMPER", { 100, 400 }, CharMap, 100, nullptr);*/
+		MainUI.OnRender("Zehnfinger", Player.Score, GameStatus == GameState_Running);
 		MessageScroller.OnRender();
 	}
 
@@ -245,11 +249,16 @@ void GameEngine::OnPostRender()
 
 void GameEngine::OnCleanup()
 {
+	SDL_free(_font);
 	Editor.OnCleanUp();
 	Scroller.OnCleanUp();
 	Player.OnCleanup();
 	MainUI.OnCleanup();
 	MessageScroller.OnCleanUp();
+
+	Mix_CloseAudio();
+	Mix_FreeMusic(tune);
+
 	SDL_DestroyWindow(AppWindow);
 	SDL_DestroyRenderer(Renderer);
 	SDL_Quit();

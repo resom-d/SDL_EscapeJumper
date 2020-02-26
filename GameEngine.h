@@ -3,7 +3,8 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
-#include <map>
+#include <SDL_mixer.h>
+#include <unordered_map>
 #include <string>
 #include <iostream>
 #include <stdlib.h>
@@ -18,7 +19,7 @@
 #include "LevelEditor.h"
 #include "UI_Editor.h"
 #include "TextScroller.h"
-#include "SDL_AdditionalFunctions.h"
+#include "SDL_Extras.h"
 
 using namespace std;
 
@@ -40,9 +41,9 @@ public:
 	MatrixSetup MapSetup;
 	MatrixRectItem** Map;
 	JumperPlayer Player;
-	HorizontalScoller Scroller;
+	HorizontalScroller Scroller;
 	TextScroller MessageScroller;
-	map<char, SDL_Texture*> chars;
+	unordered_map<char, SDL_Texture*> CharMap;
 
 	SDL_Joystick* GamePad = NULL;
 
@@ -77,6 +78,7 @@ public:
 	
 private:
 	TTF_Font* _font;
+	Mix_Music* tune;
 
 protected:
 

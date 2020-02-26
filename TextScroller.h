@@ -26,7 +26,7 @@ private:
 
 protected:
 	string _theMessage;
-	SDL_Renderer* _renderer;
+	SDL_Renderer* _rend;
 	SDL_Texture* _texMessage;	
 	TTF_Font *_font;
 	SDL_Color _fontColor = { 0, 0, 0, 255 };

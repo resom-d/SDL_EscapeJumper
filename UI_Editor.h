@@ -39,7 +39,7 @@ public:
 
 	
 private:
-	SDL_Renderer* _renderer;
+	SDL_Renderer* _rend;
 	SDL_Surface* surf;
 	SDL_Texture* tex;
 	SDL_Texture* texSetDrawMode;
@@ -54,7 +54,6 @@ private:
 	list<UI_Button>::iterator _widgetsIter;
 	list<SDL_Color> _colorPalette;
 	list<SDL_Color>::iterator _colorPaletteIter;
-	list<UI_Widget> _colorWidgets;
 	list<UI_Widget>::iterator _colorWidgetsIter;
 	UI_Button btnSetDrawMode;
 	UI_Button btnSetBorderDrawmode;

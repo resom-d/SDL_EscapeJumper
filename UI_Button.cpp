@@ -5,31 +5,31 @@ UI_Button::UI_Button()
 {
 	_text = "";
 	_texture = nullptr;
-	_renderer = nullptr;
+	_rend = nullptr;
 }
 
 void UI_Button::OnInit(SDL_Renderer* rend, SDL_Texture* tex)
 {
-	_renderer = rend;
+	_rend = rend;
 	_texture = tex;
 }
 
 void UI_Button::OnInit(SDL_Renderer* rend, SDL_Texture* tex, string text)
 {
-	_renderer = rend;
+	_rend = rend;
 	_texture = tex;
 	_text = text;
 }
 
 void UI_Button::OnInit(SDL_Renderer* rend, string text)
 {
-	_renderer = rend;
+	_rend = rend;
 	_text = text;
 }
 
 void UI_Button::OnRender(void)
 {
-	if (_renderer == nullptr) return;
+	if (_rend == nullptr) return;
 
 	UI_Widget::OnRender();
 
@@ -50,10 +50,10 @@ void UI_Button::OnRender(void)
 			contentHeight
 		};
 
-		SDL_RenderSetClipRect(_renderer, &DisplayRect);
-		SDL_RenderCopy(_renderer, _texture, &srcRect, &destRect);
+		SDL_RenderSetClipRect(_rend, &DisplayRect);
+		SDL_RenderCopy(_rend, _texture, &srcRect, &destRect);
 
-		SDL_RenderSetClipRect(_renderer, nullptr);
+		SDL_RenderSetClipRect(_rend, nullptr);
 		
 	}
 
@@ -61,4 +61,9 @@ void UI_Button::OnRender(void)
 	{
 	}
 
+}
+
+void UI_Button::OnCleanup(void)
+{
+	SDL_DestroyTexture(_texture);
 }

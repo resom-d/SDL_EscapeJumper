@@ -4,138 +4,63 @@
 MainUI::MainUI()
 {}
 
-void MainUI::OnInit(SDL_Renderer* renderer)
+void MainUI::OnInit(SDL_Renderer* renderer, unordered_map<char, SDL_Texture*> charMap)
 {
-	_renderer = renderer;
+	_rend = renderer;
+	_charMap = charMap;
 
 	int screenWidth, screenHeight;
-	SDL_GetRendererOutputSize(_renderer, &screenWidth, &screenHeight);
+	SDL_GetRendererOutputSize(_rend, &screenWidth, &screenHeight);
 	
-	_fontBig = TTF_OpenFont("Resources/fonts/NovaMono-Regular.ttf", 48);
-	_fontMedium = TTF_OpenFont("Resources/fonts/NovaMono-Regular.ttf", 36);
-	_fontSmall = TTF_OpenFont("Resources/fonts/NovaMono-Regular.ttf", 24);
-	_fontGameOver = TTF_OpenFont("Resources/fonts/NovaMono-Regular.ttf", 120);
+	UI_TextInput ti;
+	ti.DisplayRect = { 10, 10, 400, 50 };
+	ti.BorderColor = { 0,0,0, 255 };
+	ti.Padding = 5;
+	
+	TextInputs.push_back(ti);
+
+	for (list<UI_TextInput>::iterator iter = TextInputs.begin(); iter != TextInputs.end(); iter++)
+	{
+		iter->OnInit(_rend, _charMap, "Empty String");
+	}
+}
+
+void MainUI::OnEvent(SDL_Event* event)
+{
+	for (list<UI_TextInput>::iterator iter = TextInputs.begin(); iter != TextInputs.end(); iter++)
+	{
+		iter->OnEvent(event);
+	}
 }
 
 void MainUI::OnRender(std::string playerName, int playerScore, bool gameOver)
 {
 	int h, w;
-	SDL_GetRendererOutputSize(_renderer, &w, &h);
+	SDL_GetRendererOutputSize(_rend, &w, &h);
 
-	if (_renderer == nullptr) return;
-	SDL_RenderSetClipRect(_renderer, &DisplayRect);
+	if (_rend == nullptr) return;
+	SDL_RenderSetClipRect(_rend, &DisplayRect);
 	// Give us Background and a Boarder
-	SDL_SetRenderDrawColor(_renderer, 168, 127, 50, 255);
-	SDL_RenderFillRect(_renderer, &DisplayRect);
-	SDL_SetRenderDrawColor(_renderer, 255, 255, 255, 255);
-	SDL_RenderDrawRect(_renderer, &DisplayRect);
+	SDL_SetRenderDrawColor(_rend, 168, 127, 50, 255);
+	SDL_RenderFillRect(_rend, &DisplayRect);
+	SDL_SetRenderDrawColor(_rend, 255, 255, 255, 255);
+	SDL_RenderDrawRect(_rend, &DisplayRect);
 
-	// Game-Name
-	surfGameName = TTF_RenderText_Solid(_fontBig, "Escape Jumper - Make your way out ", SDL_Color{ 0, 0, 0, 255 });
-	texGameName = SDL_CreateTextureFromSurface(_renderer, surfGameName);
-
-	SDL_Rect srcRect =
+	for (list<UI_TextInput>::iterator iter = TextInputs.begin(); iter != TextInputs.end(); iter++)
 	{
-		0,
-		0,
-		surfGameName->w,
-		surfGameName->h
-	};
-
-	SDL_Rect destRect =
-	{
-		10, 10,
-		surfGameName->w,
-		surfGameName->h
-	};
-
-	SDL_RenderCopy(_renderer, texGameName, &srcRect, &destRect);
-	SDL_FreeSurface(surfGameName);
-
-	// Player-Name
-	surfPlayerName = TTF_RenderText_Solid(_fontMedium, playerName.c_str(), SDL_Color{ 0, 0, 0, 255 });
-	texPlayerName = SDL_CreateTextureFromSurface(_renderer, surfPlayerName);
-
-	srcRect =
-	{
-		0,
-		0,
-		surfPlayerName->w,
-		surfPlayerName->h
-	};
-
-	destRect =
-	{
-		1200, 10,
-		surfPlayerName->w,
-		surfPlayerName->h
-	};
-
-	SDL_RenderCopy(_renderer, texPlayerName, &srcRect, &destRect);
-	SDL_FreeSurface(surfPlayerName);
-
-	// Player-Score
-	surfPlayerScore = TTF_RenderText_Solid(_fontMedium, std::to_string(playerScore).c_str(), SDL_Color{ 0, 0, 0, 255 });
-	texPlayerScore = SDL_CreateTextureFromSurface(_renderer, surfPlayerScore);
-
-	srcRect =
-	{
-		0,
-		0,
-		surfPlayerScore->w,
-		surfPlayerScore->h
-	};
-
-	destRect =
-	{
-		1200, 60,
-		surfPlayerScore->w,
-		surfPlayerScore->h
-	};
-
-	SDL_RenderCopy(_renderer, texPlayerScore, &srcRect, &destRect);
-	SDL_FreeSurface(surfPlayerScore);
-
-	// GameOver
-	if (gameOver)
-	{
-		surfGameOver = TTF_RenderText_Solid(_fontGameOver, " Game Over", SDL_Color{ 255, 0, 0, 255 });
-		texGameOver = SDL_CreateTextureFromSurface(_renderer, surfGameOver);
-
-		srcRect =
-		{
-			0,
-			0,
-			surfGameOver->w,
-			surfGameOver->h
-		};
-
-		destRect =
-		{
-			(w/2 - surfGameOver->w/2),
-			150 + ((h-150)/2 - (surfGameOver->h/2)), 
-			surfGameOver->w,
-			surfGameOver->h
-		};
-
-		SDL_RenderSetClipRect(_renderer, NULL);
-		SDL_RenderCopy(_renderer, texGameOver, &srcRect, &destRect);
-		SDL_FreeSurface(surfGameOver);
-		
-		SDL_RenderSetClipRect(_renderer, &DisplayRect);
+		iter->OnRender();
 	}
-
-	
 }
 
 void MainUI::OnPostRender()
 {
-	SDL_DestroyTexture(texGameName);
-	SDL_DestroyTexture(texGameOver);
-	SDL_DestroyTexture(texPlayerName);
-	SDL_DestroyTexture(texPlayerScore);
+	
 }
 
 void MainUI::OnCleanup()
 {
+	for (list<UI_TextInput>::iterator iter = TextInputs.begin(); iter != TextInputs.end(); iter++)
+	{
+		iter->OnCleanup();
+	}
 }

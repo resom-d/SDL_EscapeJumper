@@ -61,7 +61,7 @@ public:
 
 private:
 	SDL_Window* _appWindow;
-	SDL_Renderer* _renderer;
+	SDL_Renderer* _rend;
 	int _outputHeight, _outputWidth;
 	bool _drawActive;
 	bool _eraseActive;

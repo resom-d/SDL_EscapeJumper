@@ -7,7 +7,7 @@ TextScroller::TextScroller()
 
 void TextScroller::OnInit(SDL_Renderer* rend, string msg, TTF_Font* font, SDL_Color col, Uint16 speed)
 {
-	_renderer = rend;
+	_rend = rend;
 	_theMessage = msg;
 
 	_font = font;
@@ -16,7 +16,7 @@ void TextScroller::OnInit(SDL_Renderer* rend, string msg, TTF_Font* font, SDL_Co
 	_currentPosition = 0;
 
 	SDL_Surface* txtSurface = TTF_RenderText_Solid(_font, _theMessage.c_str(), _fontColor);
-	_texMessage = SDL_CreateTextureFromSurface(_renderer, txtSurface);
+	_texMessage = SDL_CreateTextureFromSurface(_rend, txtSurface);
 	
 	_surfaceSize.x = txtSurface->w;
 	_surfaceSize.y = txtSurface->h;
@@ -63,12 +63,12 @@ void TextScroller::OnRender()
 		dRect.x = DestRect.x;
 	}
 
-	SDL_SetRenderDrawBlendMode(_renderer, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
 
-	SDL_RenderSetClipRect(_renderer, &dRect);
-	SDL_RenderCopy(_renderer, _texMessage, &sRect, &dRect);
+	SDL_RenderSetClipRect(_rend, &dRect);
+	SDL_RenderCopy(_rend, _texMessage, &sRect, &dRect);
 
-	SDL_RenderSetClipRect(_renderer, nullptr);
+	SDL_RenderSetClipRect(_rend, nullptr);
 	
 }
 

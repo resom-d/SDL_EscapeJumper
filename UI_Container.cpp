@@ -63,6 +63,14 @@ void UI_Container::OnEvent(SDL_Event* event)
 	}
 }
 
+void UI_Container::OnCleanUp(void)
+{
+	for (list<UI_Button>::iterator iter = _children.begin(); iter != _children.end(); iter++)
+	{
+		iter->OnCleanup();
+	}
+}
+
 void UI_Container::AddChild(UI_Button widg)
 {
 	_children.push_back(widg);

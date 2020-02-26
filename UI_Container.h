@@ -12,7 +12,7 @@ public:
 	virtual void OnInit(SDL_Renderer*, Uint16 actionCode);
 	virtual void OnRender();
 	virtual void OnEvent(SDL_Event*);
-
+	virtual void OnCleanUp(void);
 	virtual void AddChild(UI_Button);
 
 private:

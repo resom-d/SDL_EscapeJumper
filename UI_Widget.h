@@ -1,6 +1,6 @@
 #pragma once
 #include "UI_Types.h"
-#include "SDL_AdditionalPrimitives.h"
+#include "SDL_Extras.h"
 #include <SDL.h>
 #include <stdio.h>
 #include <iostream>
@@ -48,7 +48,7 @@ public:
 private:
 
 protected:
-	SDL_Renderer* _renderer;
+	SDL_Renderer* _rend;
 	SDL_Color _fillColor;
 	SDL_Color _borderColor;
 

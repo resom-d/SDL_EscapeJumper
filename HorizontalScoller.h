@@ -1,5 +1,5 @@
 #pragma once
-#include "SDL_AdditionalPrimitives.h"
+#include "SDL_Extras.h"
 #include "GameTypes.h"
 #include <SDL.h>
 #include <SDL_image.h>
@@ -7,11 +7,11 @@
 #include <list>
 using namespace std;
 
-class HorizontalScoller
+class HorizontalScroller
 {
 
 public:
-	HorizontalScoller();
+	HorizontalScroller();
 
 	int ColumnPosition = 0;
 	int ScrollPosition = 0;
@@ -28,7 +28,7 @@ public:
 	void OnCleanUp();
 
 private:
-	SDL_Renderer* _renderer;
+	SDL_Renderer* _rend;
 		
 
 };
