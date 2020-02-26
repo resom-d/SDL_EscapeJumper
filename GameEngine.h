@@ -19,6 +19,7 @@
 #include "UI_Editor.h"
 #include "TextScroller.h"
 #include "SDL_AdditionalFunctions.h"
+
 using namespace std;
 
 class GameEngine : public GameEvents

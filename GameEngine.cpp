@@ -97,7 +97,7 @@ bool GameEngine::OnInit()
 	if ((Renderer = SDL_CreateRenderer(AppWindow, -1, SDL_RENDERER_ACCELERATED)) == nullptr) return false;
 
 	// Create a texure map from a string 
-	chars = SDL_AdditionalFunctions::GetTexturesFromString(Renderer, " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz,.;:*#-?=()!\"§$%&/()@€~", _font);
+	chars = SDL_AdditionalFunctions::GetTexturesFromString(Renderer, " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜßabcdefghijklmnopqrstuvwxyzäöü,.;:*#-_|<>^°?=()!\"§$%&/()@€~", _font);
 	
 	// Allocate memory for a 2D matrix of tiles
 	Map = (MatrixRectItem**)malloc(MapSetup.Cols * sizeof(MatrixRectItem*));
@@ -134,7 +134,7 @@ bool GameEngine::OnInit()
 		1
 	);
 	MessageScroller.DestRect.x = 320;
-	MessageScroller.DestRect.y =  (MessageScroller.GetSurfaceSize().y);
+	MessageScroller.DestRect.y = 320;
 	MessageScroller.DestRect.w = 800;
 
 	Editor.DisplayRect = {
@@ -170,14 +170,14 @@ void GameEngine::OnLoop()
 		MessageScroller.OnLoop();
 
 		MessageScroller.DestRect.y += inc;
-		if (MessageScroller.DestRect.y > 40)
+		if (MessageScroller.DestRect.y > 340)
 		{
-			MessageScroller.DestRect.y = 40;
+			MessageScroller.DestRect.y = 340;
 			inc *= -1;
 		}
-		if (MessageScroller.DestRect.y < 0)
+		if (MessageScroller.DestRect.y < 300)
 		{
-			MessageScroller.DestRect.y = 0;
+			MessageScroller.DestRect.y = 300;
 			inc *= -1; 
 		}
 	}
@@ -209,6 +209,9 @@ void GameEngine::OnRender()
 
 	if (GameStatus == GameState_MainScreen)
 	{
+		SDL_AdditionalFunctions::SDL_RenderStringAt(Renderer, "Zehnfinger", { 180, 100 }, chars, 100);
+		SDL_AdditionalFunctions::SDL_RenderStringAt(Renderer, "Präsentiert:", { 120, 200 }, chars, 100);
+		SDL_AdditionalFunctions::SDL_RenderStringAt(Renderer, "ESCAPE JUMPER", { 100, 400 }, chars, 100);
 		MessageScroller.OnRender();
 	}
 
