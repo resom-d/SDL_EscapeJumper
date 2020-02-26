@@ -60,6 +60,9 @@
     <ClCompile Include="UI_Container.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="SDL_AdditionalFunctions.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="zlib1.dll">
@@ -84,12 +87,6 @@
       <Filter>Ressourcendateien</Filter>
     </CopyFileToFolders>
     <CopyFileToFolders Include="SDL2_ttf.dll">
-      <Filter>Ressourcendateien</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="SigmarOne-Regular.ttf">
-      <Filter>Ressourcendateien</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="Resources\IconBar_48px.png">
       <Filter>Ressourcendateien</Filter>
     </CopyFileToFolders>
   </ItemGroup>
@@ -142,6 +139,9 @@
     <ClInclude Include="UI_Container.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="SDL_AdditionalFunctions.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="libjpeg-9.dll">
@@ -149,10 +149,21 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Spritesheet_Alien_01.png">
+    <Font Include="Resources\fonts\NovaMono-Regular.ttf">
       <Filter>Ressourcendateien</Filter>
-    </Image>
-    <Image Include="Spritesheet_Alien_02.png">
+    </Font>
+    <Font Include="Resources\fonts\ShareTechMono-Regular.ttf">
+      <Filter>Ressourcendateien</Filter>
+    </Font>
+    <Font Include="Resources\fonts\SigmarOne-Regular.ttf">
+      <Filter>Ressourcendateien</Filter>
+    </Font>
+    <Font Include="Resources\fonts\VT323-Regular.ttf">
+      <Filter>Ressourcendateien</Filter>
+    </Font>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\sprites\Spritesheet_Alien_01.png">
       <Filter>Ressourcendateien</Filter>
     </Image>
   </ItemGroup>

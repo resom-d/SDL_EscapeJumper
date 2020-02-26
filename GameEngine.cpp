@@ -1,9 +1,10 @@
 #include "GameEngine.h"
 
+int inc = 1;
 
 GameEngine::GameEngine()
 {
-	GlobalFrameRate = 60;
+	GlobalFrameRate = 120;
 	Properties.WindowFrame.x = 50;
 	Properties.WindowFrame.y = 50;
 	Properties.WindowFrame.w = 1600;
@@ -23,6 +24,8 @@ int GameEngine::OnExecute()
 
 	while (_appIsRunning)
 	{
+		timerFPS_1n = SDL_GetTicks();
+
 		//grab events	
 		while (SDL_PollEvent(&AppEvent)) OnEvent(&AppEvent);
 
@@ -36,8 +39,15 @@ int GameEngine::OnExecute()
 		// make sure we are running at a constant frame rate
 		timerFPS_n = SDL_GetTicks();
 		timeDiff = timerFPS_n - timerFPS_1n;
-		timerFPS_1n = timerFPS_n;
-		if (timeDiff < 1000 / GlobalFrameRate) SDL_Delay(1000 / GlobalFrameRate - timeDiff);
+		if (timeDiff < 1000 / GlobalFrameRate)
+		{
+			cout << "Idle-Time: " << to_string((1000 / GlobalFrameRate) - timeDiff) << endl;
+			SDL_Delay((1000 / GlobalFrameRate) - timeDiff);
+		}
+		else
+		{
+			cout << "Framerate not constant." << endl;
+		}
 	}
 
 	// don't leave a messy place
@@ -52,7 +62,8 @@ bool GameEngine::OnInit()
 	if (TTF_Init() == -1) return false;
 	if (SDL_NumJoysticks() > 0) GamePad = SDL_JoystickOpen(0);
 
-	_font = TTF_OpenFont("SigmarOne-Regular.ttf", 46);
+	_font = TTF_OpenFont("Resources/fonts/NovaMono-Regular.ttf", 36);
+
 
 	UI_Height = 200;
 
@@ -85,6 +96,9 @@ bool GameEngine::OnInit()
 
 	if ((Renderer = SDL_CreateRenderer(AppWindow, -1, SDL_RENDERER_ACCELERATED)) == nullptr) return false;
 
+	// Create a texure map from a string 
+	chars = SDL_AdditionalFunctions::GetTexturesFromString(Renderer, " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz,.;:*#-?=()!\"§$%&/()@€~", _font);
+	
 	// Allocate memory for a 2D matrix of tiles
 	Map = (MatrixRectItem**)malloc(MapSetup.Cols * sizeof(MatrixRectItem*));
 	for (int cols = 0; cols < MapSetup.Cols; cols++)
@@ -109,18 +123,19 @@ bool GameEngine::OnInit()
 	MainUI.OnInit(Renderer);
 
 	Scroller.OnInit(Renderer, &MapSetup, Map);
-	Scroller.ScrollSpeed = 1;
+	Scroller.ScrollSpeed = 4;
 	Scroller.ScrollPosition = 20;
 
-	SDL_Rect r = { 200, (MapSetup.DisplayRect.h >> 1) - 20, MapSetup.DisplayRect.w, 0 };
 
-	/*TextScoller.OnInit(Renderer,
-		"EscapeJumper - Ein Zehnfinger Spiel",
+	MessageScroller.OnInit(Renderer,
+		"ESCAPE JUMPER - Ein Spiel für Kinder von 6 bis 100 Jahre. Drücke F1 um hier her zurück zu kommen, F3 um mit dem Spiel zu beginnen oder F5 um zum Level-Editor zu gelangen. Viel Spass damit.                           Let Peace Grow.       ",
 		_font,
-		{0,0,0,255},
-		1,
-		&r
-	);*/
+		{ 0, 61, 115, 255 },
+		1
+	);
+	MessageScroller.DestRect.x = 320;
+	MessageScroller.DestRect.y =  (MessageScroller.GetSurfaceSize().y);
+	MessageScroller.DestRect.w = 800;
 
 	Editor.DisplayRect = {
 		0,
@@ -132,7 +147,7 @@ bool GameEngine::OnInit()
 
 
 	_appIsRunning = true;
-	GameStatus = GameState_LevelEdit;
+	GameStatus = GameState_MainScreen;
 
 	return true;
 };
@@ -152,7 +167,19 @@ void GameEngine::OnLoop()
 {
 	if (GameStatus == GameState_MainScreen)
 	{
-		TextScoller.OnLoop();
+		MessageScroller.OnLoop();
+
+		MessageScroller.DestRect.y += inc;
+		if (MessageScroller.DestRect.y > 40)
+		{
+			MessageScroller.DestRect.y = 40;
+			inc *= -1;
+		}
+		if (MessageScroller.DestRect.y < 0)
+		{
+			MessageScroller.DestRect.y = 0;
+			inc *= -1; 
+		}
 	}
 
 	if (GameStatus == GameState_Running)
@@ -177,12 +204,12 @@ void GameEngine::OnLoop()
 void GameEngine::OnRender()
 {
 	SDL_SetRenderDrawBlendMode(Renderer, SDL_BLENDMODE_BLEND);
-	SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 255);
+	SDL_SetRenderDrawColor(Renderer, 255, 208, 99, 255);
 	SDL_RenderClear(Renderer);
 
 	if (GameStatus == GameState_MainScreen)
 	{
-		//TextScoller.OnRender();
+		MessageScroller.OnRender();
 	}
 
 	if (GameStatus == GameState_Running || GameStatus == GameState_Paused || GameStatus == GameState_GameOver)
@@ -219,7 +246,7 @@ void GameEngine::OnCleanup()
 	Scroller.OnCleanUp();
 	Player.OnCleanup();
 	MainUI.OnCleanup();
-	TextScoller.OnCleanUp();
+	MessageScroller.OnCleanUp();
 	SDL_DestroyWindow(AppWindow);
 	SDL_DestroyRenderer(Renderer);
 	SDL_Quit();
@@ -247,22 +274,22 @@ void GameEngine::OnCollisionCheck()
 	{
 		for (int y = -1; y <= 1; y++)
 		{
-			int obstX = playerScreenColumn + x + Scroller.ColumnPosition +1;
+			int obstX = playerScreenColumn + x + Scroller.ColumnPosition + 1;
 			int obstY = playerScreenRow + y;
 
 			if (obstX < 0 || obstY < 0 || obstX > MapSetup.Cols || obstY > MapSetup.Rows) continue;
 
 			if (Map[obstX][obstY].FillColor == 0) continue;
 
-			obstEdgeT = MapSetup.DisplayRect.y +  ((playerScreenRow + y) * (MapSetup.BlockSize + MapSetup.BlockSpacing));
+			obstEdgeT = MapSetup.DisplayRect.y + ((playerScreenRow + y) * (MapSetup.BlockSize + MapSetup.BlockSpacing));
 			obstEdgeL = MapSetup.DisplayRect.x + ((playerScreenColumn + x + 1) * (MapSetup.BlockSize + MapSetup.BlockSpacing)) - Scroller.ScrollPosition;
 
-			SDL_Rect rObst = 
-			{ 
+			SDL_Rect rObst =
+			{
 				obstEdgeL,
-				obstEdgeT, 
+				obstEdgeT,
 				MapSetup.BlockSize,
-			    MapSetup.BlockSize 
+				MapSetup.BlockSize
 			};
 
 			SDL_Rect result;
@@ -283,7 +310,7 @@ void GameEngine::OnInitPlayer()
 {
 	Player.AnimationRate = 40;		// t=1000/framesPerSecond e.g. 1000/25 = 40
 	Player.Name = "Mollmops";
-	Player.TextureSourcePath = "Spritesheet_Alien_01.png";
+	Player.TextureSourcePath = "Resources/sprites/Spritesheet_Alien_01.png";
 	Player.HorizontalTiling = 6;
 	Player.VerticalTiling = 4;
 	Player.Speed = 4;
@@ -339,7 +366,7 @@ void GameEngine::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 	}
 	if (sym == SDLK_F1) GameStatus = GameState_MainScreen;
 	if (sym == SDLK_F3) OnGameRestart();
-	if (sym == SDLK_F4) GameStatus = GameState_LevelEdit;
+	if (sym == SDLK_F5) GameStatus = GameState_LevelEdit;
 
 }
 

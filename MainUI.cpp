@@ -11,10 +11,10 @@ void MainUI::OnInit(SDL_Renderer* renderer)
 	int screenWidth, screenHeight;
 	SDL_GetRendererOutputSize(_renderer, &screenWidth, &screenHeight);
 	
-	_fontBig = TTF_OpenFont("SigmarOne-Regular.ttf", 48);
-	_fontMedium = TTF_OpenFont("SigmarOne-Regular.ttf", 36);
-	_fontSmall = TTF_OpenFont("SigmarOne-Regular.ttf", 24);
-	_fontGameOver = TTF_OpenFont("SigmarOne-Regular.ttf", 120);
+	_fontBig = TTF_OpenFont("Resources/fonts/NovaMono-Regular.ttf", 48);
+	_fontMedium = TTF_OpenFont("Resources/fonts/NovaMono-Regular.ttf", 36);
+	_fontSmall = TTF_OpenFont("Resources/fonts/NovaMono-Regular.ttf", 24);
+	_fontGameOver = TTF_OpenFont("Resources/fonts/NovaMono-Regular.ttf", 120);
 }
 
 void MainUI::OnRender(std::string playerName, int playerScore, bool gameOver)

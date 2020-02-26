@@ -3,6 +3,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
+#include <map>
 #include <string>
 #include <iostream>
 #include <stdlib.h>
@@ -17,7 +18,8 @@
 #include "LevelEditor.h"
 #include "UI_Editor.h"
 #include "TextScroller.h"
-
+#include "SDL_AdditionalFunctions.h"
+using namespace std;
 
 class GameEngine : public GameEvents
 {
@@ -38,7 +40,8 @@ public:
 	MatrixRectItem** Map;
 	JumperPlayer Player;
 	HorizontalScoller Scroller;
-	TextScroller TextScoller;
+	TextScroller MessageScroller;
+	map<char, SDL_Texture*> chars;
 
 	SDL_Joystick* GamePad = NULL;
 

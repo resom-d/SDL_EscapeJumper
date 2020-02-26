@@ -161,6 +161,7 @@
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameEvents.cpp" />
     <ClCompile Include="MainUI.cpp" />
+    <ClCompile Include="SDL_AdditionalFunctions.cpp" />
     <ClCompile Include="SDL_AdditionalPrimitives.cpp" />
     <ClCompile Include="TextScroller.cpp" />
     <ClCompile Include="UI_Abstract.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="JumperPlayer.h" />
     <ClInclude Include="LevelEditor.h" />
     <ClInclude Include="MainUI.h" />
+    <ClInclude Include="SDL_AdditionalFunctions.h" />
     <ClInclude Include="SDL_AdditionalPrimitives.h" />
     <ClInclude Include="TextScroller.h" />
     <ClInclude Include="UI_Abstract.h" />
@@ -217,14 +219,13 @@
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="SigmarOne-Regular.ttf">
-      <FileType>Document</FileType>
-    </CopyFileToFolders>
+    <Font Include="Resources\fonts\NovaMono-Regular.ttf" />
+    <Font Include="Resources\fonts\ShareTechMono-Regular.ttf" />
+    <Font Include="Resources\fonts\SigmarOne-Regular.ttf" />
+    <Font Include="Resources\fonts\VT323-Regular.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="Resources\IconBar_48px.png" />
-    <Image Include="Spritesheet_Alien_01.png" />
-    <Image Include="Spritesheet_Alien_02.png" />
+    <Image Include="Resources\sprites\Spritesheet_Alien_01.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
