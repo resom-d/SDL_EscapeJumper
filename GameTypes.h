@@ -46,4 +46,13 @@ typedef struct MatrixRectItem
 	int FillColor;
 };
 
-
+typedef struct MatrixTile
+{
+	Uint16 TileIndex;
+	bool IsCollisionActive;
+	bool IsDamage;
+	bool IsHealthUp;
+	bool IsItem;
+	Uint16 Damage;
+	
+};
