@@ -1,12 +1,9 @@
 #pragma once
-#include<stdlib.h>
 #include <SDL.h>
 #include <SDL_ttf.h>
-#include <SDL_ttf.h>
-#include <stdlib.h>
-#include <iostream>
 #include <string>
-#include <vector>
+#include <iostream>
+
 using namespace std;
 
 class TextScroller

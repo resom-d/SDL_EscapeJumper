@@ -1,13 +1,7 @@
 #pragma once
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
-#include <string>
-#include <list>
-#include "UI_Abstract.h"
-#include "UI_Button.h"
-#include "UI_Container.h"
 #include "UI_Types.h"
+#include "UI_Control.h"
+#include "UI_Container.h"
 using namespace std;
 
 
@@ -19,7 +13,7 @@ public:
 	SDL_Rect DisplayRect;
 	SDL_Color BorderColor = { 0,0,0, 255 };
 	SDL_Color FillColor = { 255, 254, 219, 255 };
-	list<UI_Button> Buttons;
+	list<UI_Control> Buttons;
 	UI_Container FillColorWidgets;
 	UI_Container BorderColorWidgets;
 	TTF_Font* _fontBig;
@@ -52,17 +46,17 @@ private:
 	SDL_Texture* texSetBlockscrollEnd;
 
 	CharacterMap _charmap;
-	list<UI_Button>::iterator _widgetsIter;
+	list<UI_Control>::iterator _widgetsIter;
 	ColorPalette _colorPalette;
 	ColorPalette::iterator _colorPaletteIter;
 	list<UI_Widget>::iterator _colorWidgetsIter;
-	UI_Button btnSetDrawMode;
-	UI_Button btnSetBorderDrawmode;
-	UI_Button btnSetBlockdrawMode;
-	UI_Button btnScrollLeft;
-	UI_Button btnScrollRight;
-	UI_Button btnScrollBlockLeft;
-	UI_Button btnScrollBlockRight;
+	UI_Control btnSetDrawMode;
+	UI_Control btnSetBorderDrawmode;
+	UI_Control btnSetBlockdrawMode;
+	UI_Control btnScrollLeft;
+	UI_Control btnScrollRight;
+	UI_Control btnScrollBlockLeft;
+	UI_Control btnScrollBlockRight;
 	EDITOR_ACTION _activeTool;
 	void FireEvent(void*, void*);
 

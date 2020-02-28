@@ -165,9 +165,8 @@
     <ClCompile Include="MainUI.cpp" />
     <ClCompile Include="SDL_Extras.cpp" />
     <ClCompile Include="TextScroller.cpp" />
-    <ClCompile Include="UI_Abstract.cpp" />
-    <ClCompile Include="UI_Button.cpp" />
     <ClCompile Include="UI_Container.cpp" />
+    <ClCompile Include="UI_Control.cpp" />
     <ClCompile Include="UI_Editor.cpp" />
     <ClCompile Include="UI_TextInput.cpp" />
     <ClCompile Include="UI_Widget.cpp" />
@@ -185,9 +184,8 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="SDL_Extras.h" />
     <ClInclude Include="TextScroller.h" />
-    <ClInclude Include="UI_Abstract.h" />
-    <ClInclude Include="UI_Button.h" />
     <ClInclude Include="UI_Container.h" />
+    <ClInclude Include="UI_Control.h" />
     <ClInclude Include="UI_Editor.h" />
     <ClInclude Include="UI_TextInput.h" />
     <ClInclude Include="UI_Types.h" />

@@ -47,7 +47,7 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, CharacterMap charMap, ColorPalett
 	int x = 0;
 	for (_colorPaletteIter = _colorPalette.begin(); _colorPaletteIter != _colorPalette.end(); _colorPaletteIter++)
 	{
-		UI_Button btn;
+		UI_Control btn;
 		btn.ActionCode = EDITOR_ACTION::SET_FILL_COLOR;
 		btn.EventType = UI_EDITOR_EVENT_TYPE;
 		Userdata data;
@@ -77,7 +77,7 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, CharacterMap charMap, ColorPalett
 	x = 0;
 	for (_colorPaletteIter = _colorPalette.begin(); _colorPaletteIter != _colorPalette.end(); _colorPaletteIter++)
 	{
-		UI_Button btn;
+		UI_Control btn;
 		btn.ActionCode = EDITOR_ACTION::SET_BORDER_COLOR;
 		btn.EventType = UI_EDITOR_EVENT_TYPE;
 		Userdata data;
@@ -184,7 +184,7 @@ void UI_Editor::LoadTextures(const SDL_Rect* destRect, const SDL_Rect* srcRect)
 
 void UI_Editor::OnLoop()
 {
-	list<UI_Button>::iterator iter = Buttons.begin();
+	list<UI_Control>::iterator iter = Buttons.begin();
 	iter->IsActive = _activeTool == EDITOR_ACTION::DRAWMODE;
 	advance(iter, 1);
 	iter->IsActive = _activeTool == EDITOR_ACTION::BORDERDRAWMODE;
@@ -252,7 +252,7 @@ void UI_Editor::OnPostRender()
 void UI_Editor::OnCleanup()
 {
 	
-	for (list<UI_Button>::iterator iter = Buttons.begin(); iter != Buttons.end(); iter++)
+	for (list<UI_Control>::iterator iter = Buttons.begin(); iter != Buttons.end(); iter++)
 	{
 		iter->OnCleanup();
 	}

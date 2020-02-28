@@ -1,11 +1,11 @@
 #pragma once
-#include "SDL_Extras.h"
-#include "GameTypes.h"
-#include "GameMap.h"
 #include <SDL.h>
 #include <SDL_image.h>
 #include <iostream>
 #include <list>
+#include "SDL_Extras.h"
+#include "GameTypes.h"
+#include "GameMap.h"
 using namespace std;
 
 class HorizontalScroller

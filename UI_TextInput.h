@@ -1,4 +1,5 @@
 #pragma once
+#include "UI_Types.h"
 #include "UI_Widget.h"
 
 class UI_TextInput :	public UI_Widget

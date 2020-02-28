@@ -1,6 +1,6 @@
 #pragma once
 #include <SDL.h>
-#include <stdlib.h>
+#include <SDL_image.h>
 #include <string>
 
 // indicate the players status

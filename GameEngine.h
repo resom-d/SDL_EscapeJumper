@@ -8,17 +8,16 @@
 #include <string>
 #include <iostream>
 #include <list>
-#include "GameTypes.h"
 #include "GameEvents.h"
-#include "GamePlayer.h"
+#include "GameTypes.h"
+#include "GameMap.h"
 #include "HorizontalScoller.h"
 #include "MainUI.h"
+#include "GamePlayer.h"
 #include"JumperPlayer.h"
 #include "LevelEditor.h"
-#include "UI_Editor.h"
 #include "TextScroller.h"
 #include "SDL_Extras.h"
-#include "GameMap.h"
 
 using namespace std;
 

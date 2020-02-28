@@ -1,10 +1,11 @@
 #pragma once
 #include <SDL.h>
 #include <SDL_ttf.h>
-#include <stdio.h>
+#include "SDL_Extras.h"
+#include <iostream>
+#include <list>
 #include <string>
-#include <vector>
-#include "UI_Types.h"
+
 using namespace std;
 
 const Uint32 GAME_EVENT_TYPE = 40000;

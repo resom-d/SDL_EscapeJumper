@@ -1,7 +1,4 @@
 #include "GamePlayer.h"
-#include <SDL.h>
-#include <SDL_image.h>
-
 
 // Player Construction/Destruction
 GamePlayer::GamePlayer()

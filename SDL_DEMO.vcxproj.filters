@@ -30,9 +30,6 @@
     <ClCompile Include="TextScroller.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="UI_Abstract.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="UI_Widget.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
@@ -46,9 +43,6 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="UI_Editor.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="UI_Button.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="UI_Container.cpp">
@@ -67,6 +61,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="SDL_Extras.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="UI_Control.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
@@ -112,9 +109,6 @@
     <ClInclude Include="HorizontalScoller.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="UI_Abstract.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="UI_Widget.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
@@ -136,9 +130,6 @@
     <ClInclude Include="UI_Types.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="UI_Button.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="UI_Container.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
@@ -152,6 +143,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="GameMap.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="UI_Control.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

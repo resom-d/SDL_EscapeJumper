@@ -4,7 +4,7 @@ void UI_Container::OnInit(SDL_Renderer* rend)
 {
 	UI_Widget::OnInit(rend);
 
-	for (list<UI_Button>::iterator iter = _children.begin(); iter != _children.end(); iter++)
+	for (list<UI_Control>::iterator iter = _children.begin(); iter != _children.end(); iter++)
 	{
 		iter->OnInit(rend, "-Color-");
 	}
@@ -14,7 +14,7 @@ void UI_Container::OnInit(SDL_Renderer* rend, EDITOR_ACTION actionCode)
 {
 	UI_Widget::OnInit(rend,  actionCode);
 
-	for (list<UI_Button>::iterator iter = _children.begin(); iter != _children.end(); iter++)
+	for (list<UI_Control>::iterator iter = _children.begin(); iter != _children.end(); iter++)
 	{
 		iter->OnInit(rend, "");
 	}
@@ -31,7 +31,7 @@ void UI_Container::OnRender()
 	};
 
 	int lastMargin;
-	for (list<UI_Button>::iterator iter = next(_children.begin(), 1); iter != _children.end(); iter++)
+	for (list<UI_Control>::iterator iter = next(_children.begin(), 1); iter != _children.end(); iter++)
 	{		
 		if (Orientation == WIDGET_ORIENTATION::HORIZONTAL)
 		{
@@ -57,7 +57,7 @@ void UI_Container::OnRender()
 
 void UI_Container::OnEvent(SDL_Event* event)
 {
-	for (list<UI_Button>::iterator iter = _children.begin(); iter != _children.end(); iter++)
+	for (list<UI_Control>::iterator iter = _children.begin(); iter != _children.end(); iter++)
 	{
 		iter->OnEvent(event);
 	}
@@ -65,13 +65,13 @@ void UI_Container::OnEvent(SDL_Event* event)
 
 void UI_Container::OnCleanUp(void)
 {
-	for (list<UI_Button>::iterator iter = _children.begin(); iter != _children.end(); iter++)
+	for (list<UI_Control>::iterator iter = _children.begin(); iter != _children.end(); iter++)
 	{
 		iter->OnCleanup();
 	}
 }
 
-void UI_Container::AddChild(UI_Button widg)
+void UI_Container::AddChild(UI_Control widg)
 {
 	_children.push_back(widg);
 }

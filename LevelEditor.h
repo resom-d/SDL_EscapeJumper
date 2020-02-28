@@ -1,13 +1,13 @@
 #pragma once
-#include "GameTypes.h"
-#include "UI_Editor.h"
-#include "GameMap.h"
 #include <SDL.h>
 #include <string>
+#include <list>
 #include <iostream>
 #include <fstream>
-#include <list>
-#include <algorithm>
+#include "GameTypes.h"
+#include "GameMap.h"
+#include "UI_Editor.h"
+
 using namespace std;
 
 class LevelEditor

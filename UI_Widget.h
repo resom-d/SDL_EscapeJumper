@@ -1,10 +1,6 @@
 #pragma once
 #include "UI_Types.h"
-#include "SDL_Extras.h"
-#include <SDL.h>
-#include <stdio.h>
-#include <iostream>
-#include <list>
+
 using namespace std;
 
 

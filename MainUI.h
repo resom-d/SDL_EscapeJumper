@@ -1,11 +1,7 @@
 #pragma once
-#include <SDL.h>
-#include <SDL_ttf.h>
-#include <string>
-#include <list>
+#include "UI_Types.h"
 #include "GameTypes.h"
-#include "UI_Abstract.h"
-#include "UI_Button.h"
+#include "UI_Control.h"
 #include "UI_Container.h"
 #include "UI_TextInput.h"
 #include "SDL_Extras.h"
@@ -27,7 +23,7 @@ public:
 	
 	CharacterMap _charMap;
 	SDL_Rect DisplayRect;
-	list<UI_Button> Buttons;
+	list<UI_Control> Buttons;
 	list<UI_TextInput> TextInputs;
 	
 };

@@ -1,7 +1,8 @@
 #pragma once
-#include "UI_Button.h"
-#include <algorithm>
+#include "UI_Types.h"
+#include "UI_Control.h"
 using namespace std;
+
 
 class UI_Container : 	public UI_Widget
 {
@@ -13,9 +14,9 @@ public:
 	virtual void OnRender();
 	virtual void OnEvent(SDL_Event*);
 	virtual void OnCleanUp(void);
-	virtual void AddChild(UI_Button);
+	virtual void AddChild(UI_Control);
 
 private:
-	list<UI_Button> _children;
+	list<UI_Control> _children;
 };
 
