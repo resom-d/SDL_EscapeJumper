@@ -153,7 +153,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GameMap.cpp" />
     <ClCompile Include="GamePlayer.cpp" />
+    <ClCompile Include="GameTypes.cpp" />
     <ClCompile Include="HorizontalScroller.cpp" />
     <ClCompile Include="JumperPlayer.cpp" />
     <ClCompile Include="LevelEditor.cpp" />
@@ -161,7 +163,7 @@
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameEvents.cpp" />
     <ClCompile Include="MainUI.cpp" />
-    <ClCompile Include="SDL_AdditionalFunctions.cpp" />
+    <ClCompile Include="SDL_Extras.cpp" />
     <ClCompile Include="TextScroller.cpp" />
     <ClCompile Include="UI_Abstract.cpp" />
     <ClCompile Include="UI_Button.cpp" />
@@ -171,6 +173,7 @@
     <ClCompile Include="UI_Widget.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GameMap.h" />
     <ClInclude Include="GamePlayer.h" />
     <ClInclude Include="GameEngine.h" />
     <ClInclude Include="GameEvents.h" />

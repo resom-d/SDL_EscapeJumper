@@ -13,11 +13,11 @@ class UI_Widget
 public:
 	UI_Widget();
 	
-	WIDGET_STATE State = Visible ;
+	WIDGET_STATE State = WIDGET_STATE::Visible ;
 	bool IsActive;
 	SDL_Event Event;
 	Uint32 EventType;
-	Uint16 ActionCode;
+	EDITOR_ACTION ActionCode;
 	Userdata UserData;
 	SDL_Rect DisplayRect;
 	Uint16 BorderWidth;
@@ -37,7 +37,7 @@ public:
 
 	// Methods
 	virtual void OnInit(SDL_Renderer* renderer);
-	virtual void OnInit(SDL_Renderer* renderer, Uint16 actionCode);
+	virtual void OnInit(SDL_Renderer* renderer, EDITOR_ACTION actionCode);
 	virtual void OnLoop();
 	virtual void OnEvent(SDL_Event*);
 	virtual void OnRender();

@@ -12,7 +12,7 @@ int JumperPlayer::OnInit(SDL_Renderer* rend)
 
 int JumperPlayer::OnLoop()
 {
-	if (MotionVer == Plus)
+	if (MotionVer == MotionState::Plus)
 	{
 		DisplayRect.y -= Speed;
 		if (DisplayRect.y < MinPosition.y)
@@ -23,7 +23,7 @@ int JumperPlayer::OnLoop()
 		}
 	}
 
-	if (MotionVer == Minus)
+	if (MotionVer == MotionState:: Minus)
 	{
 		DisplayRect.y += Speed;
 		if (DisplayRect.y > MaxPosition.y)
@@ -34,7 +34,7 @@ int JumperPlayer::OnLoop()
 		}
 	}
 
-	if (MotionHor == Minus)
+	if (MotionHor == MotionState::Minus)
 	{
 		DisplayRect.x -= Speed >> 1;
 		if (DisplayRect.x < MinPosition.x)
@@ -43,7 +43,7 @@ int JumperPlayer::OnLoop()
 		}
 	}
 
-	if (MotionHor == Plus)
+	if (MotionHor == MotionState::Plus)
 	{
 		DisplayRect.x += Speed >> 1;
 		if (DisplayRect.x > MaxPosition.x)
@@ -92,23 +92,23 @@ void JumperPlayer::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 	// player keys
 	if (sym == SDLK_UP && (IsBottom||true))
 	{
-		MotionVer = Plus;
+		MotionVer = MotionState::Plus;
 		Score++;
 	}
 	if (sym == SDLK_DOWN && (IsTop||true))
 	{
-		MotionVer = Minus;
+		MotionVer = MotionState::Minus;
 		Score++;
 	}
 
 	if (sym == SDLK_LEFT)
 	{
-		MotionHor = Minus;
+		MotionHor = MotionState::Minus;
 	}		
 
 	if (sym == SDLK_RIGHT)
 	{
-		MotionHor = Plus;
+		MotionHor = MotionState::Plus;
 	}
 
 }
@@ -117,16 +117,16 @@ void JumperPlayer::OnKeyUp(SDL_Keycode sym, SDL_Keycode mod)
 {
 	if (sym == SDLK_LEFT || sym == SDLK_RIGHT)
 	{
-		MotionHor = None;
+		MotionHor = MotionState::None;
 	}
 
 	if (sym == SDLK_UP && (IsBottom||true))
 	{
-		MotionVer = None;
+		MotionVer = MotionState::None;
 	}
 	if (sym == SDLK_DOWN && (IsTop||true))
 	{
-		MotionVer = None;
+		MotionVer = MotionState::None;
 	}
 
 }

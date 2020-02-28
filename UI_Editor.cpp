@@ -3,12 +3,13 @@
 UI_Editor::UI_Editor()
 {}
 
-void UI_Editor::OnInit(SDL_Renderer* renderer, list<SDL_Color> colors)
+void UI_Editor::OnInit(SDL_Renderer* renderer, CharacterMap charMap, ColorPalette colors)
 {
 	_rend = renderer;
+	_charmap = charMap;
 	_colorPalette = colors;
 
-	_activeTool = EDITOR_DRAWMODE;	
+	_activeTool = EDITOR_ACTION::DRAWMODE;
 
 	btnSetDrawMode.EventType = EDITOR_EVENT_TYPE;
 	btnSetBlockdrawMode.EventType = EDITOR_EVENT_TYPE;
@@ -17,12 +18,12 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, list<SDL_Color> colors)
 	btnScrollBlockLeft.EventType = EDITOR_EVENT_TYPE;
 	btnScrollBlockRight.EventType = EDITOR_EVENT_TYPE;
 
-	btnSetDrawMode.ActionCode = EDITOR_DRAWMODE;
-	btnSetBlockdrawMode.ActionCode = EDITOR_BORDERDRAWMODE;
-	btnScrollLeft.ActionCode = EDITOR_SCROLL_BLOCK_LEFT;
-	btnScrollRight.ActionCode = EDITOR_SCROLL_BLOCK_RIGHT;
-	btnScrollBlockLeft.ActionCode = EDITOR_SCROLL_BLOCK_START;
-	btnScrollBlockRight.ActionCode = EDITOR_SCROLL_BLOCK_END;
+	btnSetDrawMode.ActionCode = EDITOR_ACTION::DRAWMODE;
+	btnSetBlockdrawMode.ActionCode = EDITOR_ACTION::BORDERDRAWMODE;
+	btnScrollLeft.ActionCode = EDITOR_ACTION::SCROLL_BLOCK_LEFT;
+	btnScrollRight.ActionCode = EDITOR_ACTION::SCROLL_BLOCK_RIGHT;
+	btnScrollBlockLeft.ActionCode = EDITOR_ACTION::SCROLL_BLOCK_START;
+	btnScrollBlockRight.ActionCode = EDITOR_ACTION::SCROLL_BLOCK_END;
 
 	FillColor = { 235, 210, 52, 255 };
 	BorderColor = { 255, 255, 255, 255 };
@@ -34,7 +35,7 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, list<SDL_Color> colors)
 	ConfigureWidgets(&srcRect, &destRect);
 
 	// Fill-ColorPallet
-	FillColorWidgets.Orientation = HORIZONTAL;
+	FillColorWidgets.Orientation = WIDGET_ORIENTATION::HORIZONTAL;
 	FillColorWidgets.BorderWidth = 2;
 	FillColorWidgets.DisplayRect =
 	{
@@ -47,7 +48,7 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, list<SDL_Color> colors)
 	for (_colorPaletteIter = _colorPalette.begin(); _colorPaletteIter != _colorPalette.end(); _colorPaletteIter++)
 	{
 		UI_Button btn;
-		btn.ActionCode = EDITOR_SET_FILL_COLOR;
+		btn.ActionCode = EDITOR_ACTION::SET_FILL_COLOR;
 		btn.EventType = UI_EDITOR_EVENT_TYPE;
 		Userdata data;
 		data.ColorIndex = x;
@@ -61,10 +62,10 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, list<SDL_Color> colors)
 		FillColorWidgets.AddChild(btn);
 		x++;
 	}
-	FillColorWidgets.OnInit(_rend, 24);
+	FillColorWidgets.OnInit(_rend, EDITOR_ACTION::DRAWMODE);
 
 	// Border-ColorPallet
-	BorderColorWidgets.Orientation = HORIZONTAL;
+	BorderColorWidgets.Orientation = WIDGET_ORIENTATION::HORIZONTAL;
 	BorderColorWidgets.BorderWidth = 2;
 	BorderColorWidgets.DisplayRect =
 	{
@@ -77,7 +78,7 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, list<SDL_Color> colors)
 	for (_colorPaletteIter = _colorPalette.begin(); _colorPaletteIter != _colorPalette.end(); _colorPaletteIter++)
 	{
 		UI_Button btn;
-		btn.ActionCode = EDITOR_SET_BORDER_COLOR;
+		btn.ActionCode = EDITOR_ACTION::SET_BORDER_COLOR;
 		btn.EventType = UI_EDITOR_EVENT_TYPE;
 		Userdata data;
 		data.ColorIndex = x;
@@ -91,7 +92,7 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, list<SDL_Color> colors)
 		BorderColorWidgets.AddChild(btn);
 		x++;
 	}
-	BorderColorWidgets.OnInit(_rend, 24);
+	BorderColorWidgets.OnInit(_rend, EDITOR_ACTION::DRAWMODE);
 
 	// Cleanup
 	SDL_RenderSetScale(_rend, 1.0, 1.0);
@@ -120,31 +121,36 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	btnSetDrawMode.OnInit(_rend, texSetDrawMode, "DRAW");
 	btnSetDrawMode.DisplayRect = { 5,5, 50, 50 };
 	btnSetDrawMode.BorderWidth = 2;
+	btnSetDrawMode.Padding = 5;
 
 	btnSetBlockdrawMode.OnInit(_rend, texSetBlockdrawMode, "ERASE");
 	btnSetBlockdrawMode.DisplayRect = { 65, 5, 50, 50 };
 	btnSetBlockdrawMode.BorderWidth = 2;
-	
+	btnSetBlockdrawMode.Padding = 5;
 	
 	btnScrollBlockLeft.OnInit(_rend, texSetBlockscrollStart, "|<");
 	btnScrollBlockLeft.DisplayRect = { 125, 5, 50, 50 };
 	btnScrollBlockLeft.BorderWidth = 2;
-	btnScrollBlockLeft.ActionCode = EDITOR_SCROLL_BLOCK_START;
+	btnScrollBlockLeft.ActionCode = EDITOR_ACTION::SCROLL_BLOCK_START;
+	btnScrollBlockLeft.Padding = 5;
 
 	btnScrollBlockRight.OnInit(_rend, texScrollBlockLeft, "<");
 	btnScrollBlockRight.DisplayRect = { 185, 5, 50, 50 };
 	btnScrollBlockRight.BorderWidth = 2;
-	btnScrollBlockRight.ActionCode = EDITOR_SCROLL_BLOCK_LEFT;
+	btnScrollBlockRight.ActionCode = EDITOR_ACTION::SCROLL_BLOCK_LEFT;
+	btnScrollBlockRight.Padding = 5;
 
 	btnScrollLeft.OnInit(_rend, texScrollBlockRight, ">");
 	btnScrollLeft.DisplayRect = { 245, 5, 50, 50 };
 	btnScrollLeft.BorderWidth = 2;
-	btnScrollLeft.ActionCode = EDITOR_SCROLL_BLOCK_RIGHT;
+	btnScrollLeft.ActionCode = EDITOR_ACTION::SCROLL_BLOCK_RIGHT;
+	btnScrollLeft.Padding = 5;
 
 	btnScrollRight.OnInit(_rend, texSetBlockscrollEnd, ">|");
 	btnScrollRight.DisplayRect = { 305, 5, 50, 50 };
 	btnScrollRight.BorderWidth = 2;
-	btnScrollRight.ActionCode = EDITOR_SCROLL_BLOCK_END;
+	btnScrollRight.ActionCode = EDITOR_ACTION::SCROLL_BLOCK_END;
+	btnScrollRight.Padding = 5;
 
 	Buttons.push_back(btnSetDrawMode);
 	Buttons.push_back(btnSetBlockdrawMode);
@@ -179,9 +185,9 @@ void UI_Editor::LoadTextures(const SDL_Rect* destRect, const SDL_Rect* srcRect)
 void UI_Editor::OnLoop()
 {
 	list<UI_Button>::iterator iter = Buttons.begin();
-	iter->IsActive = _activeTool == EDITOR_DRAWMODE;
+	iter->IsActive = _activeTool == EDITOR_ACTION::DRAWMODE;
 	advance(iter, 1);
-	iter->IsActive = _activeTool == EDITOR_BORDERDRAWMODE;
+	iter->IsActive = _activeTool == EDITOR_ACTION::BORDERDRAWMODE;
 }
 
 void UI_Editor::OnEvent(SDL_Event* event)
@@ -196,7 +202,7 @@ void UI_Editor::OnEvent(SDL_Event* event)
 	
 	if (event->type == EDITOR_EVENT_TYPE)
 	{
-		if (event->user.code == EDITOR_DRAWMODE || event->user.code == EDITOR_BORDERDRAWMODE)
+		if (event->user.code == (Sint32)EDITOR_ACTION::DRAWMODE || event->user.code == (Sint32)EDITOR_ACTION::BORDERDRAWMODE)
 		{
 			_activeTool = (EDITOR_ACTION) event->user.code;
 		}
@@ -219,13 +225,13 @@ void UI_Editor::OnEvent(SDL_Event* event)
 
 }
 
-void UI_Editor::OnRender()
+void UI_Editor::OnRender(Uint16 colPos, Uint16 rowPos)
 {
 	// Background and a border please...
 	SDL_RenderSetClipRect(_rend, &DisplayRect);
 	SDL_Extras::SDL_RenderSetDrawColor(_rend, FillColor);
 	SDL_RenderFillRect(_rend, &DisplayRect);
-	SDL_Extras::SDL_RenderDrawBorder(_rend, DisplayRect, 2, &BorderColor);
+	SDL_Extras::SDL_RenderDrawBorder(_rend, DisplayRect, 2, BorderColor);
 
 	for (_widgetsIter = Buttons.begin(); _widgetsIter != Buttons.end(); _widgetsIter++)
 	{
@@ -234,6 +240,8 @@ void UI_Editor::OnRender()
 
 	FillColorWidgets.OnRender();
 	BorderColorWidgets.OnRender();
+	SDL_Extras::SDL_RenderStringAt(_rend, "Column " +  to_string(colPos + 1) + "-" + to_string(colPos + 1 + 40), { 700, 0 }, _charmap, 50, nullptr);
+	
 }
 
 void UI_Editor::OnPostRender()

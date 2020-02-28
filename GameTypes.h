@@ -1,30 +1,41 @@
 #pragma once
 #include <SDL.h>
 #include <iostream>
+#include <list>
+#include <unordered_map>
+using namespace std;
 
-typedef struct GameProperties
+enum class GameState
 {
-	SDL_Rect WindowFrame;
-} ;
-
-typedef enum GameState
-{
-	GameState_Idle,
-	GameState_MainScreen,
-	GameState_LevelEdit,
-	GameState_PlayerEdit,
-	GameState_Running,
-	GameState_Paused,
-	GameState_Highscore,
-	GameState_GameOver
+	Idle,
+	MainScreen,
+	LevelEdit,
+	PlayerEdit,
+	Running,
+	Paused,
+	Highscore,
+	GameOver
 
 };
 
-typedef enum MotionState
+enum class MotionState
 {
 	None = 0,
 	Plus,
 	Minus
+};
+
+enum class TileType
+{
+	Background = 0,
+	Deadly,
+	Damage,
+	Teleport
+};
+
+typedef struct GameProperties
+{
+	SDL_Rect WindowFrame;
 };
 
 typedef struct MatrixSetup
@@ -33,26 +44,28 @@ typedef struct MatrixSetup
 	int Cols = 1000;
 	Uint16 BlockSize = 35;
 	Uint16 BlockSpacing = 1;
-	Uint16 DisplayColumns = 40;
+	Uint16 DisplayCols = 40;
 	Uint16 DisplayRows = 20;
 	SDL_Rect DisplayRect = { 1, 1, 1,1 };
 	int ScreenOffsX;
 	SDL_Color Background;
 };
 
-typedef struct MatrixRectItem
+class MatrixTile
 {
-	int BorderColor;
-	int FillColor;
+public:
+	MatrixTile();
+	~MatrixTile();
+
+	TileType Type;
+	Uint16 TileIndex;
+	Uint16 FillColor;
+	Uint16 BorderColor;
+	bool Visible;
 };
 
-typedef struct MatrixTile
-{
-	Uint16 TileIndex;
-	bool IsCollisionActive;
-	bool IsDamage;
-	bool IsHealthUp;
-	bool IsItem;
-	Uint16 Damage;
-	
-};
+typedef unordered_map<char, SDL_Texture*> CharacterMap;
+typedef list<SDL_Color> ColorPalette;
+typedef pair<Uint16, Uint16> MapCoords;
+
+typedef MatrixTile** GameMatrix;

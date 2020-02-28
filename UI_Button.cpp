@@ -38,14 +38,14 @@ void UI_Button::OnRender(void)
 		Uint32 f;
 		int  a, w, h;
 		SDL_QueryTexture(_texture, &f, &a, &w, &h);
-		int contentWidth = DisplayRect.w - (BorderWidth << 1);
-		int contentHeight = DisplayRect.h - (BorderWidth << 1);
+		int contentWidth = DisplayRect.w - (BorderWidth << 1) - (Padding << 1);
+		int contentHeight = DisplayRect.h - (BorderWidth << 1) - (Padding << 1);
 		
 		SDL_Rect srcRect = { 0,0,w,h };
 		SDL_Rect destRect =
 		{
-			DisplayRect.x + BorderWidth,
-			DisplayRect.y + BorderWidth,
+			DisplayRect.x + BorderWidth + Padding,
+			DisplayRect.y + BorderWidth + Padding,
 			contentWidth,
 			contentHeight
 		};

@@ -7,10 +7,10 @@ UI_Widget::UI_Widget()
 void UI_Widget::OnInit(SDL_Renderer* renderer)
 {	
 	_rend = renderer;
-	ActionCode = 0;
+	ActionCode =EDITOR_ACTION::DRAWMODE;
 }
 
-void UI_Widget::OnInit(SDL_Renderer* renderer, Uint16 actionCode)
+void UI_Widget::OnInit(SDL_Renderer* renderer, EDITOR_ACTION actionCode)
 {
 	_rend = renderer;
 	ActionCode = actionCode;
@@ -39,8 +39,8 @@ void UI_Widget::OnRender()
 	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
 	SDL_RenderFillRect(_rend, &DisplayRect);
 	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_NONE);
-	if (!IsActive) SDL_Extras::SDL_RenderDrawBorder(_rend, DisplayRect, BorderWidth, &BorderColor);
-	else SDL_Extras::SDL_RenderDrawBorder(_rend, DisplayRect, BorderWidth, &BorderColorActive);
+	if (!IsActive) SDL_Extras::SDL_RenderDrawBorder(_rend, DisplayRect, BorderWidth, BorderColor);
+	else SDL_Extras::SDL_RenderDrawBorder(_rend, DisplayRect, BorderWidth, BorderColorActive);
 	SDL_RenderSetClipRect(_rend, nullptr);
 }
 
@@ -59,7 +59,7 @@ void UI_Widget::OnMouseButtonDown(SDL_MouseButtonEvent event)
 	
 	SDL_zero(Event);
 	Event.type = EventType;
-	Event.user.code = ActionCode;
+	Event.user.code = (Sint32)ActionCode;
 	Event.user.data1 = this;
 	Event.user.data2 = &UserData;
 	SDL_PushEvent(&Event);

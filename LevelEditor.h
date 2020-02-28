@@ -1,6 +1,7 @@
 #pragma once
 #include "GameTypes.h"
 #include "UI_Editor.h"
+#include "GameMap.h"
 #include <SDL.h>
 #include <string>
 #include <iostream>
@@ -16,22 +17,16 @@ public:
 	LevelEditor();
 
 	UI_Editor UI;
-	EDITOR_ACTION Mode = EDITOR_DRAWMODE;
-	MatrixSetup* MapSetup;
-	MatrixRectItem** MapMatrix;
-	list<MatrixRectItem> DrawCollection;
-	list<SDL_Color> ColorPalette;
+	EDITOR_ACTION Mode = EDITOR_ACTION::DRAWMODE;
 	SDL_Rect DisplayRect;
 	Uint16 UI_Height = 200;
-	SDL_Color ActiveFillColor;
-	SDL_Color ActiveBorderColor;
 	SDL_Point ActiveIndex;
 	int ColumnPosition = 0;
 	int RowPosition = 0;
 	int ScrollPosition = 0;
 	int ScrollSpeed = 1;
 
-	void OnInit(SDL_Window* win, SDL_Renderer* rend, MatrixRectItem** map, MatrixSetup* setup);
+	void OnInit(SDL_Window* win, SDL_Renderer* rend, GameMap* map, CharacterMap charMap);
 
 	void OnLoop();
 
@@ -62,6 +57,9 @@ public:
 private:
 	SDL_Window* _appWindow;
 	SDL_Renderer* _rend;
+	GameMap* _map;
+	CharacterMap _charMap;
+
 	int _outputHeight, _outputWidth;
 	bool _drawActive;
 	bool _eraseActive;
@@ -73,8 +71,5 @@ private:
 
 	int _colorIndexFill;
 	int _colorIndexBorder;
-	list<SDL_Color>::iterator _colorPalletIterator;
-	
-	void FillArea(SDL_Point p1, SDL_Point p2, SDL_Point offset, Uint16 cf, Uint16 cb);
-
+		
 };

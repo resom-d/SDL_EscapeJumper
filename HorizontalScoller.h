@@ -1,6 +1,7 @@
 #pragma once
 #include "SDL_Extras.h"
 #include "GameTypes.h"
+#include "GameMap.h"
 #include <SDL.h>
 #include <SDL_image.h>
 #include <iostream>
@@ -14,21 +15,19 @@ public:
 	HorizontalScroller();
 
 	int ColumnPosition = 0;
-	int ScrollPosition = 0;
+	SDL_Point ScrollPosition = { 0,0 };
+	SDL_Point BlockPosition = { 0,0 };
 	int ScrollSpeed = 1;
-	MatrixSetup* MapSetup;
-	MatrixRectItem** MapMatrix;
-	list<SDL_Color> ColorPalette;
 	bool LevelDone = false;
 	// Game functions
-	void OnInit(SDL_Renderer* renderer, MatrixSetup* setup, MatrixRectItem** map);
-	void InitScollerContent();
+	void OnInit(SDL_Renderer* renderer,  GameMap* map);
 	void OnLoop();
 	void OnRender();
 	void OnCleanUp();
 
 private:
 	SDL_Renderer* _rend;
+	GameMap* _map;
 		
 
 };

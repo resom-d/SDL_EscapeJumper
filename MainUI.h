@@ -3,6 +3,7 @@
 #include <SDL_ttf.h>
 #include <string>
 #include <list>
+#include "GameTypes.h"
 #include "UI_Abstract.h"
 #include "UI_Button.h"
 #include "UI_Container.h"
@@ -15,7 +16,7 @@ class MainUI
 public:
 	MainUI();
 
-	void OnInit(SDL_Renderer* renderer, unordered_map<char, SDL_Texture*> charMap);
+	void OnInit(SDL_Renderer* renderer, CharacterMap charMap);
 	void OnLoop();
 	void OnEvent(SDL_Event* event);
 	void OnRender(std::string  playerName, int playerScore, bool gameOver);
@@ -24,7 +25,7 @@ public:
 
 	SDL_Renderer* _rend;
 	
-	unordered_map<char, SDL_Texture*> _charMap;
+	CharacterMap _charMap;
 	SDL_Rect DisplayRect;
 	list<UI_Button> Buttons;
 	list<UI_TextInput> TextInputs;

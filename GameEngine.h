@@ -7,9 +7,7 @@
 #include <unordered_map>
 #include <string>
 #include <iostream>
-#include <stdlib.h>
-#include <stdio.h>
-#include <iostream>
+#include <list>
 #include "GameTypes.h"
 #include "GameEvents.h"
 #include "GamePlayer.h"
@@ -20,6 +18,7 @@
 #include "UI_Editor.h"
 #include "TextScroller.h"
 #include "SDL_Extras.h"
+#include "GameMap.h"
 
 using namespace std;
 
@@ -33,17 +32,16 @@ public:
 	GameProperties Properties;
 	bool _appIsRunning;
 	Uint16 GlobalFrameRate;
-	GameState GameStatus = GameState_Running;
+	GameState GameStatus = GameState::Running;
 	SDL_Window* AppWindow;
 	SDL_Renderer* Renderer;
 	MainUI MainUI;
 	LevelEditor Editor;
-	MatrixSetup MapSetup;
-	MatrixRectItem** Map;
+	GameMap Map;
 	JumperPlayer Player;
 	HorizontalScroller Scroller;
 	TextScroller MessageScroller;
-	unordered_map<char, SDL_Texture*> CharMap;
+	CharacterMap CharMap;
 
 	SDL_Joystick* GamePad = NULL;
 

@@ -27,13 +27,13 @@ public:
 	TTF_Font* _fontSmall;
 	TTF_Font* _fontGameOversize;
 
-	void OnInit(SDL_Renderer* renderer, list<SDL_Color> colors);
+	void OnInit(SDL_Renderer* renderer, CharacterMap charMap, ColorPalette colors);
 	void LoadTextures(const SDL_Rect* srcRect, const SDL_Rect* destRect);
 	void CreateWidgetTexture(SDL_Renderer* rend, string filePath, SDL_Texture* destTex, SDL_Rect srcRect, SDL_Rect destRect);
 	void ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect);
 	void OnLoop();
 	void OnEvent(SDL_Event*);
-	void OnRender();
+	void OnRender(Uint16 colPos, Uint16 rowPos);
 	void OnPostRender();
 	void OnCleanup();
 
@@ -51,9 +51,10 @@ private:
 	SDL_Texture* texSetBlockscrollStart;
 	SDL_Texture* texSetBlockscrollEnd;
 
+	CharacterMap _charmap;
 	list<UI_Button>::iterator _widgetsIter;
-	list<SDL_Color> _colorPalette;
-	list<SDL_Color>::iterator _colorPaletteIter;
+	ColorPalette _colorPalette;
+	ColorPalette::iterator _colorPaletteIter;
 	list<UI_Widget>::iterator _colorWidgetsIter;
 	UI_Button btnSetDrawMode;
 	UI_Button btnSetBorderDrawmode;

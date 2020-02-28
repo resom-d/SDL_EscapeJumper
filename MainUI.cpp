@@ -4,7 +4,7 @@
 MainUI::MainUI()
 {}
 
-void MainUI::OnInit(SDL_Renderer* renderer, unordered_map<char, SDL_Texture*> charMap)
+void MainUI::OnInit(SDL_Renderer* renderer, CharacterMap charMap)
 {
 	_rend = renderer;
 	_charMap = charMap;
@@ -21,7 +21,7 @@ void MainUI::OnInit(SDL_Renderer* renderer, unordered_map<char, SDL_Texture*> ch
 
 	for (list<UI_TextInput>::iterator iter = TextInputs.begin(); iter != TextInputs.end(); iter++)
 	{
-		iter->OnInit(_rend, _charMap, "Empty String");
+		iter->OnInit(_rend, _charMap, "--Nobody--");
 	}
 }
 
@@ -46,10 +46,7 @@ void MainUI::OnRender(std::string playerName, int playerScore, bool gameOver)
 	SDL_SetRenderDrawColor(_rend, 255, 255, 255, 255);
 	SDL_RenderDrawRect(_rend, &DisplayRect);
 
-	for (list<UI_TextInput>::iterator iter = TextInputs.begin(); iter != TextInputs.end(); iter++)
-	{
-		iter->OnRender();
-	}
+	SDL_Extras::SDL_RenderStringAt(_rend, "ESCAPE JUMPER", { 150, 20 }, _charMap, 80, &DisplayRect);
 }
 
 void MainUI::OnPostRender()

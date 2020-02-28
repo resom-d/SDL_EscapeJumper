@@ -10,7 +10,7 @@ void UI_Container::OnInit(SDL_Renderer* rend)
 	}
 }
 
-void UI_Container::OnInit(SDL_Renderer* rend, Uint16 actionCode)
+void UI_Container::OnInit(SDL_Renderer* rend, EDITOR_ACTION actionCode)
 {
 	UI_Widget::OnInit(rend,  actionCode);
 
@@ -33,7 +33,7 @@ void UI_Container::OnRender()
 	int lastMargin;
 	for (list<UI_Button>::iterator iter = next(_children.begin(), 1); iter != _children.end(); iter++)
 	{		
-		if (Orientation == HORIZONTAL)
+		if (Orientation == WIDGET_ORIENTATION::HORIZONTAL)
 		{
 			destRect.x += iter->Margin;
 			iter->DisplayRect.x = destRect.x;
@@ -41,7 +41,7 @@ void UI_Container::OnRender()
 			destRect.x += iter->DisplayRect.w + iter->Margin;
 		}
 
-		if (Orientation == VERTICAL)
+		if (Orientation == WIDGET_ORIENTATION::VERTICAL)
 		{
 			destRect.y += iter->Margin;
 			iter->DisplayRect.x = destRect.x + Margin;
