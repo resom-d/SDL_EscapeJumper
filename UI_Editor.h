@@ -22,7 +22,7 @@ public:
 	TTF_Font* _fontSmall;
 	TTF_Font* _fontGameOversize;
 
-	void OnInit(SDL_Renderer* renderer, GameMap map, CharacterTextureMap charMap, ColorPalette colors);
+	void OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap charMap, ColorPalette colors);
 	void LoadTextures(const SDL_Rect* srcRect, const SDL_Rect* destRect);
 	void CreateWidgetTexture(SDL_Renderer* rend, string filePath, SDL_Texture* destTex, SDL_Rect srcRect, SDL_Rect destRect);
 	void ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect);
@@ -48,7 +48,7 @@ private:
 	SDL_Texture* texSetBlockscrollStart;
 	SDL_Texture* texSetBlockscrollEnd;
 
-	GameMap _map;
+	GameMap* _map;
 	CharacterTextureMap _charmap;
 	list<UI_Control>::iterator _widgetsIter;
 	ColorPalette _colorPalette;

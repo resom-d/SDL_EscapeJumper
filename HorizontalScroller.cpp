@@ -21,9 +21,9 @@ void HorizontalScroller::OnLoop()
 	if (ScrollPosition.x > _map->Setup.BlockSize + _map->Setup.BlockSpacing)
 	{
 		ScrollPosition.x = ScrollPosition.x % (_map->Setup.BlockSpacing + _map->Setup.BlockSpacing);
-		if (++ColumnPosition > _map->Setup.Cols - _map->Setup.DisplayCols - 2)
+		if (++BlockPosition.x > _map->Setup.Cols - _map->Setup.DisplayCols - 2)
 		{
-			ColumnPosition = 0;
+			BlockPosition.x = 0;
 			ScrollPosition.x = 0;
 			//LevelDone = true;
 		}
@@ -44,7 +44,7 @@ void HorizontalScroller::OnRender()
 	);
 	SDL_RenderFillRect(_rend, &_map->Setup.DisplayRect);
 		
-	_map->OnRender({ ColumnPosition,0 }, ScrollPosition);
+	_map->OnRender(BlockPosition, ScrollPosition);
 	
 	SDL_RenderSetClipRect(_rend, nullptr);
 }

@@ -7,7 +7,7 @@ UI_Editor::UI_Editor()
 
 }
 
-void UI_Editor::OnInit(SDL_Renderer* renderer, GameMap map, CharacterTextureMap charMap, ColorPalette colors)
+void UI_Editor::OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap charMap, ColorPalette colors)
 {
 	_rend = renderer;
 	_map = map;
@@ -229,12 +229,10 @@ void UI_Editor::OnEvent(SDL_Event* event)
 	if (event->type == SDL_MOUSEBUTTONDOWN)
 	{
 		Size2D texSize;
-		auto iter = _map.TextureResources.begin();
+		auto iter = _map->TextureResources.begin();
 		int mx = event->button.x, my = event->button.y;
-
 		SDL_QueryTexture(iter->Texture, nullptr, nullptr, &texSize.w, &texSize.h);
-		if (mx < _tileResourceDPoint.x || mx > _tileResourceDPoint.x + texSize.w || my < _tileResourceDPoint.y || my > _tileResourceDPoint.y + texSize.h);
-		else
+		if (mx >= _tileResourceDPoint.x && mx <= _tileResourceDPoint.x + texSize.w && my >= _tileResourceDPoint.y && my <= _tileResourceDPoint.y + texSize.h)
 		{
 			int col = (mx - _tileResourceDPoint.x) / iter->Tilesize.w;
 			int row = (my - _tileResourceDPoint.y) / iter->Tilesize.h;
@@ -245,8 +243,7 @@ void UI_Editor::OnEvent(SDL_Event* event)
 			_setTileIdEvent.type = UI_EDITOR_EVENT_TYPE;
 			_setTileIdEvent.user.code = (int)UI_ACTION::SET_TILEINDEX;
 			_setTileIdEvent.user.data1= this;
-			_setTileIdEvent.user.data2 = &_setTileData;;
-			
+			_setTileIdEvent.user.data2 = &_setTileData;;			
 									
 			SDL_PushEvent(&_setTileIdEvent);
 		}
@@ -269,7 +266,7 @@ void UI_Editor::OnRender(Uint16 colPos, Uint16 rowPos)
 
 	FillColorWidgets.OnRender();
 	BorderColorWidgets.OnRender();
-	SDL_Extras::SDL_RenderStringAt(_rend, "Column " + to_string(colPos + 1) + "-" + to_string(colPos + 1 + _map.Setup.DisplayCols), { 10, 170 }, _charmap, 22, nullptr);
+	SDL_Extras::SDL_RenderStringAt(_rend, "Column " + to_string(colPos + 1) + "-" + to_string(colPos + 1 + _map->Setup.DisplayCols), { 10, 170 }, _charmap, 22, nullptr);
 
 	RenderTileResource(1, _tileResourceDPoint);
 }
@@ -304,9 +301,9 @@ void UI_Editor::OnCleanup()
 
 void UI_Editor::RenderTileResource(Uint16 index, SDL_Point dispPoint)
 {
-	if (_map.TextureResources.size() < 1 || index > _map.TextureResources.size() || index < 1) return;
+	if (_map->TextureResources.size() < 1 || index > _map->TextureResources.size() || index < 1) return;
 
-	auto resource = _map.TextureResources.begin();
+	auto resource = _map->TextureResources.begin();
 	advance(resource, index - 1);
 
 	int w, h;

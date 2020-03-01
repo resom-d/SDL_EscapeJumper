@@ -43,12 +43,12 @@ enum class TileType
 
 typedef struct TilemapTile
 {
-	TileType Type;
-	Uint16 FillColor;
-	Uint16 BorderColor;
-	Uint16 ResourceIndex;
-	Uint16 TileIndex;
-	bool Visible;
+	TileType Type = TileType::Background;
+	Uint16 ResourceIndex = 0;
+	Uint16 TileIndex = 0;
+	Uint16 FillColor = 0;
+	Uint16 BorderColor = 0;
+	bool Visible = false;
 };
 
 typedef struct TilemapSetup
@@ -74,6 +74,7 @@ public:
 	~GameMap();
 
 	TilemapSetup Setup;
+	TileMap TileMap;
 	ColorPalette ColorPallete;
 	TileMapTextureResourceList TextureResources;
 
@@ -84,10 +85,11 @@ public:
 	virtual void InitMap();
 	virtual void SetTileInMap(MapCoords, TilemapTile settings);
 	virtual void FillArea(MapCoords p1, MapCoords p2, MapCoords offs, TilemapTile org);
+	virtual TilemapTile GetTileAt(Uint16 col, Uint16 row);
+
 private:
 
 protected:
 	SDL_Renderer* _rend;
-	TileMap _map;
 };
 

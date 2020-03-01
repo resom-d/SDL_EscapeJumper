@@ -27,7 +27,7 @@ public:
 	int ScrollPosition = 0;
 	int ScrollSpeed = 1;
 
-	void OnInit(SDL_Window* win, SDL_Renderer* rend, GameMap map, CharacterTextureMap charMap);
+	void OnInit(SDL_Window* win, SDL_Renderer* rend, GameMap* map, CharacterTextureMap charMap);
 
 	void OnLoop();
 
@@ -58,7 +58,7 @@ public:
 private:
 	SDL_Window* _appWindow;
 	SDL_Renderer* _rend;
-	GameMap _map;
+	GameMap* _map;
 	CharacterTextureMap _charMap;
 	
 	int _colorIndexFill;

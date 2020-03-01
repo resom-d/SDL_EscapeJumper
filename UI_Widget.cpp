@@ -11,9 +11,9 @@ UI_Widget::UI_Widget()
 }
 
 void UI_Widget::OnInit(SDL_Renderer* renderer)
-{	
+{
 	_rend = renderer;
-	ActionCode =UI_ACTION::DRAWMODE;
+	ActionCode = UI_ACTION::DRAWMODE;
 }
 
 void UI_Widget::OnInit(SDL_Renderer* renderer, UI_ACTION actionCode)
@@ -34,13 +34,16 @@ void UI_Widget::OnEvent(SDL_Event* event)
 		OnMouseButtonDown(event->button);
 		break;
 
+	case SDL_MOUSEMOTION:
+		OnMouseMove(event->button);
+		break;
 	}
 }
 
 void UI_Widget::OnRender()
 {
 	SDL_RenderSetClipRect(_rend, &DisplayRect);
-	if(!IsActive) SDL_SetRenderDrawColor(_rend, FillColor.r, FillColor.g, FillColor.b, FillColor.a);
+	if (!IsActive) SDL_SetRenderDrawColor(_rend, FillColor.r, FillColor.g, FillColor.b, FillColor.a);
 	else SDL_SetRenderDrawColor(_rend, FillColorActive.r, FillColorActive.g, FillColorActive.b, FillColorActive.a);
 	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
 	SDL_RenderFillRect(_rend, &DisplayRect);
@@ -62,7 +65,7 @@ void UI_Widget::SetActiveMode(bool active)
 void UI_Widget::OnMouseButtonDown(SDL_MouseButtonEvent event)
 {
 	if (event.x > DisplayRect.x + DisplayRect.w || event.x < DisplayRect.x || event.y < DisplayRect.y || event.y > DisplayRect.y + DisplayRect.h) return;
-	
+
 	SDL_zero(Event);
 	Event.type = EventType;
 	Event.user.code = (Sint32)ActionCode;
@@ -70,4 +73,11 @@ void UI_Widget::OnMouseButtonDown(SDL_MouseButtonEvent event)
 	Event.user.data2 = &UserData;
 	SDL_PushEvent(&Event);
 
+}
+
+void UI_Widget::OnMouseMove(SDL_MouseButtonEvent event)
+{
+	BorderColor = Control_BorderColor;
+	if (event.x > DisplayRect.x + DisplayRect.w || event.x < DisplayRect.x || event.y < DisplayRect.y || event.y > DisplayRect.y + DisplayRect.h) return;
+	BorderColor = Control_BorderColorActive;
 }

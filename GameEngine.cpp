@@ -65,7 +65,7 @@ bool GameEngine::OnInit()
 	// Create a texure map from a string 
 	_font = TTF_OpenFont("Resources/fonts/NovaMono-Regular.ttf", 36);
 	CharMap = SDL_Extras::SDL_GetTexturesFromString(Renderer, " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜßabcdefghijklmnopqrstuvwxyzäöü,.;:*#-_|<>^°?=()!\"§$%&/()@€~", _font);
-		
+
 	Player.OnInit(Renderer);
 	OnInitPlayer();
 
@@ -91,7 +91,7 @@ bool GameEngine::OnInit()
 		Map.Setup.DisplayRect.w,
 		Map.Setup.DisplayRect.w + UI_Height
 	};
-	Editor.OnInit(AppWindow, Renderer, Map, CharMap);
+	Editor.OnInit(AppWindow, Renderer, &Map, CharMap);
 
 	/*int r = Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 	tune = Mix_LoadMUS("Resources/music/The impossible Mission.mp3");
@@ -131,7 +131,7 @@ int GameEngine::OnExecute()
 		timerFPS_n = SDL_GetTicks();
 		timeDiff = timerFPS_n - timerFPS_1n;
 		if (timeDiff < 1000 / GlobalFrameRate) SDL_Delay((1000 / GlobalFrameRate) - timeDiff);
-	
+
 	}
 
 	// don't leave a messy place
@@ -201,6 +201,7 @@ void GameEngine::OnRender()
 		SDL_Extras::SDL_RenderStringAt(Renderer, "Präsentiert:", { 120, 200 }, CharMap, 100, nullptr);
 		SDL_Extras::SDL_RenderStringAt(Renderer, "ESCAPE JUMPER", { 100, 400 }, CharMap, 100, nullptr);*/
 		MainUI.OnRender("Zehnfinger", Player.Score, GameStatus == GameState::Running);
+		Map.OnRender({ 0,0 }, { 0,0 });
 		MessageScroller.OnRender();
 	}
 
@@ -220,7 +221,6 @@ void GameEngine::OnRender()
 	{
 		Editor.OnRender();
 	}
-
 
 	// Hey, Renderer! Do it! Do it !
 	SDL_RenderPresent(Renderer);
@@ -253,6 +253,17 @@ void GameEngine::OnCleanup()
 
 void GameEngine::OnCollisionCheck()
 {
+	TilemapTile ta[200][20];
+
+	/*for (int column = 0; column < Map.Setup.Cols; column++)
+	{
+		for (int row = 0; row < Map.Setup.Rows; row++)
+		{
+			TilemapTile t = Map.GetTileAt(column, row);
+			ta[column][row] = t;
+		}
+	}*/
+
 	int playerScreenColumn, playerScreenRow;
 	int playerEdgeT, playerEdgeL, playerEdgeR, playerEdgeB;
 	int obstEdgeT, obstEdgeL, obstEdgeR, obstEdgeB;
@@ -268,17 +279,16 @@ void GameEngine::OnCollisionCheck()
 	// Check if row and column of player make sense - exit if not.
 	if (playerScreenColumn < 0 || playerScreenRow < 0 || playerScreenColumn > Map.Setup.DisplayCols || playerScreenRow > Map.Setup.DisplayRows) return;
 	// Check 9 possible zones
-	for (int x = -1; x <= 1; x++)
+	for (int x = -1; x < 2; x++)
 	{
 		for (int y = -1; y <= 1; y++)
 		{
-			int obstX = playerScreenColumn + x + Scroller.ColumnPosition + 1;
-			int obstY = playerScreenRow + y;
+			int obstX = playerScreenColumn + x + Scroller.BlockPosition.x +1;
+			int obstY = playerScreenRow + y + Scroller.BlockPosition.y;
+			if (obstX < 0 || obstY < 0 || obstX > Map.Setup.Cols - 1 || obstY > Map.Setup.Rows - 1) continue;
 
-			if (obstX < 0 || obstY < 0 || obstX > Map.Setup.Cols || obstY > Map.Setup.Rows) continue;
-
-			// todo fix
-			//if (Map[obstX][obstY].FillColor == 0) continue;
+			TilemapTile tile = Map.TileMap[obstX][obstY];
+			if (!tile.Visible) continue;
 
 			obstEdgeT = Map.Setup.DisplayRect.y + ((playerScreenRow + y) * (Map.Setup.BlockSize + Map.Setup.BlockSpacing));
 			obstEdgeL = Map.Setup.DisplayRect.x + ((playerScreenColumn + x + 1) * (Map.Setup.BlockSize + Map.Setup.BlockSpacing)) - Scroller.ScrollPosition.x;
@@ -295,7 +305,7 @@ void GameEngine::OnCollisionCheck()
 
 			if (SDL_IntersectRect(&Player.DisplayRect, &rObst, &result))
 			{
-				//GameStatus = GameState::GameOver;
+				GameStatus = GameState::GameOver;
 
 			}
 
@@ -339,7 +349,7 @@ void GameEngine::OnGameRestart()
 	OnInitPlayer();
 
 	Scroller.ScrollPosition.x = 0;
-	Scroller.ColumnPosition = 0;
+	Scroller.BlockPosition = { 0,0 };
 
 	Player.Score = 0;
 	Player.Speed = 2;

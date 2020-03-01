@@ -13,8 +13,7 @@ class HorizontalScroller
 
 public:
 	HorizontalScroller();
-
-	int ColumnPosition = 0;
+		
 	SDL_Point ScrollPosition = { 0,0 };
 	SDL_Point BlockPosition = { 0,0 };
 	int ScrollSpeed = 1;

@@ -69,6 +69,20 @@ void UI_Container::OnEvent(SDL_Event* event)
 	{
 		iter->OnEvent(event);
 	}
+
+	switch (event->type)
+	{
+	case SDL_MOUSEMOTION:
+		OnMouseMove(event->button);
+		break;
+	}	
+}
+
+void UI_Container::OnMouseMove(SDL_MouseButtonEvent event)
+{
+	BorderColor = Control_BorderColor;
+	if (event.x > DisplayRect.x + DisplayRect.w || event.x < DisplayRect.x || event.y < DisplayRect.y || event.y > DisplayRect.y + DisplayRect.h) return;
+	BorderColor = Control_BorderColorHover;
 }
 
 void UI_Container::OnCleanUp(void)

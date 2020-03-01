@@ -17,7 +17,7 @@ public:
 	virtual void OnCleanup(void);
 	
 	virtual void OnMouseButtonDown(SDL_MouseButtonEvent event);
-	
+	virtual void OnMouseMove(SDL_MouseButtonEvent event);
 
 private:
 	SDL_Texture* _texture = nullptr;

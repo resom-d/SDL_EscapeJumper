@@ -16,6 +16,7 @@ public:
 	virtual void OnInit(SDL_Renderer*, UI_ACTION actionCode);
 	virtual void OnRender();
 	virtual void OnEvent(SDL_Event*);
+	virtual void OnMouseMove(SDL_MouseButtonEvent event);
 	virtual void OnCleanUp(void);
 	virtual void AddChild(UI_Control);
 
