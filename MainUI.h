@@ -12,7 +12,7 @@ class MainUI
 public:
 	MainUI();
 
-	void OnInit(SDL_Renderer* renderer, CharacterMap charMap);
+	void OnInit(SDL_Renderer* renderer, CharacterTextureMap charMap);
 	void OnLoop();
 	void OnEvent(SDL_Event* event);
 	void OnRender(std::string  playerName, int playerScore, bool gameOver);
@@ -21,10 +21,11 @@ public:
 
 	SDL_Renderer* _rend;
 	
-	CharacterMap _charMap;
+	CharacterTextureMap _charMap;
 	SDL_Rect DisplayRect;
 	list<UI_Control> Buttons;
 	list<UI_TextInput> TextInputs;
+
 	
 };
 

@@ -1,0 +1,17 @@
+<- Zehnfinger Game-Engine Level-File for MatrixRectItems
+
+<- Map-Setup
+MXC:,200
+MXR:,20
+MXDC:,40
+MXDR:,20
+MXBZ:,35
+MXBS:,1
+MXFR:,0
+MXFG:,0
+MXFB:,0
+MXFA:,255
+
+<- Color-Pallete:
+
+<- MATRIX-ITEMS

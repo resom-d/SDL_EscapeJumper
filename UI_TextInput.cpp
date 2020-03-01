@@ -1,7 +1,9 @@
 #include "UI_TextInput.h"
 
 UI_TextInput::UI_TextInput()
-{}
+{
+	UI_Widget::UI_Widget();
+}
 
 void UI_TextInput::OnInit(SDL_Renderer* rend, unordered_map<char, SDL_Texture*> charMap, string text)
 {

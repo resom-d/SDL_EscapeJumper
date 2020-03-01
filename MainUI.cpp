@@ -4,7 +4,7 @@
 MainUI::MainUI()
 {}
 
-void MainUI::OnInit(SDL_Renderer* renderer, CharacterMap charMap)
+void MainUI::OnInit(SDL_Renderer* renderer, CharacterTextureMap charMap)
 {
 	_rend = renderer;
 	_charMap = charMap;
@@ -40,10 +40,12 @@ void MainUI::OnRender(std::string playerName, int playerScore, bool gameOver)
 
 	if (_rend == nullptr) return;
 	SDL_RenderSetClipRect(_rend, &DisplayRect);
-	// Give us Background and a Boarder
-	SDL_SetRenderDrawColor(_rend, 168, 127, 50, 255);
+	// Give us Background and a Border
+	SDL_Color col = UI_EditorFill;
+	SDL_SetRenderDrawColor(_rend, col.r, col.b, col.g, col.a );
 	SDL_RenderFillRect(_rend, &DisplayRect);
-	SDL_SetRenderDrawColor(_rend, 255, 255, 255, 255);
+	col = UI_EditorBorder;
+	SDL_SetRenderDrawColor(_rend, col.r, col.b, col.g, col.a);
 	SDL_RenderDrawRect(_rend, &DisplayRect);
 
 	SDL_Extras::SDL_RenderStringAt(_rend, "ESCAPE JUMPER", { 150, 20 }, _charMap, 80, &DisplayRect);

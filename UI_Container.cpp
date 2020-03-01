@@ -1,5 +1,13 @@
 #include "UI_Container.h"
 
+UI_Container::UI_Container()
+{
+	UI_Widget::UI_Widget();
+}
+
+UI_Container::~UI_Container()
+{}
+
 void UI_Container::OnInit(SDL_Renderer* rend)
 {
 	UI_Widget::OnInit(rend);
@@ -10,7 +18,7 @@ void UI_Container::OnInit(SDL_Renderer* rend)
 	}
 }
 
-void UI_Container::OnInit(SDL_Renderer* rend, EDITOR_ACTION actionCode)
+void UI_Container::OnInit(SDL_Renderer* rend, UI_ACTION actionCode)
 {
 	UI_Widget::OnInit(rend,  actionCode);
 

@@ -13,7 +13,7 @@ public:
 	bool IsActive;
 	SDL_Event Event;
 	Uint32 EventType;
-	EDITOR_ACTION ActionCode;
+	UI_ACTION ActionCode;
 	Userdata UserData;
 	SDL_Rect DisplayRect;
 	Uint16 BorderWidth;
@@ -33,7 +33,7 @@ public:
 
 	// Methods
 	virtual void OnInit(SDL_Renderer* renderer);
-	virtual void OnInit(SDL_Renderer* renderer, EDITOR_ACTION actionCode);
+	virtual void OnInit(SDL_Renderer* renderer, UI_ACTION actionCode);
 	virtual void OnLoop();
 	virtual void OnEvent(SDL_Event*);
 	virtual void OnRender();

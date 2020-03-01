@@ -2,6 +2,7 @@
 
 UI_Control::UI_Control()
 {
+	UI_Widget::UI_Widget();
 	_text = "";
 	_texture = nullptr;
 	_rend = nullptr;

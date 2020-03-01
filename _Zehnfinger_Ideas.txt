@@ -1,0 +1,1 @@
+Make the map scrollable in editor while middle mouse is down.

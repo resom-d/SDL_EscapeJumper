@@ -10,7 +10,7 @@ public:
 
 	string TextBuffer;
 
-	virtual void OnInit(SDL_Renderer* rend, CharacterMap charMap, string text);
+	virtual void OnInit(SDL_Renderer* rend, CharacterTextureMap charMap, string text);
 	virtual void OnEvent(SDL_Event* event);
 	virtual void OnRender(void);
 	virtual void OnCleanup(void);
@@ -18,7 +18,7 @@ public:
 private:
 	SDL_Renderer* _rend;
 	bool _hasFocus;
-	CharacterMap _charMap;
+	CharacterTextureMap _charMap;
 
 	virtual void OnLeftMouseDown(int mx, int my);
 

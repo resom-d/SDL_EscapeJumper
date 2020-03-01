@@ -14,9 +14,9 @@ using namespace std;
 class SDL_Extras
 {
 public:
-	static CharacterMap SDL_GetTexturesFromString(SDL_Renderer* rend, string aString, TTF_Font* font);
+	static CharacterTextureMap SDL_GetTexturesFromString(SDL_Renderer* rend, string aString, TTF_Font* font);
 	
-	static void SDL_RenderStringAt(SDL_Renderer* rend, string text, SDL_Point p, CharacterMap chars, Uint16 size, SDL_Rect* clipRect);
+	static void SDL_RenderStringAt(SDL_Renderer* rend, string text, SDL_Point p, CharacterTextureMap chars, Uint16 size, SDL_Rect* clipRect);
 
 	static void SDL_RenderSetPixel(SDL_Renderer* renderer, int x, int y, Uint8 red, Uint8 green, Uint8 blue, Uint8 alpha);
 

@@ -168,6 +168,7 @@
     <ClCompile Include="UI_Container.cpp" />
     <ClCompile Include="UI_Control.cpp" />
     <ClCompile Include="UI_Editor.cpp" />
+    <ClCompile Include="UI_GridContainer.cpp" />
     <ClCompile Include="UI_TextInput.cpp" />
     <ClCompile Include="UI_Widget.cpp" />
   </ItemGroup>
@@ -187,6 +188,8 @@
     <ClInclude Include="UI_Container.h" />
     <ClInclude Include="UI_Control.h" />
     <ClInclude Include="UI_Editor.h" />
+    <ClInclude Include="UI_GridContainer.h" />
+    <ClInclude Include="UI_Styles.h" />
     <ClInclude Include="UI_TextInput.h" />
     <ClInclude Include="UI_Types.h" />
     <ClInclude Include="UI_Widget.h" />
@@ -243,6 +246,9 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SDL_GameBase.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="_Zehnfinger_Ideas.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

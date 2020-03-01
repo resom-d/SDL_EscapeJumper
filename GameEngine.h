@@ -40,7 +40,7 @@ public:
 	JumperPlayer Player;
 	HorizontalScroller Scroller;
 	TextScroller MessageScroller;
-	CharacterMap CharMap;
+	CharacterTextureMap CharMap;
 
 	SDL_Joystick* GamePad = NULL;
 

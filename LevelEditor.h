@@ -17,16 +17,17 @@ public:
 	LevelEditor();
 
 	UI_Editor UI;
-	EDITOR_ACTION Mode = EDITOR_ACTION::DRAWMODE;
+	UI_ACTION Mode = UI_ACTION::DRAWMODE;
 	SDL_Rect DisplayRect;
 	Uint16 UI_Height = 200;
-	SDL_Point ActiveIndex;
+	Uint16 TileIndex = 0;
+	Uint16 ResourceIndex = 0;
 	int ColumnPosition = 0;
 	int RowPosition = 0;
 	int ScrollPosition = 0;
 	int ScrollSpeed = 1;
 
-	void OnInit(SDL_Window* win, SDL_Renderer* rend, GameMap* map, CharacterMap charMap);
+	void OnInit(SDL_Window* win, SDL_Renderer* rend, GameMap map, CharacterTextureMap charMap);
 
 	void OnLoop();
 
@@ -45,7 +46,7 @@ public:
 	void OnKeyDown(SDL_Keycode sym, SDL_Keycode mod);
 
 	void OnKeyUp(SDL_Keycode sym, SDL_Keycode mod);
-	
+
 	void OnLeftButtonUp(int mX, int mY);
 	void OnLeftButtonDown(int mX, int mY);
 	void OnRightButtonUp(int mX, int mY);
@@ -57,19 +58,23 @@ public:
 private:
 	SDL_Window* _appWindow;
 	SDL_Renderer* _rend;
-	GameMap* _map;
-	CharacterMap _charMap;
-
-	int _outputHeight, _outputWidth;
+	GameMap _map;
+	CharacterTextureMap _charMap;
+	
+	int _colorIndexFill;
+	int _colorIndexBorder;
+	int _outputHeight;
+	int _outputWidth;
 	bool _drawActive;
 	bool _eraseActive;
-	
+	bool _mapScrollMidlleMouse;
+
+	SDL_Point _mapScrollDiff;
+
 	SDL_Point _blockdrawStart;
 	SDL_Point _blockdrawEnd;
 	SDL_Point _blockdrawStartScreen;
 	SDL_Point _blockdrawEndScreen;
 
-	int _colorIndexFill;
-	int _colorIndexBorder;
-		
+
 };

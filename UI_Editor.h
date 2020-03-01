@@ -2,6 +2,7 @@
 #include "UI_Types.h"
 #include "UI_Control.h"
 #include "UI_Container.h"
+#include "GameMap.h"
 using namespace std;
 
 
@@ -21,7 +22,7 @@ public:
 	TTF_Font* _fontSmall;
 	TTF_Font* _fontGameOversize;
 
-	void OnInit(SDL_Renderer* renderer, CharacterMap charMap, ColorPalette colors);
+	void OnInit(SDL_Renderer* renderer, GameMap map, CharacterTextureMap charMap, ColorPalette colors);
 	void LoadTextures(const SDL_Rect* srcRect, const SDL_Rect* destRect);
 	void CreateWidgetTexture(SDL_Renderer* rend, string filePath, SDL_Texture* destTex, SDL_Rect srcRect, SDL_Rect destRect);
 	void ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect);
@@ -31,6 +32,8 @@ public:
 	void OnPostRender();
 	void OnCleanup();
 
+protected:
+	
 	
 private:
 	SDL_Renderer* _rend;
@@ -45,11 +48,17 @@ private:
 	SDL_Texture* texSetBlockscrollStart;
 	SDL_Texture* texSetBlockscrollEnd;
 
-	CharacterMap _charmap;
+	GameMap _map;
+	CharacterTextureMap _charmap;
 	list<UI_Control>::iterator _widgetsIter;
 	ColorPalette _colorPalette;
 	ColorPalette::iterator _colorPaletteIter;
 	list<UI_Widget>::iterator _colorWidgetsIter;
+	SDL_Point _tileResourceDPoint;
+
+	SDL_Event _setTileIdEvent;
+	Userdata _setTileData;
+
 	UI_Control btnSetDrawMode;
 	UI_Control btnSetBorderDrawmode;
 	UI_Control btnSetBlockdrawMode;
@@ -57,7 +66,7 @@ private:
 	UI_Control btnScrollRight;
 	UI_Control btnScrollBlockLeft;
 	UI_Control btnScrollBlockRight;
-	EDITOR_ACTION _activeTool;
-	void FireEvent(void*, void*);
-
+	UI_ACTION _activeTool;
+	
+	void RenderTileResource(Uint16 index, SDL_Point dispPoint);
 };

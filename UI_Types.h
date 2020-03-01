@@ -1,10 +1,12 @@
 #pragma once
 #include <SDL.h>
 #include <SDL_ttf.h>
-#include "SDL_Extras.h"
 #include <iostream>
 #include <list>
 #include <string>
+#include "SDL_Extras.h"
+#include "UI_Styles.h"
+
 
 using namespace std;
 
@@ -43,7 +45,7 @@ enum class WIDGET_ORIENTATION
 	VERTICAL
 };
 		  
-enum class EDITOR_ACTION
+enum class UI_ACTION
 {
 	NONE = 0,
 	DRAWMODE,
@@ -57,7 +59,8 @@ enum class EDITOR_ACTION
 	BORDERDRAWMODE,
 	SET_FILL_COLOR,
 	SET_BORDER_COLOR,
-	SET_TILEINDEX
+	SET_TILEINDEX,
+	SET_RESSOURCEINDEX
 };
 		  
 enum class WIDGET_EVENT_TYPE
@@ -67,10 +70,11 @@ enum class WIDGET_EVENT_TYPE
 	
 };
 
-
 class Userdata
 {
 public:
 	Uint16 ColorIndex;
 	SDL_Color Color;
+	Uint16 ResourceIndex;
+	Uint16 TileIndex;
 };

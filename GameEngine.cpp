@@ -49,6 +49,18 @@ bool GameEngine::OnInit()
 	if ((Renderer = SDL_CreateRenderer(AppWindow, -1, SDL_RENDERER_ACCELERATED)) == nullptr) return false;
 
 	Map.OnInit(Renderer);
+	TileMapTextureResource res;
+	res.Cols = 3;
+	res.Rows = 3;
+	res.MaxIndex = 9;
+	res.Tilesize = { 35, 35 };
+	res.Path = "Resources/tilemaps/tilemap_001.png";
+	SDL_Surface* surf = IMG_Load(res.Path.c_str());
+	res.Texture = SDL_CreateTextureFromSurface(Renderer, surf);
+	SDL_FreeSurface(surf);
+
+	Map.TextureResources.push_back(res);
+
 
 	// Create a texure map from a string 
 	_font = TTF_OpenFont("Resources/fonts/NovaMono-Regular.ttf", 36);
@@ -79,11 +91,11 @@ bool GameEngine::OnInit()
 		Map.Setup.DisplayRect.w,
 		Map.Setup.DisplayRect.w + UI_Height
 	};
-	Editor.OnInit(AppWindow, Renderer, &Map, CharMap);
+	Editor.OnInit(AppWindow, Renderer, Map, CharMap);
 
-	int r = Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+	/*int r = Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 	tune = Mix_LoadMUS("Resources/music/The impossible Mission.mp3");
-	Mix_PlayMusic(tune, -1);
+	Mix_PlayMusic(tune, -1);*/
 
 	_appIsRunning = true;
 	GameStatus = GameState::MainScreen;
@@ -118,15 +130,8 @@ int GameEngine::OnExecute()
 		// make sure we are running at a constant frame rate
 		timerFPS_n = SDL_GetTicks();
 		timeDiff = timerFPS_n - timerFPS_1n;
-		if (timeDiff < 1000 / GlobalFrameRate)
-		{
-			cout << "Idle-Time: " << to_string((1000 / GlobalFrameRate) - timeDiff) << endl;
-			SDL_Delay((1000 / GlobalFrameRate) - timeDiff);
-		}
-		else
-		{
-			cout << "Framerate not constant." << endl;
-		}
+		if (timeDiff < 1000 / GlobalFrameRate) SDL_Delay((1000 / GlobalFrameRate) - timeDiff);
+	
 	}
 
 	// don't leave a messy place

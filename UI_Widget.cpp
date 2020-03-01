@@ -2,15 +2,21 @@
 
 UI_Widget::UI_Widget()
 {
+	FillColor = Control_FillColor;
+	FillColorActive = Control_FillColorActive;
+	FillColorHover = Control_FillColorHover;
+	BorderColor = Control_BorderColor;
+	BorderColorActive = Control_BorderColorActive;
+	BorderColorHover = Control_BorderColorHover;
 }
 
 void UI_Widget::OnInit(SDL_Renderer* renderer)
 {	
 	_rend = renderer;
-	ActionCode =EDITOR_ACTION::DRAWMODE;
+	ActionCode =UI_ACTION::DRAWMODE;
 }
 
-void UI_Widget::OnInit(SDL_Renderer* renderer, EDITOR_ACTION actionCode)
+void UI_Widget::OnInit(SDL_Renderer* renderer, UI_ACTION actionCode)
 {
 	_rend = renderer;
 	ActionCode = actionCode;

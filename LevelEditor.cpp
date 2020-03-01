@@ -3,24 +3,25 @@
 LevelEditor::LevelEditor()
 {}
 
-void LevelEditor::OnInit(SDL_Window* win, SDL_Renderer* rend, GameMap* map, CharacterMap charMap)
+void LevelEditor::OnInit(SDL_Window* win, SDL_Renderer* rend, GameMap map, CharacterTextureMap charMap)
 {
 	_map = map;
 	_appWindow = win;
 	_rend = rend;
 	_charMap = charMap;
+	ResourceIndex = 1;
 	_colorIndexBorder = 1;
 	_colorIndexFill = 2;
 	_blockdrawStart = { -1, -1 };
 	_blockdrawEnd = { -1, -1 };
-		
+
 	// Assign active colors
 	_colorIndexFill = 1;
 	_colorIndexBorder = 1;
 
 	UI.DisplayRect = { 0,0, DisplayRect.w, UI_Height };
-	UI.OnInit(_rend, _charMap,  _map->ColorPallete);
-		
+	UI.OnInit(_rend, _map, _charMap, _map.ColorPallete);
+
 }
 
 void LevelEditor::OnLoop()
@@ -30,49 +31,35 @@ void LevelEditor::OnLoop()
 
 void LevelEditor::OnRender()
 {
-	SDL_RenderSetClipRect(_rend, NULL);
-	SDL_Rect rect;
+	SDL_RenderSetClipRect(_rend, nullptr);
+	SDL_SetRenderDrawColor(_rend, _map.Setup.Background.r, _map.Setup.Background.g, _map.Setup.Background.b,_map. Setup.Background.a);
+	SDL_RenderFillRect(_rend, &_map.Setup.DisplayRect);
+	
+	// Draw a grid
+	SDL_SetRenderDrawColor(_rend, 255, 255, 255, 255);
+	for (auto x = 0; x <= _map.Setup.DisplayRows; x++)
+	{
+		SDL_RenderDrawLine(_rend, 
+			_map.Setup.DisplayRect.x,
+			_map.Setup.DisplayRect.y +( x * (_map.Setup.BlockSize + _map.Setup.BlockSpacing)),
+			_map.Setup.DisplayRect.x + DisplayRect.w,
+			_map.Setup.DisplayRect.y + (x * (_map.Setup.BlockSize + _map.Setup.BlockSpacing))
+		);
+	}
+	for (auto y = 0; y <= _map.Setup.DisplayCols; y++)
+	{
+		SDL_RenderDrawLine(_rend,
+			_map.Setup.DisplayRect.x + (y * (_map.Setup.BlockSize + _map.Setup.BlockSpacing)),
+			_map.Setup.DisplayRect.y,
+			_map.Setup.DisplayRect.x + (y * (_map.Setup.BlockSize + _map.Setup.BlockSpacing)),
+			_map.Setup.DisplayRect.y + DisplayRect.h
+		);
+	}
 
 	UI.OnRender(ColumnPosition, RowPosition);
+	_map.OnRender({ ColumnPosition, RowPosition }, { ScrollPosition, 0 });
 
-	// Fill the background
-	SDL_RenderSetClipRect(_rend, &_map->Setup.DisplayRect);
-	SDL_SetRenderDrawColor(_rend,
-		_map->Setup.Background.r,
-		_map->Setup.Background.g,
-		_map->Setup.Background.b,
-		_map->Setup.Background.a
-	);
-	SDL_RenderFillRect(_rend, &_map->Setup.DisplayRect);
-
-	// Render the map
-	_map->OnRender({ ColumnPosition,RowPosition }, { 0,0 });
-
-	// Draw a grid
-	SDL_RenderSetClipRect(_rend, &_map->Setup.DisplayRect);
-	SDL_SetRenderDrawColor(_rend, 255, 255, 255, 255);
-	int x1, y1, x2, y2;
-	// horizontal Gridlines
-	for (int x = 0; x < _map->Setup.DisplayRows + 1; x++)
-	{
-		x1 = _map->Setup.DisplayRect.x;
-		x2 = x1 + _map->Setup.DisplayRect.w;
-		y1 = _map->Setup.DisplayRect.y + (x * (_map->Setup.BlockSize + _map->Setup.BlockSpacing));
-		y2 = y1;
-		SDL_RenderDrawLine(_rend, x1, y1, x2, y2);
-	}
-	// vertical Gridlines
-	for (int y = 0; y < _map->Setup.DisplayCols + 1; y++)
-	{
-		x1 = _map->Setup.DisplayRect.x + (y * (_map->Setup.BlockSize + _map->Setup.BlockSpacing));
-		x2 = x1;
-		y1 = _map->Setup.DisplayRect.y;
-		y2 = y1 + _map->Setup.DisplayRect.h;
-		SDL_RenderDrawLine(_rend, x1, y1, x2, y2);
-	}
-
-	// Show boxselect border
-	if (Mode == EDITOR_ACTION::BORDERDRAWMODE && (_drawActive || _eraseActive))
+	if (Mode == UI_ACTION::BORDERDRAWMODE && (_drawActive || _eraseActive))
 	{
 		int minX, minY, maxX, maxY;
 
@@ -81,17 +68,24 @@ void LevelEditor::OnRender()
 		maxX = _blockdrawStartScreen.x < _blockdrawEndScreen.x ? _blockdrawEndScreen.x : _blockdrawStartScreen.x;
 		maxY = _blockdrawStartScreen.y < _blockdrawEndScreen.y ? _blockdrawEndScreen.y : _blockdrawStartScreen.y;
 
-		SDL_Rect rect = { minX, minY, maxX - minX, maxY - minY };
-		SDL_SetRenderDrawColor(_rend, 0, 255, 0, 255);
-		SDL_RenderSetClipRect(_rend, &rect);
-		SDL_RenderDrawRect(_rend, &rect);
+		SDL_Rect r = {
+			minX,
+			minY,
+			maxX- minX,
+			maxY -minY
+		};
+
+		SDL_RenderSetClipRect(_rend, &r);
+		SDL_SetRenderDrawColor(_rend, 0, 200, 0, 255);
+		SDL_RenderDrawRect(_rend, &r);
+		SDL_RenderSetClipRect(_rend, nullptr);
 	}
 }
 
 void LevelEditor::OnCleanUp()
 {
 	UI.OnCleanup();
-	
+
 }
 
 void LevelEditor::OnLoadMap()
@@ -104,26 +98,26 @@ void LevelEditor::OnSaveMap()
 	theFile << "<- Zehnfinger Game-Engine Level-File for MatrixRectItems" << endl << endl;;
 
 	theFile << "<- Map-Setup" << endl;
-	theFile << "MXC:," << to_string(_map->Setup.Cols) << endl;
-	theFile << "MXR:," << to_string(_map->Setup.Rows) << endl;
-	theFile << "MXDC:," << to_string(_map->Setup.DisplayCols) << endl;
-	theFile << "MXDR:," << to_string(_map->Setup.DisplayRows) << endl;
-	theFile << "MXBZ:," << to_string(_map->Setup.BlockSize) << endl;
-	theFile << "MXBS:," << to_string(_map->Setup.BlockSpacing) << endl;
-	theFile << "MXFR:," << to_string(_map->Setup.Background.r) << endl;
-	theFile << "MXFG:," << to_string(_map->Setup.Background.g) << endl;
-	theFile << "MXFB:," << to_string(_map->Setup.Background.b) << endl;
-	theFile << "MXFA:," << to_string(_map->Setup.Background.a) << endl << endl;
+	theFile << "MXC:," << to_string(_map.Setup.Cols) << endl;
+	theFile << "MXR:," << to_string(_map.Setup.Rows) << endl;
+	theFile << "MXDC:," << to_string(_map.Setup.DisplayCols) << endl;
+	theFile << "MXDR:," << to_string(_map.Setup.DisplayRows) << endl;
+	theFile << "MXBZ:," << to_string(_map.Setup.BlockSize) << endl;
+	theFile << "MXBS:," << to_string(_map.Setup.BlockSpacing) << endl;
+	theFile << "MXFR:," << to_string(_map.Setup.Background.r) << endl;
+	theFile << "MXFG:," << to_string(_map.Setup.Background.g) << endl;
+	theFile << "MXFB:," << to_string(_map.Setup.Background.b) << endl;
+	theFile << "MXFA:," << to_string(_map.Setup.Background.a) << endl << endl;
 
 	theFile << "<- Color-Pallete:" << endl;
-	
+
 
 	theFile << endl << "<- MATRIX-ITEMS" << endl;
-	for (int x = 0; x < _map->Setup.Cols; x++)
+	for (int x = 0; x < _map.Setup.Cols; x++)
 	{
-		for (int y = 0; y < _map->Setup.Rows; y++)
+		for (int y = 0; y < _map.Setup.Rows; y++)
 		{
-			
+
 		}
 	}
 
@@ -143,41 +137,48 @@ void LevelEditor::OnEvent(SDL_Event* event)
 
 		switch (event->user.code)
 		{
-		case (Sint32)EDITOR_ACTION::DRAWMODE:
-			Mode = EDITOR_ACTION::DRAWMODE;
-			break;
-		case (Sint32)EDITOR_ACTION::BORDERDRAWMODE:
-			Mode = EDITOR_ACTION::BORDERDRAWMODE;
+		case (Sint32)UI_ACTION::SET_TILEINDEX:
+			ud = *(Userdata*)event->user.data2;
+			TileIndex = ud.TileIndex;
 			break;
 
-		case (Sint32)EDITOR_ACTION::SCROLL_BLOCK_START:
+		case (Sint32)UI_ACTION::DRAWMODE:
+			Mode = UI_ACTION::DRAWMODE;
+			break;
+		case (Sint32)UI_ACTION::BORDERDRAWMODE:
+			Mode = UI_ACTION::BORDERDRAWMODE;
+			break;
+
+		case (Sint32)UI_ACTION::SCROLL_BLOCK_START:
 			ColumnPosition = 0;
 			break;
 
-		case (Sint32)EDITOR_ACTION::SCROLL_BLOCK_END:
-			ColumnPosition = _map->Setup.Cols - _map->Setup.DisplayCols - 1;
+		case (Sint32)UI_ACTION::SCROLL_BLOCK_END:
+			ColumnPosition = _map.Setup.Cols - _map.Setup.DisplayCols - 1;
 			break;
 
-		case (Sint32)EDITOR_ACTION::SCROLL_BLOCK_LEFT:
+		case (Sint32)UI_ACTION::SCROLL_BLOCK_LEFT:
 			ColumnPosition--;
 			if (ColumnPosition < 0) ColumnPosition = 0;
 			break;
 
-		case (Sint32)EDITOR_ACTION::SCROLL_BLOCK_RIGHT:
+		case (Sint32)UI_ACTION::SCROLL_BLOCK_RIGHT:
 			ColumnPosition++;
-			if (ColumnPosition > _map->Setup.Cols - _map->Setup.DisplayCols - 1) ColumnPosition = _map->Setup.Cols - _map->Setup.DisplayCols - 1;
+			if (ColumnPosition > _map.Setup.Cols - _map.Setup.DisplayCols - 1) ColumnPosition = _map.Setup.Cols - _map.Setup.DisplayCols - 1;
 			break;
 
-		case (Sint32)EDITOR_ACTION::SET_FILL_COLOR:
+		case (Sint32)UI_ACTION::SET_FILL_COLOR:
 			ud = *(Userdata*)event->user.data2;
-			if (ud.ColorIndex < 0 || ud.ColorIndex > _map->ColorPallete.size() - 1) return;
+			if (ud.ColorIndex < 0 || ud.ColorIndex > _map.ColorPallete.size() - 1) return;
 			_colorIndexFill = ud.ColorIndex;
+			TileIndex = 0;
 			break;
 
-		case (Sint32)EDITOR_ACTION::SET_BORDER_COLOR:
+		case (Sint32)UI_ACTION::SET_BORDER_COLOR:
 			ud = *(Userdata*)event->user.data2;
-			if (ud.ColorIndex < 0 || ud.ColorIndex > _map->ColorPallete.size() - 1) return;
+			if (ud.ColorIndex < 0 || ud.ColorIndex > _map.ColorPallete.size() - 1) return;
 			_colorIndexBorder = ud.ColorIndex;
+			TileIndex = 0;
 			break;
 		}
 
@@ -254,7 +255,7 @@ void LevelEditor::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 
 	case SDLK_RIGHT:
 		ColumnPosition++;
-		if (ColumnPosition > _map->Setup.Cols - _map->Setup.DisplayCols - 1) ColumnPosition = _map->Setup.Cols - _map->Setup.DisplayCols - 1;
+		if (ColumnPosition > _map.Setup.Cols - _map.Setup.DisplayCols - 1) ColumnPosition = _map.Setup.Cols - _map.Setup.DisplayCols - 1;
 		break;
 
 	case SDLK_UP:
@@ -264,15 +265,15 @@ void LevelEditor::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 
 	case SDLK_DOWN:
 		RowPosition++;
-		if (RowPosition > _map->Setup.Rows - _map->Setup.DisplayRows) RowPosition = _map->Setup.Rows - _map->Setup.DisplayRows;
+		if (RowPosition > _map.Setup.Rows - _map.Setup.DisplayRows) RowPosition = _map.Setup.Rows - _map.Setup.DisplayRows;
 		break;
 
 	case SDLK_d:
-		Mode = EDITOR_ACTION::DRAWMODE;
+		Mode = UI_ACTION::DRAWMODE;
 		break;
 
 	case SDLK_e:
-		Mode = EDITOR_ACTION::ERASEMODE;
+		Mode = UI_ACTION::ERASEMODE;
 		break;
 
 	case SDLK_1:
@@ -280,7 +281,7 @@ void LevelEditor::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 		break;
 
 	case SDLK_2:
-		if (++_colorIndexFill > _map->ColorPallete.size() - 1) _colorIndexFill = _map->ColorPallete.size() - 1;
+		if (++_colorIndexFill > _map.ColorPallete.size() - 1) _colorIndexFill = _map.ColorPallete.size() - 1;
 		break;
 
 	case SDLK_3:
@@ -288,9 +289,9 @@ void LevelEditor::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 		break;
 
 	case SDLK_4:
-		if (++_colorIndexBorder > _map->ColorPallete.size() - 1) _colorIndexBorder = _map->ColorPallete.size() - 1;
+		if (++_colorIndexBorder > _map.ColorPallete.size() - 1) _colorIndexBorder = _map.ColorPallete.size() - 1;
 		break;
-		
+
 
 	case SDLK_0:
 		_colorIndexFill = 9;
@@ -303,33 +304,33 @@ void LevelEditor::OnKeyUp(SDL_Keycode sym, SDL_Keycode mod)
 
 void LevelEditor::OnLeftButtonDown(int mX, int mY)
 {
-	if (mX <  _map->Setup.DisplayRect.x || mX >  _map->Setup.DisplayRect.x + _map->Setup.DisplayRect.w || mY <  _map->Setup.DisplayRect.y || mY >  _map->Setup.DisplayRect.y + _map->Setup.DisplayRect.h) return;
-	int x = (mX - _map->Setup.DisplayRect.x) / (_map->Setup.BlockSize + _map->Setup.BlockSpacing);
-	if (x > _map->Setup.DisplayCols - 1 || mX < DisplayRect.x) return;
-	int y = (mY - _map->Setup.DisplayRect.y) / (_map->Setup.BlockSize + _map->Setup.BlockSpacing);
-	if (y >  _map->Setup.DisplayRows - 1 || y < 0) return;
-	ActiveIndex.x = x;
-	ActiveIndex.y = y;
+	if (mX <  _map.Setup.DisplayRect.x || mX >  _map.Setup.DisplayRect.x + _map.Setup.DisplayRect.w || mY <  _map.Setup.DisplayRect.y || mY >  _map.Setup.DisplayRect.y + _map.Setup.DisplayRect.h) return;
+	int x = (mX - _map.Setup.DisplayRect.x) / (_map.Setup.BlockSize + _map.Setup.BlockSpacing);
+	if (x > _map.Setup.DisplayCols - 1 || mX < DisplayRect.x) return;
+	int y = (mY - _map.Setup.DisplayRect.y) / (_map.Setup.BlockSize + _map.Setup.BlockSpacing);
+	if (y > _map.Setup.DisplayRows - 1 || y < 0) return;
 
 	_drawActive = true;
 
-	if (Mode == EDITOR_ACTION::DRAWMODE)
+	if (Mode == UI_ACTION::DRAWMODE)
 	{
 		_blockdrawStart = { -1, -1 };
 		_blockdrawEnd = { -1, -1 };
 
 		_drawActive = true;
 		_eraseActive = false;
-		
-		MatrixTile tile;
+
+		TilemapTile tile;
 		tile.Visible = true;
+		tile.TileIndex = TileIndex;
+		tile.ResourceIndex = ResourceIndex;
 		tile.FillColor = _colorIndexFill;
 		tile.BorderColor = _colorIndexBorder;
 
-		_map->SetTileInMap({ ColumnPosition+ x, RowPosition + y }, tile);
+		_map.SetTileInMap({ ColumnPosition + x, RowPosition + y }, tile);
 	}
 
-	if (Mode == EDITOR_ACTION::BORDERDRAWMODE)
+	if (Mode == UI_ACTION::BORDERDRAWMODE)
 	{
 		_blockdrawStart.x = x;
 		_blockdrawStart.y = y;
@@ -348,26 +349,28 @@ void LevelEditor::OnLeftButtonUp(int mX, int mY)
 {
 	_drawActive = false;
 
-	if (mX <  _map->Setup.DisplayRect.x || mX >  _map->Setup.DisplayRect.x + _map->Setup.DisplayRect.w || mY <  _map->Setup.DisplayRect.y || mY >  _map->Setup.DisplayRect.y + _map->Setup.DisplayRect.h) return;
-	int x = (mX - _map->Setup.DisplayRect.x) / (_map->Setup.BlockSize + _map->Setup.BlockSpacing);
-	if (x >  _map->Setup.DisplayCols - 1 || mX < DisplayRect.x) return;
-	int y = (mY -  _map->Setup.DisplayRect.y) / ( _map->Setup.BlockSize +  _map->Setup.BlockSpacing);
-	if (y >  _map->Setup.DisplayRows - 1 || y < 0) return;
+	if (mX <  _map.Setup.DisplayRect.x || mX >  _map.Setup.DisplayRect.x + _map.Setup.DisplayRect.w || mY <  _map.Setup.DisplayRect.y || mY >  _map.Setup.DisplayRect.y + _map.Setup.DisplayRect.h) return;
+	int x = (mX - _map.Setup.DisplayRect.x) / (_map.Setup.BlockSize + _map.Setup.BlockSpacing);
+	if (x > _map.Setup.DisplayCols - 1 || mX < DisplayRect.x) return;
+	int y = (mY - _map.Setup.DisplayRect.y) / (_map.Setup.BlockSize + _map.Setup.BlockSpacing);
+	if (y > _map.Setup.DisplayRows - 1 || y < 0) return;
 
-	if (Mode == EDITOR_ACTION::BORDERDRAWMODE)
+	if (Mode == UI_ACTION::BORDERDRAWMODE)
 	{
 		if (_blockdrawStart.x < 0 || _blockdrawStart.y < 0) return;
 		_blockdrawEnd.x = x;
 		_blockdrawEnd.y = y;
-		
-		MatrixTile tile;
+
+		TilemapTile tile;
 		tile.Type = TileType::Background;
 		tile.TileIndex = 0;
 		tile.FillColor = _colorIndexFill;
 		tile.BorderColor = _colorIndexBorder;
 		tile.Visible = true;
+		tile.TileIndex = TileIndex;
+		tile.ResourceIndex = ResourceIndex;
 
-		_map->FillArea({ _blockdrawStart.x,  _blockdrawStart.y }, { _blockdrawEnd.x,  _blockdrawEnd.y },  { ColumnPosition, RowPosition }, tile);
+		_map.FillArea({ _blockdrawStart.x,  _blockdrawStart.y }, { _blockdrawEnd.x,  _blockdrawEnd.y }, { ColumnPosition, RowPosition }, tile);
 	}
 
 }
@@ -377,25 +380,26 @@ void LevelEditor::OnRightButtonDown(int mX, int mY)
 	_eraseActive = true;
 	_drawActive = false;
 
-	if (mX <  _map->Setup.DisplayRect.x || mX >  _map->Setup.DisplayRect.x +  _map->Setup.DisplayRect.w || mY <  _map->Setup.DisplayRect.y || mY >  _map->Setup.DisplayRect.y +  _map->Setup.DisplayRect.h) return;
-	int x = (mX -  _map->Setup.DisplayRect.x) / ( _map->Setup.BlockSize +  _map->Setup.BlockSpacing);
-	if (x >  _map->Setup.DisplayCols - 1 || mX < DisplayRect.x) return;
-	int y = (mY -  _map->Setup.DisplayRect.y) / ( _map->Setup.BlockSize +  _map->Setup.BlockSpacing);
-	if (y >  _map->Setup.DisplayRows - 1 || y < 0) return;
-	
-	if (Mode == EDITOR_ACTION::DRAWMODE)
+	if (mX <  _map.Setup.DisplayRect.x || mX >  _map.Setup.DisplayRect.x + _map.Setup.DisplayRect.w || mY <  _map.Setup.DisplayRect.y || mY >  _map.Setup.DisplayRect.y + _map.Setup.DisplayRect.h) return;
+	int x = (mX - _map.Setup.DisplayRect.x) / (_map.Setup.BlockSize + _map.Setup.BlockSpacing);
+	if (x > _map.Setup.DisplayCols - 1 || mX < DisplayRect.x) return;
+	int y = (mY - _map.Setup.DisplayRect.y) / (_map.Setup.BlockSize + _map.Setup.BlockSpacing);
+	if (y > _map.Setup.DisplayRows - 1 || y < 0) return;
+
+	if (Mode == UI_ACTION::DRAWMODE)
 	{
-		MatrixTile tile;
+		TilemapTile tile;
 		tile.Type = TileType::Background;
-		tile.TileIndex = 0;
 		tile.Visible = false;
+		tile.TileIndex = 0;
+		tile.ResourceIndex = 0;
 		tile.FillColor = 0;
 		tile.BorderColor = 0;
 
-		_map->SetTileInMap({ ColumnPosition + x, RowPosition + y }, tile);
+		_map.SetTileInMap({ ColumnPosition + x, RowPosition + y }, tile);
 	}
 
-	if (Mode == EDITOR_ACTION::BORDERDRAWMODE)
+	if (Mode == UI_ACTION::BORDERDRAWMODE)
 	{
 		_blockdrawStart.x = x;
 		_blockdrawStart.y = y;
@@ -414,74 +418,101 @@ void LevelEditor::OnRightButtonUp(int mX, int mY)
 	_eraseActive = false;
 	_drawActive = false;
 
-	if (mX <  _map->Setup.DisplayRect.x || mX >  _map->Setup.DisplayRect.x +  _map->Setup.DisplayRect.w || mY <  _map->Setup.DisplayRect.y || mY >  _map->Setup.DisplayRect.y +  _map->Setup.DisplayRect.h) return;
-	int x = (mX -  _map->Setup.DisplayRect.x) / ( _map->Setup.BlockSize +  _map->Setup.BlockSpacing);
-	if (x >  _map->Setup.DisplayCols - 1 || mX < DisplayRect.x) return;
-	int y = (mY -  _map->Setup.DisplayRect.y) / ( _map->Setup.BlockSize +  _map->Setup.BlockSpacing);
-	if (y >  _map->Setup.DisplayRows - 1 || y < 0) return;
-	
-	if (Mode == EDITOR_ACTION::BORDERDRAWMODE)
+	if (mX <  _map.Setup.DisplayRect.x || mX >  _map.Setup.DisplayRect.x + _map.Setup.DisplayRect.w || mY <  _map.Setup.DisplayRect.y || mY >  _map.Setup.DisplayRect.y + _map.Setup.DisplayRect.h) return;
+	int x = (mX - _map.Setup.DisplayRect.x) / (_map.Setup.BlockSize + _map.Setup.BlockSpacing);
+	if (x > _map.Setup.DisplayCols - 1 || mX < DisplayRect.x) return;
+	int y = (mY - _map.Setup.DisplayRect.y) / (_map.Setup.BlockSize + _map.Setup.BlockSpacing);
+	if (y > _map.Setup.DisplayRows - 1 || y < 0) return;
+
+	if (Mode == UI_ACTION::BORDERDRAWMODE)
 	{
 		if (_blockdrawStart.x < 0 || _blockdrawStart.y < 0) return;
 		_blockdrawEnd.x = x;
 		_blockdrawEnd.y = y;
-		
-		MatrixTile tile;
+
+		TilemapTile tile;
 		tile.Type = TileType::Background;
-		tile.TileIndex = 0;
+		tile.Visible = false;
+		tile.TileIndex = TileIndex;
+		tile.ResourceIndex = ResourceIndex;
 		tile.FillColor = 0;
 		tile.BorderColor = 0;
-		tile.Visible = false;
 
-		_map->FillArea({ _blockdrawStart.x,  _blockdrawStart.y }, { _blockdrawEnd.x,  _blockdrawEnd.y }, { ColumnPosition, RowPosition }, tile);
+		_map.FillArea({ _blockdrawStart.x,  _blockdrawStart.y }, { _blockdrawEnd.x,  _blockdrawEnd.y }, { ColumnPosition, RowPosition }, tile);
 	}
 }
 
 void LevelEditor::OnMiddleButtonDown(int mX, int mY)
-{}
+{
+	_drawActive = false;
+	_eraseActive = false;
+	_mapScrollMidlleMouse = true;
+	_mapScrollDiff.x = mX;
+	_mapScrollDiff.y = mY;
+}
 
 void LevelEditor::OnMiddleButtonUp(int mX, int mY)
-{}
+{
+	_mapScrollMidlleMouse = false;
+}
 
 void LevelEditor::OnMouseMove(int mX, int mY, int relX, int relY, bool Left, bool Right, bool Middle)
 {
-	if (mX <  _map->Setup.DisplayRect.x || mX >  _map->Setup.DisplayRect.x +  _map->Setup.DisplayRect.w || mY <  _map->Setup.DisplayRect.y || mY >  _map->Setup.DisplayRect.y +  _map->Setup.DisplayRect.h) return;
+	if (mX <  _map.Setup.DisplayRect.x || mX >  _map.Setup.DisplayRect.x + _map.Setup.DisplayRect.w || mY <  _map.Setup.DisplayRect.y || mY >  _map.Setup.DisplayRect.y + _map.Setup.DisplayRect.h) return;
 
-	int x = (mX -  _map->Setup.DisplayRect.x) / ( _map->Setup.BlockSize +  _map->Setup.BlockSpacing);
-	if (x >  _map->Setup.DisplayCols - 1 || x < 0) return;
-	int y = (mY -  _map->Setup.DisplayRect.y) / ( _map->Setup.BlockSize +  _map->Setup.BlockSpacing);
-	if (y >  _map->Setup.DisplayRows - 1 || y < 0) return;
-	ActiveIndex.x = x;
-	ActiveIndex.y = y;
+	int x = (mX - _map.Setup.DisplayRect.x) / (_map.Setup.BlockSize + _map.Setup.BlockSpacing);
+	if (x > _map.Setup.DisplayCols - 1 || x < 0) return;
+	int y = (mY - _map.Setup.DisplayRect.y) / (_map.Setup.BlockSize + _map.Setup.BlockSpacing);
+	if (y > _map.Setup.DisplayRows - 1 || y < 0) return;
 
-	if (Mode == EDITOR_ACTION::DRAWMODE)
+	if (Mode == UI_ACTION::DRAWMODE)
 	{
 		if (_drawActive)
 		{
-			MatrixTile tile;
+			TilemapTile tile;
 			tile.Visible = true;
+			tile.ResourceIndex = ResourceIndex;
+			tile.TileIndex = TileIndex;
 			tile.FillColor = _colorIndexFill;
 			tile.BorderColor = _colorIndexBorder;
 
-			_map->SetTileInMap({ ColumnPosition + x, RowPosition + y }, tile);
+			_map.SetTileInMap({ ColumnPosition + x, RowPosition + y }, tile);
 		}
 		if (_eraseActive)
 		{
-			MatrixTile tile;
-			tile.Type = TileType::Background;
-			tile.TileIndex = 0;
+			TilemapTile tile;
 			tile.Visible = false;
+			tile.ResourceIndex = 0;
+			tile.TileIndex = 0;
 			tile.FillColor = 0;
-			tile.BorderColor =0;
+			tile.BorderColor = 0;
 
-			_map->SetTileInMap({ ColumnPosition + x, RowPosition + y }, tile);
+			_map.SetTileInMap({ ColumnPosition + x, RowPosition + y }, tile);
 		}
 	}
-	
-	if (Mode == EDITOR_ACTION::BORDERDRAWMODE)
-	{		
-			_blockdrawEnd = { x, y };
-			_blockdrawEndScreen = { mX, mY };
+
+	if (Mode == UI_ACTION::BORDERDRAWMODE)
+	{
+		_blockdrawEnd = { x, y };
+		_blockdrawEndScreen = { mX, mY };
+	}
+
+	if (_mapScrollMidlleMouse)
+	{
+		int diff = abs(_mapScrollDiff.x - mX);
+		cout << "Old: " << to_string(_mapScrollDiff.x) << " Diff :" << to_string(diff) <<  endl;
+		
+
+		if (diff >= _map.Setup.BlockSize + _map.Setup.BlockSpacing)
+		{
+			if (_mapScrollDiff.x - mX < 0) ColumnPosition--;
+			else ColumnPosition++;
+
+			if (ColumnPosition < 0) ColumnPosition = 0;
+			if (ColumnPosition > _map.Setup.Cols - _map.Setup.DisplayCols - 1) ColumnPosition = _map.Setup.Cols - _map.Setup.DisplayCols - 1;
+
+			_mapScrollDiff.x = mX;
+		}
 	}
 
 }

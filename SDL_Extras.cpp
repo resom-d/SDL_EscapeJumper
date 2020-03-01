@@ -1,6 +1,6 @@
 #include "SDL_Extras.h"
 
-CharacterMap SDL_Extras::SDL_GetTexturesFromString(SDL_Renderer* rend, string aString, TTF_Font* font)
+CharacterTextureMap SDL_Extras::SDL_GetTexturesFromString(SDL_Renderer* rend, string aString, TTF_Font* font)
 {
 	unordered_map<char, SDL_Texture*> chars;
 
@@ -18,7 +18,7 @@ CharacterMap SDL_Extras::SDL_GetTexturesFromString(SDL_Renderer* rend, string aS
 	return chars;
 }
 
-void SDL_Extras::SDL_RenderStringAt(SDL_Renderer* rend, string text, SDL_Point p, CharacterMap chars, Uint16 size, SDL_Rect* clipRect)
+void SDL_Extras::SDL_RenderStringAt(SDL_Renderer* rend, string text, SDL_Point p, CharacterTextureMap chars, Uint16 size, SDL_Rect* clipRect)
 {
 	SDL_Rect destRect{ p.x, p.y, 0,0 };
 	SDL_Rect srcRect = { 0,0,0,0 };
