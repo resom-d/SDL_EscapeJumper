@@ -32,4 +32,4 @@ typedef struct GameProperties
 
 typedef unordered_map<char, SDL_Texture*> CharacterTextureMap;
 typedef list<SDL_Color> ColorPalette;
-typedef pair<Uint16, Uint16> MapCoords;
+

@@ -1,4 +1,5 @@
 #include "GameMap.h"
+#include <fstream>
 
 GameMap::GameMap()
 {
@@ -50,7 +51,7 @@ void GameMap::OnRender(SDL_Point blockpos, SDL_Point scrollpos)
 			if (tile.ResourceIndex < 1 || tile.ResourceIndex > TextureResources.size() || tile.TileIndex < 1)
 			{
 				ColorPalette::iterator ci = ColorPallete.begin();
-				advance(ci,tile.FillColor);
+				advance(ci, tile.FillColor);
 				SDL_SetRenderDrawColor(_rend, ci->r, ci->g, ci->b, ci->a);
 				SDL_RenderFillRect(_rend, &dRect);
 
@@ -85,15 +86,15 @@ void GameMap::OnCleanUp()
 
 void GameMap::InitMap()
 {
-	TileMap = (TilemapTile**)malloc(Setup.Cols * sizeof(TilemapTile*));
-	for (int i = 0; i < Setup.Cols; i++)
+	TileMap = (TilemapTile**)malloc((Setup.Cols + 1) * sizeof(TilemapTile*));
+	for (int i = 0; i < Setup.Cols + 1; i++)
 	{
-		TileMap[i] = (TilemapTile*)malloc(Setup.Rows * sizeof(TilemapTile));
+		TileMap[i] = (TilemapTile*)malloc((Setup.Rows + 1) * sizeof(TilemapTile));
 	}
 
-	for (int x = 0; x < Setup.Cols; x++)
+	for (int x = 0; x < Setup.Cols + 1; x++)
 	{
-		for (int y = 0; y < Setup.Rows; y++)
+		for (int y = 0; y < Setup.Rows + 1; y++)
 		{
 			TilemapTile tile;
 			tile.Type = TileType::Background;
@@ -106,38 +107,106 @@ void GameMap::InitMap()
 	}
 }
 
-void GameMap::SetTileInMap(MapCoords cords, TilemapTile settings)
+void GameMap::SaveMap(string filename)
 {
-	TileMap[cords.first][cords.second].BorderColor;
-	TileMap[cords.first][cords.second].Type = settings.Type;
-	TileMap[cords.first][cords.second].ResourceIndex = settings.ResourceIndex;
-	TileMap[cords.first][cords.second].TileIndex = settings.TileIndex;
-	TileMap[cords.first][cords.second].Visible = settings.Visible;
-	TileMap[cords.first][cords.second].BorderColor = settings.BorderColor;
-	TileMap[cords.first][cords.second].FillColor = settings.FillColor;
+	ofstream theFile;
+	theFile.open(filename + ".txt");
+	theFile << "<- Zehnfinger Tilemap-Description" << endl << endl;;
+
+	theFile << "<- Map-Setup" << endl;
+	theFile << "#SET#" << endl;
+	theFile << "C:" << to_string(Setup.Cols) << endl;
+	theFile << "R:" << to_string(Setup.Rows) << endl;
+	theFile << "DC:" << to_string(Setup.DisplayCols) << endl;
+	theFile << "DR:" << to_string(Setup.DisplayRows) << endl;
+	theFile << "BD:" << to_string(Setup.BlockSize) << endl;
+	theFile << "BS::" << to_string(Setup.BlockSpacing) << endl;
+	theFile << "BGR:" << to_string(Setup.Background.r) << endl;
+	theFile << "BGG:" << to_string(Setup.Background.g) << endl;
+	theFile << "BGB:" << to_string(Setup.Background.b) << endl;
+	theFile << "BGA:" << to_string(Setup.Background.a) << endl << endl;
+
+	theFile << "<- Texture Resources" << endl;
+	if (TextureResources.size() > 0)
+	{
+		for (auto iter = TextureResources.begin(); iter != TextureResources.end(); iter++)
+		{
+			theFile << "#RES#"<< endl;
+			theFile << "P:" << iter->Path << endl;
+			theFile << "C:" << to_string(iter->Cols) << endl;
+			theFile << "R:" << to_string(iter->Rows) << endl;
+			theFile << "M:" << to_string(iter->MaxIndex) << endl;
+			theFile << "T:" << to_string(iter->Tilesize.w) << ":" << to_string(iter->Tilesize.h) << endl;
+		}
+	}
+
+	theFile << endl << "<- Color-Pallete" << endl;
+	if (this->ColorPallete.size() > 0)
+	{
+		theFile << "#COL#" << endl;
+		for (auto cIter = this->ColorPallete.begin(); cIter != this->ColorPallete.end(); cIter++)
+		{
+			theFile << "C:" << to_string(cIter->r) << ":" << to_string(cIter->g) << ":" << to_string(cIter->b) << ":" << to_string(cIter->a) << endl;
+		}
+	}
+
+	theFile << endl << "<- Tilemap-Tiles" << endl;
+	theFile << "#TLM#" << endl;
+	for (int x = 0; x <= Setup.Cols; x++)
+	{
+		for (int y = 0; y <= Setup.Rows; y++)
+		{
+			TilemapTile tile = TileMap[x][y];
+			
+			if(!tile.Visible) continue;
+			
+			theFile << "T:"
+				<< to_string((int)tile.Type) << ":"
+				<< to_string(tile.ResourceIndex) << ":"
+				<< to_string(tile.TileIndex) << ":"
+				<< to_string(tile.FillColor) << ":"
+				<< to_string(tile.BorderColor) << endl;
+		}
+	}
+
+	theFile.close();
+}
+
+void GameMap::LoadMap(string filename)
+{}
+
+void GameMap::SetTileInMap(SDL_Point cords, TilemapTile settings)
+{
+	TileMap[cords.x][cords.y].BorderColor;
+	TileMap[cords.x][cords.y].Type = settings.Type;
+	TileMap[cords.x][cords.y].ResourceIndex = settings.ResourceIndex;
+	TileMap[cords.x][cords.y].TileIndex = settings.TileIndex;
+	TileMap[cords.x][cords.y].Visible = settings.Visible;
+	TileMap[cords.x][cords.y].BorderColor = settings.BorderColor;
+	TileMap[cords.x][cords.y].FillColor = settings.FillColor;
 
 }
 
-void GameMap::FillArea(MapCoords p1, MapCoords p2, MapCoords offs, TilemapTile settings)
+void GameMap::FillArea(SDL_Point p1, SDL_Point p2, SDL_Point offs, TilemapTile settings)
 {
 	int minX, minY, maxX, maxY;
 
-	minX = p1.first > p2.first ? p2.first : p1.first;
-	minY = p1.second > p2.second ? p2.second : p1.second;
-	maxX = p1.first < p2.first ? p2.first : p1.first;
-	maxY = p1.second < p2.second ? p2.second : p1.second;
+	minX = p1.x > p2.x ? p2.x : p1.x;
+	minY = p1.y > p2.y ? p2.y : p1.y;
+	maxX = p1.x < p2.x ? p2.x : p1.x;
+	maxY = p1.y < p2.x ? p2.y : p1.y;
 
 
 	for (int x = minX; x <= maxX; x++)
 	{
 		for (int y = minY; y <= maxY; y++)
 		{
-			TileMap[x + offs.first][y + offs.second].Type = settings.Type;
-			TileMap[x + offs.first][y + offs.second].ResourceIndex = settings.ResourceIndex;
-			TileMap[x + offs.first][y + offs.second].TileIndex = settings.TileIndex;
-			TileMap[x + offs.first][y + offs.second].FillColor = settings.FillColor;
-			TileMap[x + offs.first][y + offs.second].BorderColor = settings.BorderColor;
-			TileMap[x + offs.first][y + offs.second].Visible = settings.Visible;
+			TileMap[x + offs.x][y + offs.y].Type = settings.Type;
+			TileMap[x + offs.x][y + offs.y].ResourceIndex = settings.ResourceIndex;
+			TileMap[x + offs.x][y + offs.y].TileIndex = settings.TileIndex;
+			TileMap[x + offs.x][y + offs.y].FillColor = settings.FillColor;
+			TileMap[x + offs.x][y + offs.y].BorderColor = settings.BorderColor;
+			TileMap[x + offs.x][y + offs.y].Visible = settings.Visible;
 		}
 	}
 }

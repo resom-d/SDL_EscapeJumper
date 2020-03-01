@@ -99,6 +99,9 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap
 	}
 	BorderColorWidgets.OnInit(_rend, UI_ACTION::DRAWMODE);
 
+	_txtSaveFilename.OnInit(_rend, _charmap, &FilenameSave);
+	_txtSaveFilename.DisplayRect = { 800,5, 600, 50 };
+
 	// Cleanup
 	SDL_RenderSetScale(_rend, 1.0, 1.0);
 	SDL_SetRenderTarget(_rend, orgTex);
@@ -204,6 +207,7 @@ void UI_Editor::OnEvent(SDL_Event* event)
 
 	FillColorWidgets.OnEvent(event);
 	BorderColorWidgets.OnEvent(event);
+	_txtSaveFilename.OnEvent(event);
 
 	if (event->type == EDITOR_EVENT_TYPE)
 	{
@@ -266,6 +270,8 @@ void UI_Editor::OnRender(Uint16 colPos, Uint16 rowPos)
 
 	FillColorWidgets.OnRender();
 	BorderColorWidgets.OnRender();
+	_txtSaveFilename.OnRender();
+
 	SDL_Extras::SDL_RenderStringAt(_rend, "Column " + to_string(colPos + 1) + "-" + to_string(colPos + 1 + _map->Setup.DisplayCols), { 10, 170 }, _charmap, 22, nullptr);
 
 	RenderTileResource(1, _tileResourceDPoint);

@@ -8,9 +8,9 @@ public:
 
 	UI_TextInput();
 
-	string TextBuffer;
+	string* TextBuffer;
 
-	virtual void OnInit(SDL_Renderer* rend, CharacterTextureMap charMap, string text);
+	virtual void OnInit(SDL_Renderer* rend, CharacterTextureMap charMap, string* text);
 	virtual void OnEvent(SDL_Event* event);
 	virtual void OnRender(void);
 	virtual void OnCleanup(void);

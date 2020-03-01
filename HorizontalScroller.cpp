@@ -21,7 +21,7 @@ void HorizontalScroller::OnLoop()
 	if (ScrollPosition.x > _map->Setup.BlockSize + _map->Setup.BlockSpacing)
 	{
 		ScrollPosition.x = ScrollPosition.x % (_map->Setup.BlockSpacing + _map->Setup.BlockSpacing);
-		if (++BlockPosition.x > _map->Setup.Cols - _map->Setup.DisplayCols - 2)
+		if (++BlockPosition.x > _map->Setup.Cols - _map->Setup.DisplayCols - 1)
 		{
 			BlockPosition.x = 0;
 			ScrollPosition.x = 0;

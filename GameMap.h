@@ -1,36 +1,14 @@
 #pragma once
 #include "GameTypes.h"
 #include "SDL_Extras.h"
+#include "TilemapTextureResource.h"
 using namespace std;
-
-typedef struct Size2D
-{
-	int w , h;
-
-};
-
-typedef struct Size3D
-{
-	int w, h, d;
-
-};
-
-typedef struct TileMapTextureResource
-{
-	string Path;
-	SDL_Texture* Texture;
-	Uint16 Cols;
-	Uint16 Rows;
-	Uint16 MaxIndex;
-	Size2D Tilesize;
-	
-};
 
 typedef list<TileMapTextureResource> TileMapTextureResourceList;
 
 enum class TileType
 {
-	None=0,
+	None = 0,
 	Background,
 	World,
 	Door,
@@ -83,8 +61,10 @@ public:
 	virtual void OnCleanUp();
 
 	virtual void InitMap();
-	virtual void SetTileInMap(MapCoords, TilemapTile settings);
-	virtual void FillArea(MapCoords p1, MapCoords p2, MapCoords offs, TilemapTile org);
+	virtual void SaveMap(string filename);
+	virtual void LoadMap(string filename);
+	virtual void SetTileInMap(SDL_Point coords, TilemapTile settings);
+	virtual void FillArea(SDL_Point p1, SDL_Point p2, SDL_Point offs, TilemapTile org);
 	virtual TilemapTile GetTileAt(Uint16 col, Uint16 row);
 
 private:

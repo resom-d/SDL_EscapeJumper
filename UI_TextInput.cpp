@@ -5,7 +5,7 @@ UI_TextInput::UI_TextInput()
 	UI_Widget::UI_Widget();
 }
 
-void UI_TextInput::OnInit(SDL_Renderer* rend, unordered_map<char, SDL_Texture*> charMap, string text)
+void UI_TextInput::OnInit(SDL_Renderer* rend, unordered_map<char, SDL_Texture*> charMap, string* text)
 {
 	UI_Widget::OnInit(rend);
 	_rend = rend;
@@ -26,14 +26,14 @@ void UI_TextInput::OnEvent(SDL_Event* event)
 		if (!_hasFocus) break;
 		if (event->key.keysym.sym == SDLK_BACKSPACE)
 		{
-			if (TextBuffer.length() > 0) TextBuffer.pop_back();
+			if (TextBuffer->length() > 0) TextBuffer->pop_back();
 			break;
 		}
 		break;
 
 	case SDL_TEXTINPUT:
 		if (!_hasFocus) break;
-		TextBuffer.append(event->text.text);
+		TextBuffer->append(event->text.text);
 		break;
 	}
 
@@ -51,7 +51,7 @@ void UI_TextInput::OnRender(void)
 		DisplayRect.h - (Padding << 1)
 	};
 
-	SDL_Extras::SDL_RenderStringAt(_rend, TextBuffer, { DisplayRect.x, DisplayRect.y }, _charMap, 28, &dRect);
+	SDL_Extras::SDL_RenderStringAt(_rend, *TextBuffer, { DisplayRect.x, DisplayRect.y }, _charMap, 28, &dRect);
 	
 }
 

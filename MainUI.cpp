@@ -21,7 +21,7 @@ void MainUI::OnInit(SDL_Renderer* renderer, CharacterTextureMap charMap)
 
 	for (list<UI_TextInput>::iterator iter = TextInputs.begin(); iter != TextInputs.end(); iter++)
 	{
-		iter->OnInit(_rend, _charMap, "--Nobody--");
+		iter->OnInit(_rend, _charMap, nullptr);
 	}
 }
 

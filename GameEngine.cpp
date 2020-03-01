@@ -53,7 +53,7 @@ bool GameEngine::OnInit()
 	res.Cols = 3;
 	res.Rows = 3;
 	res.MaxIndex = 9;
-	res.Tilesize = { 35, 35 };
+	res.Tilesize = Size2D(35,35);
 	res.Path = "Resources/tilemaps/tilemap_001.png";
 	SDL_Surface* surf = IMG_Load(res.Path.c_str());
 	res.Texture = SDL_CreateTextureFromSurface(Renderer, surf);
