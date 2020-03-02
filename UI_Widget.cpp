@@ -14,6 +14,7 @@ void UI_Widget::OnInit(SDL_Renderer* renderer)
 {
 	_rend = renderer;
 	ActionCode = UI_ACTION::DRAWMODE;
+	IsActive = false;
 }
 
 void UI_Widget::OnInit(SDL_Renderer* renderer, UI_ACTION actionCode)
@@ -55,11 +56,6 @@ void UI_Widget::OnRender()
 
 void UI_Widget::OnCleanup()
 {}
-
-void UI_Widget::SetActiveMode(bool active)
-{
-	IsActive = active;
-}
 
 
 void UI_Widget::OnMouseButtonDown(SDL_MouseButtonEvent event)

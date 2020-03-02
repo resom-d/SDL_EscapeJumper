@@ -93,9 +93,9 @@ bool GameEngine::OnInit()
 	};
 	Editor.OnInit(AppWindow, Renderer, &Map, CharMap);
 
-	/*int r = Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+	int r = Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 	tune = Mix_LoadMUS("Resources/music/The impossible Mission.mp3");
-	Mix_PlayMusic(tune, -1);*/
+	Mix_PlayMusic(tune, -1);
 
 	_appIsRunning = true;
 	GameStatus = GameState::MainScreen;

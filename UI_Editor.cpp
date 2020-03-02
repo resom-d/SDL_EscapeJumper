@@ -14,25 +14,10 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap
 	_charmap = charMap;
 	_colorPalette = colors;
 
-	_tileResourceDPoint = { 650,5 };
+	_tileResourceDPoint = { 750,5 };
 
 	_activeTool = UI_ACTION::DRAWMODE;
-
-	btnSetDrawMode.EventType = EDITOR_EVENT_TYPE;
-	btnSetBlockdrawMode.EventType = EDITOR_EVENT_TYPE;
-	btnScrollLeft.EventType = EDITOR_EVENT_TYPE;
-	btnScrollRight.EventType = EDITOR_EVENT_TYPE;
-	btnScrollBlockLeft.EventType = EDITOR_EVENT_TYPE;
-	btnScrollBlockRight.EventType = EDITOR_EVENT_TYPE;
-
-	btnSetDrawMode.ActionCode = UI_ACTION::DRAWMODE;
-	btnSetBlockdrawMode.ActionCode = UI_ACTION::BORDERDRAWMODE;
-	btnScrollLeft.ActionCode = UI_ACTION::SCROLL_BLOCK_LEFT;
-	btnScrollRight.ActionCode = UI_ACTION::SCROLL_BLOCK_RIGHT;
-	btnScrollBlockLeft.ActionCode = UI_ACTION::SCROLL_BLOCK_START;
-	btnScrollBlockRight.ActionCode = UI_ACTION::SCROLL_BLOCK_END;
-
-
+	
 	SDL_Texture* orgTex = SDL_GetRenderTarget(_rend);
 
 	SDL_Rect srcRect = { 0,0,48,48 };
@@ -99,9 +84,6 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap
 	}
 	BorderColorWidgets.OnInit(_rend, UI_ACTION::DRAWMODE);
 
-	_txtSaveFilename.OnInit(_rend, _charmap, &FilenameSave);
-	_txtSaveFilename.DisplayRect = { 800,5, 600, 50 };
-
 	// Cleanup
 	SDL_RenderSetScale(_rend, 1.0, 1.0);
 	SDL_SetRenderTarget(_rend, orgTex);
@@ -109,14 +91,14 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap
 
 }
 
-void UI_Editor::CreateWidgetTexture(SDL_Renderer* rend, string filePath, SDL_Texture* destTex, SDL_Rect srcRect, SDL_Rect destRect)
+void UI_Editor::CreateWidgetTexture(SDL_Renderer* rend, string filePath, SDL_Texture* destTex, SDL_Rect srcRect, SDL_Rect destRect, double rot)
 {
 	SDL_Surface* s = IMG_Load(filePath.c_str());
 	SDL_Texture* t = SDL_CreateTextureFromSurface(rend, s);
 	SDL_SetTextureBlendMode(destTex, SDL_BLENDMODE_BLEND);
 	SDL_SetRenderTarget(rend, destTex);
 	SDL_RenderSetClipRect(rend, &destRect);
-	SDL_RenderCopy(rend, t, &srcRect, &destRect);
+	SDL_RenderCopyEx(rend, t, &srcRect, &destRect, rot, nullptr, SDL_FLIP_NONE );
 	SDL_RenderSetClipRect(rend, nullptr);
 	SDL_FreeSurface(s);
 	SDL_DestroyTexture(t);
@@ -124,75 +106,172 @@ void UI_Editor::CreateWidgetTexture(SDL_Renderer* rend, string filePath, SDL_Tex
 
 void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 {
-	LoadTextures(destRect, srcRect);
+	UI_Control btn;
+	SDL_Texture* tex;
 
-	btnSetDrawMode.OnInit(_rend, texSetDrawMode, "DRAW");
-	btnSetDrawMode.DisplayRect = { 5,5, 50, 50 };
-	btnSetDrawMode.BorderWidth = 2;
-	btnSetDrawMode.Padding = 5;
+	int w = 50;
+	int pad = 5;
+	int bordW = 2;
+	SDL_Rect dRect = { 5,5, 50,50 };
 
-	btnSetBlockdrawMode.OnInit(_rend, texSetBlockdrawMode, "ERASE");
-	btnSetBlockdrawMode.DisplayRect = { 65, 5, 50, 50 };
-	btnSetBlockdrawMode.BorderWidth = 2;
-	btnSetBlockdrawMode.Padding = 5;
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/FileOpen.png", tex, *srcRect, *destRect, 0);
+	btn.OnInit(_rend, tex);;
+	btn.EventType = EDITOR_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::LOADMAP;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	dRect.x += w + pad;
 
-	btnScrollBlockLeft.OnInit(_rend, texSetBlockscrollStart, "|<");
-	btnScrollBlockLeft.DisplayRect = { 125, 5, 50, 50 };
-	btnScrollBlockLeft.BorderWidth = 2;
-	btnScrollBlockLeft.ActionCode = UI_ACTION::SCROLL_BLOCK_START;
-	btnScrollBlockLeft.Padding = 5;
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/FileSave.png", tex, *srcRect, *destRect, 0);
+	btn.OnInit(_rend, tex);;
+	btn.EventType = EDITOR_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::SAVEMAP;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	dRect.x += w + pad;
 
-	btnScrollBlockRight.OnInit(_rend, texScrollBlockLeft, "<");
-	btnScrollBlockRight.DisplayRect = { 185, 5, 50, 50 };
-	btnScrollBlockRight.BorderWidth = 2;
-	btnScrollBlockRight.ActionCode = UI_ACTION::SCROLL_BLOCK_LEFT;
-	btnScrollBlockRight.Padding = 5;
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/Draw.png", tex, *srcRect, *destRect, 0);
+	btn.OnInit(_rend, tex);;
+	btn.EventType = EDITOR_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::DRAWMODE;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	dRect.x += w + pad;
 
-	btnScrollLeft.OnInit(_rend, texScrollBlockRight, ">");
-	btnScrollLeft.DisplayRect = { 245, 5, 50, 50 };
-	btnScrollLeft.BorderWidth = 2;
-	btnScrollLeft.ActionCode = UI_ACTION::SCROLL_BLOCK_RIGHT;
-	btnScrollLeft.Padding = 5;
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/Blockdraw.png", tex, *srcRect, *destRect, 0);
+	btn = UI_Control();
+	btn.OnInit(_rend, tex);
+	btn.EventType = EDITOR_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::BORDERDRAWMODE;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	dRect.x += w + pad;
 
-	btnScrollRight.OnInit(_rend, texSetBlockscrollEnd, ">|");
-	btnScrollRight.DisplayRect = { 305, 5, 50, 50 };
-	btnScrollRight.BorderWidth = 2;
-	btnScrollRight.ActionCode = UI_ACTION::SCROLL_BLOCK_END;
-	btnScrollRight.Padding = 5;
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/BlockscrollLeft.png", tex, *srcRect, *destRect, 0);
+	btn = UI_Control();
+	btn.OnInit(_rend, tex);
+	btn.ActionCode = UI_ACTION::SCROLL_BLOCK_START;
+	btn.EventType = EDITOR_EVENT_TYPE;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	
+	dRect.x += w + pad;
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/ScrollLeft.png", tex, *srcRect, *destRect, 0);
+	btn = UI_Control();
+	btn.OnInit(_rend, tex);
+	btn.EventType = EDITOR_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::SCROLL_BLOCK_LEFT;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	dRect.x += w + pad;
 
-	Buttons.push_back(btnSetDrawMode);
-	Buttons.push_back(btnSetBlockdrawMode);
-	Buttons.push_back(btnSetBorderDrawmode);
-	Buttons.push_back(btnScrollLeft);
-	Buttons.push_back(btnScrollRight);
-	Buttons.push_back(btnScrollBlockLeft);
-	Buttons.push_back(btnScrollBlockRight);
-}
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/ScrollRight.png", tex, *srcRect, *destRect, 0);
+	btn = UI_Control();
+	btn.OnInit(_rend, tex);
+	btn.EventType = EDITOR_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::SCROLL_BLOCK_RIGHT;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	dRect.x += w + pad;
 
-void UI_Editor::LoadTextures(const SDL_Rect* destRect, const SDL_Rect* srcRect)
-{
-	texSetDrawMode = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
-	CreateWidgetTexture(_rend, "Resources/icons/Draw.png", texSetDrawMode, *srcRect, *destRect);
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/BlockscrollRight.png", tex, *srcRect, *destRect, SDL_FLIP_NONE);
+	btn = UI_Control();
+	btn.OnInit(_rend, tex);
+	btn.ActionCode = UI_ACTION::SCROLL_BLOCK_END;
+	btn.EventType = EDITOR_EVENT_TYPE;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	dRect.x += w + pad;
 
-	texSetBlockdrawMode = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
-	CreateWidgetTexture(_rend, "Resources/icons/Blockdraw.png", texSetBlockdrawMode, *srcRect, *destRect);
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/BlockScrollLeft.png", tex, *srcRect, *destRect, 90);
+	btn = UI_Control();
+	btn.OnInit(_rend, tex);
+	btn.EventType = EDITOR_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::SCROLL_BLOCK_LEFT;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	dRect.x += w + pad;
 
-	texSetBlockscrollStart = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
-	CreateWidgetTexture(_rend, "Resources/icons/BlockscrollLeft.png", texSetBlockscrollStart, *srcRect, *destRect);
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/ScrollRight.png", tex, *srcRect, *destRect, -90);
+	btn = UI_Control();
+	btn.OnInit(_rend, tex);
+	btn.EventType = EDITOR_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::SCROLL_BLOCK_RIGHT;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	dRect.x += w + pad;
 
-	texScrollBlockLeft = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
-	CreateWidgetTexture(_rend, "Resources/icons/ScrollLeft.png", texScrollBlockLeft, *srcRect, *destRect);
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/ScrollLeft.png", tex, *srcRect, *destRect, -90);
+	btn = UI_Control();
+	btn.OnInit(_rend, tex);
+	btn.EventType = EDITOR_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::SCROLL_BLOCK_LEFT;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	dRect.x += w + pad;
 
-	texScrollBlockRight = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
-	CreateWidgetTexture(_rend, "Resources/icons/ScrollRight.png", texScrollBlockRight, *srcRect, *destRect);
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/BlockScrollRight.png", tex, *srcRect, *destRect, 90);
+	btn = UI_Control();
+	btn.OnInit(_rend, tex);
+	btn.EventType = EDITOR_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::SCROLL_BLOCK_RIGHT;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	dRect.x += w + pad;
 
-	texSetBlockscrollEnd = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
-	CreateWidgetTexture(_rend, "Resources/icons/BlockscrollRight.png", texSetBlockscrollEnd, *srcRect, *destRect);
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/Exit.png", tex, *srcRect, *destRect, 0);
+	btn = UI_Control();
+	btn.OnInit(_rend, tex);
+	btn.EventType = EDITOR_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::NONE;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	dRect.x += w + pad;
 }
 
 void UI_Editor::OnLoop()
 {
 	list<UI_Control>::iterator iter = Buttons.begin();
+	advance(iter, 2);
 	iter->IsActive = _activeTool == UI_ACTION::DRAWMODE;
 	advance(iter, 1);
 	iter->IsActive = _activeTool == UI_ACTION::BORDERDRAWMODE;
@@ -207,8 +286,7 @@ void UI_Editor::OnEvent(SDL_Event* event)
 
 	FillColorWidgets.OnEvent(event);
 	BorderColorWidgets.OnEvent(event);
-	_txtSaveFilename.OnEvent(event);
-
+	
 	if (event->type == EDITOR_EVENT_TYPE)
 	{
 		if (event->user.code == (Sint32)UI_ACTION::DRAWMODE || event->user.code == (Sint32)UI_ACTION::BORDERDRAWMODE)
@@ -270,7 +348,7 @@ void UI_Editor::OnRender(Uint16 colPos, Uint16 rowPos)
 
 	FillColorWidgets.OnRender();
 	BorderColorWidgets.OnRender();
-	_txtSaveFilename.OnRender();
+	
 
 	SDL_Extras::SDL_RenderStringAt(_rend, "Column " + to_string(colPos + 1) + "-" + to_string(colPos + 1 + _map->Setup.DisplayCols), { 10, 170 }, _charmap, 22, nullptr);
 
@@ -293,16 +371,6 @@ void UI_Editor::OnCleanup()
 	FillColorWidgets.OnCleanUp();
 	BorderColorWidgets.OnCleanUp();
 
-	SDL_FreeSurface(surf);
-	SDL_DestroyTexture(tex);
-	SDL_DestroyTexture(texSetDrawMode);
-	SDL_DestroyTexture(texSetBlockdrawMode);
-	SDL_DestroyTexture(texScrollLeft);
-	SDL_DestroyTexture(texScrollRight);
-	SDL_DestroyTexture(texScrollBlockLeft);
-	SDL_DestroyTexture(texScrollBlockRight);
-	SDL_DestroyTexture(texSetBlockscrollStart);
-	SDL_DestroyTexture(texSetBlockscrollEnd);
 }
 
 void UI_Editor::RenderTileResource(Uint16 index, SDL_Point dispPoint)

@@ -8,28 +8,25 @@ UI_Control::UI_Control()
 	_rend = nullptr;
 }
 
-void UI_Control::OnInit(SDL_Renderer* rend, SDL_Texture* tex)
-{
-	_rend = rend;
-	_texture = tex;
-}
-
-void UI_Control::OnInit(SDL_Renderer* rend, SDL_Texture* tex, string text)
-{
-	_rend = rend;
-	_texture = tex;
-	_text = text;
-}
 
 void UI_Control::OnInit(SDL_Renderer* rend)
 {
 	_rend = rend;
+	IsActive = false;
+}
+
+void UI_Control::OnInit(SDL_Renderer* rend, SDL_Texture* tex)
+{
+	_rend = rend;
+	_texture = tex;
+	IsActive = false;
 }
 
 void UI_Control::OnInit(SDL_Renderer* rend, string text)
 {
 	_rend = rend;
 	_text = text;
+	IsActive = false;
 }
 
 void UI_Control::OnRender(void)

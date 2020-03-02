@@ -38,7 +38,6 @@ public:
 	virtual void OnEvent(SDL_Event*);
 	virtual void OnRender();
 	virtual void OnCleanup();
-	virtual void SetActiveMode(bool active);
 	virtual void OnMouseButtonDown(SDL_MouseButtonEvent button);
 	virtual void OnMouseMove(SDL_MouseButtonEvent event);
 

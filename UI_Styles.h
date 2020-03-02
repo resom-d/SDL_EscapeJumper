@@ -3,10 +3,10 @@
 
 #define Control_FillColor						 {200,200,200, 255}
 #define Control_FillColorActive			 {0,200,0, 255}
-#define Control_FillColorHover			 {20,200,50, 255}
+#define Control_FillColorHover			 {255, 204, 110, 255}
 #define Control_BorderColor				 {0,0,0, 255}
 #define Control_BorderColorActive	 {0,255,0, 255}
-#define Control_BorderColorHover		{255,255, 255, 255}
+#define Control_BorderColorHover		{255, 204, 110, 255}
 
 #define UI_MainFill								{100,100,100, 255}
 #define UI_MainBorder						{100,100,100, 255}

@@ -109,6 +109,10 @@ void LevelEditor::OnEvent(SDL_Event* event)
 
 		switch (event->user.code)
 		{
+		case (Sint32)UI_ACTION::SAVEMAP:
+			_map->SaveMap("ZZZ");
+			break;
+
 		case (Sint32)UI_ACTION::SET_TILEINDEX:
 			ud = *(Userdata*)event->user.data2;
 			TileIndex = ud.TileIndex;
@@ -126,7 +130,7 @@ void LevelEditor::OnEvent(SDL_Event* event)
 			break;
 
 		case (Sint32)UI_ACTION::SCROLL_BLOCK_END:
-			ColumnPosition = _map->Setup.Cols - _map->Setup.DisplayCols - 1;
+			ColumnPosition = _map->Setup.Cols - _map->Setup.DisplayCols ;
 			break;
 
 		case (Sint32)UI_ACTION::SCROLL_BLOCK_LEFT:
@@ -136,7 +140,7 @@ void LevelEditor::OnEvent(SDL_Event* event)
 
 		case (Sint32)UI_ACTION::SCROLL_BLOCK_RIGHT:
 			ColumnPosition++;
-			if (ColumnPosition > _map->Setup.Cols - _map->Setup.DisplayCols - 1) ColumnPosition = _map->Setup.Cols - _map->Setup.DisplayCols - 1;
+			if (ColumnPosition > _map->Setup.Cols - _map->Setup.DisplayCols) ColumnPosition = _map->Setup.Cols - _map->Setup.DisplayCols;
 			break;
 
 		case (Sint32)UI_ACTION::SET_FILL_COLOR:

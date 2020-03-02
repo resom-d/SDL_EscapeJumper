@@ -22,7 +22,7 @@ public:
 
 	void OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap charMap, ColorPalette colors);
 	void LoadTextures(const SDL_Rect* srcRect, const SDL_Rect* destRect);
-	void CreateWidgetTexture(SDL_Renderer* rend, string filePath, SDL_Texture* destTex, SDL_Rect srcRect, SDL_Rect destRect);
+	void CreateWidgetTexture(SDL_Renderer* rend, string filePath, SDL_Texture* destTex, SDL_Rect srcRect, SDL_Rect destRect,  double rot);
 	void ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect);
 	void OnLoop();
 	void OnEvent(SDL_Event*);
@@ -41,18 +41,10 @@ private:
 	ColorPalette::iterator _colorPaletteIter;
 	list<UI_Widget>::iterator _colorWidgetsIter;
 	SDL_Point _tileResourceDPoint;
-
+	UI_ACTION _activeTool;
 	SDL_Renderer* _rend;
 	SDL_Surface* surf;
 	SDL_Texture* tex;
-	SDL_Texture* texSetDrawMode;
-	SDL_Texture* texSetBlockdrawMode;
-	SDL_Texture* texScrollLeft;
-	SDL_Texture* texScrollRight;
-	SDL_Texture* texScrollBlockLeft;
-	SDL_Texture* texScrollBlockRight;
-	SDL_Texture* texSetBlockscrollStart;
-	SDL_Texture* texSetBlockscrollEnd;
 	TTF_Font* _fontBig;
 	TTF_Font* _fontMedium;
 	TTF_Font* _fontSmall;
@@ -60,16 +52,6 @@ private:
 
 	SDL_Event _setTileIdEvent;
 	Userdata _setTileData;
-
-	UI_Control btnSetDrawMode;
-	UI_Control btnSetBorderDrawmode;
-	UI_Control btnSetBlockdrawMode;
-	UI_Control btnScrollLeft;
-	UI_Control btnScrollRight;
-	UI_Control btnScrollBlockLeft;
-	UI_Control btnScrollBlockRight;
-	UI_ACTION _activeTool;
-	UI_TextInput _txtSaveFilename;
-
+	
 	void RenderTileResource(Uint16 index, SDL_Point dispPoint);
 };

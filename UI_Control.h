@@ -10,8 +10,7 @@ public:
 
 	virtual void OnInit(SDL_Renderer* rend);
 	virtual void OnInit(SDL_Renderer* rend, string text);
-	virtual void OnInit(SDL_Renderer* rend, SDL_Texture* surf);
-	virtual void OnInit(SDL_Renderer* rend, SDL_Texture* surf,  string text);
+	virtual void OnInit(SDL_Renderer* rend, SDL_Texture* tex);
 	virtual void OnEvent(SDL_Event* event);
 	virtual void OnRender(void);
 	virtual void OnCleanup(void);
