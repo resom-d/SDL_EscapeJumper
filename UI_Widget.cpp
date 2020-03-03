@@ -2,6 +2,9 @@
 
 UI_Widget::UI_Widget()
 {
+	IsActive = false;
+	IsVisible = true;
+	IsEnabled = true;
 	FillColor = Control_FillColor;
 	FillColorActive = Control_FillColorActive;
 	FillColorHover = Control_FillColorHover;
@@ -14,7 +17,7 @@ void UI_Widget::OnInit(SDL_Renderer* renderer)
 {
 	_rend = renderer;
 	ActionCode = UI_ACTION::DRAWMODE;
-	IsActive = false;
+	
 }
 
 void UI_Widget::OnInit(SDL_Renderer* renderer, UI_ACTION actionCode)
@@ -49,8 +52,8 @@ void UI_Widget::OnRender()
 	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
 	SDL_RenderFillRect(_rend, &DisplayRect);
 	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_NONE);
-	if (!IsActive) SDL_Extras::SDL_RenderDrawBorder(_rend, DisplayRect, BorderWidth, BorderColor);
-	else SDL_Extras::SDL_RenderDrawBorder(_rend, DisplayRect, BorderWidth, BorderColorActive);
+	if (!IsActive) SDL_RenderDrawBorder(_rend, DisplayRect, BorderWidth, BorderColor);
+	else SDL_RenderDrawBorder(_rend, DisplayRect, BorderWidth, BorderColorActive);
 	SDL_RenderSetClipRect(_rend, nullptr);
 }
 

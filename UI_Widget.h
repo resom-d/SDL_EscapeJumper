@@ -11,6 +11,8 @@ public:
 	
 	WIDGET_STATE State = WIDGET_STATE::Visible ;
 	bool IsActive;
+	bool IsVisible;
+	bool IsEnabled;
 	SDL_Event Event;
 	Uint32 EventType;
 	UI_ACTION ActionCode;
@@ -47,7 +49,7 @@ protected:
 	SDL_Renderer* _rend;
 	SDL_Color _fillColor;
 	SDL_Color _borderColor;
-
+	
 };
 
 

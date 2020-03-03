@@ -173,6 +173,7 @@
     <ClCompile Include="UI_Editor.cpp" />
     <ClCompile Include="UI_GridContainer.cpp" />
     <ClCompile Include="UI_TextInput.cpp" />
+    <ClCompile Include="UI_Types.cpp" />
     <ClCompile Include="UI_Widget.cpp" />
   </ItemGroup>
   <ItemGroup>

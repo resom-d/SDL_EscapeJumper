@@ -22,7 +22,7 @@ bool GameEngine::OnInit()
 
 	// Configure Map
 	Map.Setup.Cols = 200;
-	Map.Setup.Rows = 20;
+	Map.Setup.Rows = 40;
 	Map.Setup.DisplayCols = 40;
 	Map.Setup.BlockSpacing = 1;
 	Map.Setup.BlockSize = 35;
@@ -64,7 +64,7 @@ bool GameEngine::OnInit()
 
 	// Create a texure map from a string 
 	_font = TTF_OpenFont("Resources/fonts/NovaMono-Regular.ttf", 36);
-	CharMap = SDL_Extras::SDL_GetTexturesFromString(Renderer, " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜßabcdefghijklmnopqrstuvwxyzäöü,.;:*#-_|<>^°?=()!\"§$%&/()@€~", _font);
+	CharMap = SDL_GetTexturesFromString(Renderer, " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜßabcdefghijklmnopqrstuvwxyzäöü,.;:*#-_|<>^°?=()!\"§$%&/()@€~", _font);
 
 	Player.OnInit(Renderer);
 	OnInitPlayer();
@@ -142,9 +142,34 @@ int GameEngine::OnExecute()
 
 void GameEngine::OnEvent(SDL_Event* event)
 {
+	if (event->type == GAME_EVENT_TYPE)
+	{
+		switch (event->user.code)
+		{
+		case (int)UI_ACTION::QUIT_GAME:
+			_appIsRunning = false;
+			break;
+
+		case (int)UI_ACTION::GO_MAINSCREEN:
+			GameStatus = GameState::MainScreen;
+			break;
+
+		case (int)UI_ACTION::GO_EDITOR:
+			GameStatus = GameState::LevelEdit;
+			break;
+
+		case (int)UI_ACTION::GO_GAME:
+			OnGameRestart();
+			break;
+		}
+	}
 	GameEvents::OnEvent(event);
 	if (GameStatus == GameState::MainScreen) MainUI.OnEvent(event);
-	if (GameStatus == GameState::Running) Player.OnEvent(event);
+	if (GameStatus != GameState::LevelEdit)	MainUI.OnEvent(event);
+	if (GameStatus == GameState::Running)
+	{
+		Player.OnEvent(event);
+	}
 	if (GameStatus == GameState::LevelEdit)
 	{
 		Editor.OnEvent(event);

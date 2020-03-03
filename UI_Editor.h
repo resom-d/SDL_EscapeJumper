@@ -22,7 +22,6 @@ public:
 
 	void OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap charMap, ColorPalette colors);
 	void LoadTextures(const SDL_Rect* srcRect, const SDL_Rect* destRect);
-	void CreateWidgetTexture(SDL_Renderer* rend, string filePath, SDL_Texture* destTex, SDL_Rect srcRect, SDL_Rect destRect,  double rot);
 	void ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect);
 	void OnLoop();
 	void OnEvent(SDL_Event*);

@@ -1,6 +1,6 @@
 #include "SDL_Extras.h"
 
-CharacterTextureMap SDL_Extras::SDL_GetTexturesFromString(SDL_Renderer* rend, string aString, TTF_Font* font)
+CharacterTextureMap SDL_GetTexturesFromString(SDL_Renderer* rend, string aString, TTF_Font* font)
 {
 	unordered_map<char, SDL_Texture*> chars;
 
@@ -18,7 +18,7 @@ CharacterTextureMap SDL_Extras::SDL_GetTexturesFromString(SDL_Renderer* rend, st
 	return chars;
 }
 
-void SDL_Extras::SDL_RenderStringAt(SDL_Renderer* rend, string text, SDL_Point p, CharacterTextureMap chars, Uint16 size, SDL_Rect* clipRect)
+void SDL_RenderStringAt(SDL_Renderer* rend, string text, SDL_Point p, CharacterTextureMap chars, Uint16 size, SDL_Rect* clipRect)
 {
 	SDL_Rect destRect{ p.x, p.y, 0,0 };
 	SDL_Rect srcRect = { 0,0,0,0 };
@@ -28,8 +28,8 @@ void SDL_Extras::SDL_RenderStringAt(SDL_Renderer* rend, string text, SDL_Point p
 	{
 		char c = *iter;
 		Uint32 f;
-		int a,w, h;
-		SDL_QueryTexture(chars[c],&f,  &a, &w, &h);
+		int a, w, h;
+		SDL_QueryTexture(chars[c], &f, &a, &w, &h);
 		destRect.w = size;
 		destRect.h = size;
 		srcRect = { 0,0,w,h };
@@ -40,13 +40,13 @@ void SDL_Extras::SDL_RenderStringAt(SDL_Renderer* rend, string text, SDL_Point p
 	SDL_RenderSetClipRect(rend, nullptr);
 }
 
-void SDL_Extras::SDL_RenderSetPixel(SDL_Renderer* renderer, int x, int y, Uint8 red, Uint8 green, Uint8 blue, Uint8 alpha)
+void SDL_RenderSetPixel(SDL_Renderer* renderer, int x, int y, Uint8 red, Uint8 green, Uint8 blue, Uint8 alpha)
 {
 	SDL_SetRenderDrawColor(renderer, red, green, blue, alpha);
 	SDL_RenderDrawPoint(renderer, x, y);
 }
 
-void SDL_Extras::SDL_RenderDrawCircle(SDL_Renderer* renderer, int n_cx, int n_cy, int radius, Uint8 red, Uint8 green, Uint8 blue, Uint8 alpha)
+void SDL_RenderDrawCircle(SDL_Renderer* renderer, int n_cx, int n_cy, int radius, Uint8 red, Uint8 green, Uint8 blue, Uint8 alpha)
 {
 	// if the first pixel in the screen is represented by (0,0) (which is in sdl)
 	// remember that the beginning of the circle is not in the middle of the pixel
@@ -94,7 +94,7 @@ void SDL_Extras::SDL_RenderDrawCircle(SDL_Renderer* renderer, int n_cx, int n_cy
 	}
 }
 
-void SDL_Extras::SDL_RenderFillCircle(SDL_Renderer* renderer, int cx, int cy, int radius, Uint8 red, Uint8 green, Uint8 blue, Uint8 alpha)
+void SDL_RenderFillCircle(SDL_Renderer* renderer, int cx, int cy, int radius, Uint8 red, Uint8 green, Uint8 blue, Uint8 alpha)
 {
 	// Note that there is more to altering the bitrate of this 
 	// method than just changing this value.  See how pixels are
@@ -120,7 +120,7 @@ void SDL_Extras::SDL_RenderFillCircle(SDL_Renderer* renderer, int cx, int cy, in
 	}
 }
 
-void SDL_Extras::SDL_RenderDrawBorder(SDL_Renderer* rend, SDL_Rect rect, Uint16 borderWidth, SDL_Color color)
+void SDL_RenderDrawBorder(SDL_Renderer* rend, SDL_Rect rect, Uint16 borderWidth, SDL_Color color)
 {
 	SDL_Rect drect;
 	drect.x = rect.x;
@@ -141,34 +141,22 @@ void SDL_Extras::SDL_RenderDrawBorder(SDL_Renderer* rend, SDL_Rect rect, Uint16 
 	SDL_RenderSetClipRect(rend, nullptr);
 }
 
-void SDL_Extras::SDL_RenderSetDrawColor(SDL_Renderer* rend, SDL_Color col)
+void SDL_RenderSetDrawColor(SDL_Renderer* rend, SDL_Color col)
 {
 	SDL_SetRenderDrawColor(rend, col.r, col.g, col.b, col.a);
 }
 
-SDL_Texture* SDL_Extras::SD_RenderLoadTexture(SDL_Renderer* renderer, std::string path)
+void CreateWidgetTexture(SDL_Renderer* rend, string filePath, SDL_Texture* destTex, SDL_Rect srcRect, SDL_Rect destRect, double rot, SDL_RendererFlip flip)
 {
-	//The final texture
-	SDL_Texture* newTexture = NULL;
-
-	//Load image at specified path
-	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
-	if (loadedSurface == NULL)
-	{
-		printf("Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError());
-	}
-	else
-	{
-		//Create texture from surface pixels
-		newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
-		if (newTexture == NULL)
-		{
-			printf("Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
-		}
-
-		//Get rid of old loaded surface
-		SDL_FreeSurface(loadedSurface);
-	}
-
-	return newTexture;
+	SDL_Texture* orgTex = SDL_GetRenderTarget(rend);
+	SDL_Surface* s = IMG_Load(filePath.c_str());
+	SDL_Texture* t = SDL_CreateTextureFromSurface(rend, s);
+	SDL_SetTextureBlendMode(destTex, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderTarget(rend, destTex);
+	SDL_RenderSetClipRect(rend, &destRect);
+	SDL_RenderCopyEx(rend, t, &srcRect, &destRect, rot, nullptr, flip);
+	SDL_RenderSetClipRect(rend, nullptr);
+	SDL_FreeSurface(s);
+	SDL_DestroyTexture(t);
+	SDL_SetRenderTarget(rend, orgTex);
 }

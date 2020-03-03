@@ -57,7 +57,7 @@ void LevelEditor::OnRender()
 	}
 
 	UI.OnRender(ColumnPosition, RowPosition);
-	_map->OnRender({ ColumnPosition, RowPosition }, { ScrollPosition, 0 });
+	_map->OnRender({ ColumnPosition, RowPosition }, { ScrollPosition.x, ScrollPosition.y });
 
 	if (Mode == UI_ACTION::BORDERDRAWMODE && (_drawActive || _eraseActive))
 	{
@@ -125,24 +125,10 @@ void LevelEditor::OnEvent(SDL_Event* event)
 			Mode = UI_ACTION::BORDERDRAWMODE;
 			break;
 
-		case (Sint32)UI_ACTION::SCROLL_BLOCK_START:
-			ColumnPosition = 0;
+		case (Sint32)UI_ACTION::SCROLL_TO:			
+			ScrollMap((*(Userdata*)event->user.data2).Scrollposition);			
 			break;
-
-		case (Sint32)UI_ACTION::SCROLL_BLOCK_END:
-			ColumnPosition = _map->Setup.Cols - _map->Setup.DisplayCols ;
-			break;
-
-		case (Sint32)UI_ACTION::SCROLL_BLOCK_LEFT:
-			ColumnPosition--;
-			if (ColumnPosition < 0) ColumnPosition = 0;
-			break;
-
-		case (Sint32)UI_ACTION::SCROLL_BLOCK_RIGHT:
-			ColumnPosition++;
-			if (ColumnPosition > _map->Setup.Cols - _map->Setup.DisplayCols) ColumnPosition = _map->Setup.Cols - _map->Setup.DisplayCols;
-			break;
-
+			
 		case (Sint32)UI_ACTION::SET_FILL_COLOR:
 			ud = *(Userdata*)event->user.data2;
 			if (ud.ColorIndex < 0 || ud.ColorIndex >_map->ColorPallete.size() - 1) return;
@@ -485,9 +471,10 @@ void LevelEditor::OnMouseMove(int mX, int mY, int relX, int relY, bool Left, boo
 
 	if (_mapScrollMidlleMouse)
 	{
-		int diff = abs(_mapScrollDiff.x - mX);
+		int diffX = abs(_mapScrollDiff.x - mX);
+		int diffY = abs(_mapScrollDiff.y - mY);
 
-		if (diff >= _map->Setup.BlockSize + _map->Setup.BlockSpacing)
+		if (diffX >= _map->Setup.BlockSize + _map->Setup.BlockSpacing)
 		{
 			if (_mapScrollDiff.x - mX < 0) ColumnPosition--;
 			else ColumnPosition++;
@@ -497,7 +484,81 @@ void LevelEditor::OnMouseMove(int mX, int mY, int relX, int relY, bool Left, boo
 
 			_mapScrollDiff.x = mX;
 		}
+
+		if (diffY >= _map->Setup.BlockSize + _map->Setup.BlockSpacing)
+		{
+			if (_mapScrollDiff.y - mY < 0) RowPosition--;
+			else RowPosition++;
+
+			if (RowPosition < 0) RowPosition = 0;
+			if (RowPosition > _map->Setup.Rows - _map->Setup.DisplayRows) RowPosition = _map->Setup.Rows - _map->Setup.DisplayRows;
+
+			_mapScrollDiff.y = mY;
+		}
 	}
 
+}
+
+void LevelEditor::ScrollMap(SDL_Point p)
+{
+	switch (p.x)
+	{
+	case 3:
+		ColumnPosition = _map->Setup.Cols - _map->Setup.DisplayCols;
+		break;
+
+	case 2:
+		ColumnPosition += _map->Setup.DisplayCols;		
+		break;
+
+	case 1:
+		ColumnPosition++;
+		break;
+	case -3:
+		ColumnPosition = 0;
+		break;
+
+	case -2:
+		ColumnPosition -= _map->Setup.DisplayCols;
+		break;
+
+	case -1:
+		ColumnPosition--;
+		break;
+
+	}
+
+	switch (p.y)
+	{
+	case 3:
+		RowPosition = _map->Setup.Rows - _map->Setup.DisplayRows;
+		break;
+
+	case 2:
+		RowPosition += _map->Setup.DisplayRows;
+		break;
+
+	case 1:
+		RowPosition++;
+		break;
+	case -3:
+		RowPosition = 0;
+		break;
+
+	case -2:
+		RowPosition -= _map->Setup.DisplayRows;
+		break;
+
+	case -1:
+		RowPosition--;
+		break;
+
+	}
+
+	if (ColumnPosition < 0) ColumnPosition = 0;
+	if (ColumnPosition > _map->Setup.Cols - _map->Setup.DisplayCols) ColumnPosition = _map->Setup.Cols - _map->Setup.DisplayCols;
+
+	if (RowPosition < 0) RowPosition = 0;
+	if (RowPosition > _map->Setup.Rows - _map->Setup.DisplayRows) RowPosition = _map->Setup.Rows - _map->Setup.DisplayRows;
 }
 

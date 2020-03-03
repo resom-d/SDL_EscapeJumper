@@ -24,7 +24,7 @@ public:
 	Uint16 ResourceIndex = 0;
 	int ColumnPosition = 0;
 	int RowPosition = 0;
-	int ScrollPosition = 0;
+	SDL_Point ScrollPosition = { 0,0 };
 	int ScrollSpeed = 1;
 
 	void OnInit(SDL_Window* win, SDL_Renderer* rend, GameMap* map, CharacterTextureMap charMap);
@@ -54,7 +54,7 @@ public:
 	void OnMiddleButtonUp(int mX, int mY);
 	void OnMiddleButtonDown(int mX, int mY);
 	void OnMouseMove(int mX, int mY, int relX, int relY, bool Left, bool Right, bool Middle);
-
+	void ScrollMap(SDL_Point p);
 private:
 	SDL_Window* _appWindow;
 	SDL_Renderer* _rend;

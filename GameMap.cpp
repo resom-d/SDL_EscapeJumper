@@ -31,6 +31,7 @@ void GameMap::OnInit(SDL_Renderer* rend)
 	InitMap();
 }
 
+// todo add option to scroll to edges on all sides. from -display colums to rows+display columns
 void GameMap::OnRender(SDL_Point blockpos, SDL_Point scrollpos)
 {
 	SDL_RenderSetClipRect(_rend, &Setup.DisplayRect);
@@ -58,7 +59,7 @@ void GameMap::OnRender(SDL_Point blockpos, SDL_Point scrollpos)
 				ci = ColorPallete.begin();
 				advance(ci, tile.BorderColor);
 				SDL_SetRenderDrawColor(_rend, ci->r, ci->g, ci->b, ci->a);
-				SDL_Extras::SDL_RenderDrawBorder(_rend, dRect, 1, { ci->r, ci->g, ci->b,ci->a });
+				SDL_RenderDrawBorder(_rend, dRect, 1, { ci->r, ci->g, ci->b,ci->a });
 			}
 			else
 			{
@@ -194,7 +195,7 @@ void GameMap::FillArea(SDL_Point p1, SDL_Point p2, SDL_Point offs, TilemapTile s
 	minX = p1.x > p2.x ? p2.x : p1.x;
 	minY = p1.y > p2.y ? p2.y : p1.y;
 	maxX = p1.x < p2.x ? p2.x : p1.x;
-	maxY = p1.y < p2.x ? p2.y : p1.y;
+	maxY = p1.y < p2.y ? p2.y : p1.y;
 
 
 	for (int x = minX; x <= maxX; x++)

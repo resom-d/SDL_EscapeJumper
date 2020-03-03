@@ -48,16 +48,15 @@ enum class WIDGET_ORIENTATION
 enum class UI_ACTION
 {
 	NONE = 0,
+	QUIT_GAME,
+	GO_MAINSCREEN,
+	GO_EDITOR,
+	GO_GAME,
 	LOADMAP,
 	SAVEMAP,
 	DRAWMODE,
 	ERASEMODE,
-	SCROLL_RIGHT,
-	SCROLL_LEFT,
-	SCROLL_BLOCK_LEFT,
-	SCROLL_BLOCK_RIGHT,
-	SCROLL_BLOCK_START,
-	SCROLL_BLOCK_END,
+	SCROLL_TO,
 	BORDERDRAWMODE,
 	SET_FILL_COLOR,
 	SET_BORDER_COLOR,
@@ -75,8 +74,9 @@ enum class WIDGET_EVENT_TYPE
 class Userdata
 {
 public:
+	Userdata();
 	Uint16 ColorIndex;
-	SDL_Color Color;
 	Uint16 ResourceIndex;
 	Uint16 TileIndex;
+	SDL_Point Scrollposition;
 };

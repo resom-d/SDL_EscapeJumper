@@ -51,7 +51,7 @@ void UI_TextInput::OnRender(void)
 		DisplayRect.h - (Padding << 1)
 	};
 
-	SDL_Extras::SDL_RenderStringAt(_rend, *TextBuffer, { DisplayRect.x, DisplayRect.y }, _charMap, 28, &dRect);
+	SDL_RenderStringAt(_rend, *TextBuffer, { DisplayRect.x, DisplayRect.y }, _charMap, 28, &dRect);
 	
 }
 
