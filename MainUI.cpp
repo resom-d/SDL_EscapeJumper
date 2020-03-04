@@ -54,7 +54,8 @@ void MainUI::OnInit(SDL_Renderer* renderer, CharacterTextureMap charMap)
 	btn.BorderWidth = bordW;
 	btn.Padding = pad;
 	Buttons.push_back(btn);
-	dRect.x += w + gap;
+	dRect.x += w + gap;	
+		
 }
 
 void MainUI::OnEvent(SDL_Event* event)
@@ -63,6 +64,7 @@ void MainUI::OnEvent(SDL_Event* event)
 	{
 		iter->OnEvent(event);
 	}
+
 }
 
 void MainUI::OnRender(std::string playerName, int playerScore, bool gameOver)
@@ -87,6 +89,7 @@ void MainUI::OnRender(std::string playerName, int playerScore, bool gameOver)
 		iter->OnRender();
 	}
 
+	
 }
 
 void MainUI::OnPostRender()
@@ -100,4 +103,6 @@ void MainUI::OnCleanup()
 	{
 		iter->OnCleanup();
 	}
+
+
 }

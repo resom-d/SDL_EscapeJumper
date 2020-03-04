@@ -21,71 +21,78 @@ void LevelEditor::OnInit(SDL_Window* win, SDL_Renderer* rend, GameMap* map, Char
 
 	UI.DisplayRect = { 0,0, DisplayRect.w, UI_Height };
 	UI.OnInit(_rend, _map, _charMap, _map->ColorPallete);
-
+	_confScreen.DisplayRect = DisplayRect;
+	_confScreen.OnInit(_rend);
 }
 
 void LevelEditor::OnLoop()
 {
 	UI.OnLoop();
+	if(ConfigScreenOn) _confScreen.OnLoop();
 }
 
 void LevelEditor::OnRender()
 {
-	SDL_RenderSetClipRect(_rend, nullptr);
-	SDL_SetRenderDrawColor(_rend, _map->Setup.Background.r, _map->Setup.Background.g, _map->Setup.Background.b, _map->Setup.Background.a);
-	SDL_RenderFillRect(_rend, &_map->Setup.DisplayRect);
-
-	// Draw a grid
-	SDL_SetRenderDrawColor(_rend, 255, 255, 255, 255);
-	for (auto x = 0; x <= _map->Setup.DisplayRows; x++)
+	if (ConfigScreenOn) _confScreen.OnRender();
+	else
 	{
-		SDL_RenderDrawLine(_rend,
-			_map->Setup.DisplayRect.x,
-			_map->Setup.DisplayRect.y + (x * (_map->Setup.BlockSize + _map->Setup.BlockSpacing)),
-			_map->Setup.DisplayRect.x + DisplayRect.w,
-			_map->Setup.DisplayRect.y + (x * (_map->Setup.BlockSize + _map->Setup.BlockSpacing))
-		);
-	}
-	for (auto y = 0; y <= _map->Setup.DisplayCols; y++)
-	{
-		SDL_RenderDrawLine(_rend,
-			_map->Setup.DisplayRect.x + (y * (_map->Setup.BlockSize + _map->Setup.BlockSpacing)),
-			_map->Setup.DisplayRect.y,
-			_map->Setup.DisplayRect.x + (y * (_map->Setup.BlockSize + _map->Setup.BlockSpacing)),
-			_map->Setup.DisplayRect.y + DisplayRect.h
-		);
-	}
-
-	UI.OnRender(ColumnPosition, RowPosition);
-	_map->OnRender({ ColumnPosition, RowPosition }, { ScrollPosition.x, ScrollPosition.y });
-
-	if (Mode == UI_ACTION::BORDERDRAWMODE && (_drawActive || _eraseActive))
-	{
-		int minX, minY, maxX, maxY;
-
-		minX = _blockdrawStartScreen.x > _blockdrawEndScreen.x ? _blockdrawEndScreen.x : _blockdrawStartScreen.x;
-		minY = _blockdrawStartScreen.y > _blockdrawEndScreen.y ? _blockdrawEndScreen.y : _blockdrawStartScreen.y;
-		maxX = _blockdrawStartScreen.x < _blockdrawEndScreen.x ? _blockdrawEndScreen.x : _blockdrawStartScreen.x;
-		maxY = _blockdrawStartScreen.y < _blockdrawEndScreen.y ? _blockdrawEndScreen.y : _blockdrawStartScreen.y;
-
-		SDL_Rect r = {
-			minX,
-			minY,
-			maxX - minX,
-			maxY - minY
-		};
-
-		SDL_RenderSetClipRect(_rend, &r);
-		SDL_SetRenderDrawColor(_rend, 0, 200, 0, 255);
-		SDL_RenderDrawRect(_rend, &r);
 		SDL_RenderSetClipRect(_rend, nullptr);
+		SDL_SetRenderDrawColor(_rend, _map->Setup.Background.r, _map->Setup.Background.g, _map->Setup.Background.b, _map->Setup.Background.a);
+		SDL_RenderFillRect(_rend, &_map->Setup.DisplayRect);
+
+		// Draw a grid
+		SDL_SetRenderDrawColor(_rend, 255, 255, 255, 255);
+		for (auto x = 0; x <= _map->Setup.DisplayRows; x++)
+		{
+			SDL_RenderDrawLine(_rend,
+				_map->Setup.DisplayRect.x,
+				_map->Setup.DisplayRect.y + (x * (_map->Setup.BlockSize + _map->Setup.BlockSpacing)),
+				_map->Setup.DisplayRect.x + DisplayRect.w,
+				_map->Setup.DisplayRect.y + (x * (_map->Setup.BlockSize + _map->Setup.BlockSpacing))
+			);
+		}
+		for (auto y = 0; y <= _map->Setup.DisplayCols; y++)
+		{
+			SDL_RenderDrawLine(_rend,
+				_map->Setup.DisplayRect.x + (y * (_map->Setup.BlockSize + _map->Setup.BlockSpacing)),
+				_map->Setup.DisplayRect.y,
+				_map->Setup.DisplayRect.x + (y * (_map->Setup.BlockSize + _map->Setup.BlockSpacing)),
+				_map->Setup.DisplayRect.y + DisplayRect.h
+			);
+		}
+
+		UI.OnRender(ColumnPosition, RowPosition);
+		_map->OnRender({ ColumnPosition, RowPosition }, { ScrollPosition.x, ScrollPosition.y });
+
+		if (Mode == UI_ACTION::BORDERDRAWMODE && (_drawActive || _eraseActive))
+		{
+			int minX, minY, maxX, maxY;
+
+			minX = _blockdrawStartScreen.x > _blockdrawEndScreen.x ? _blockdrawEndScreen.x : _blockdrawStartScreen.x;
+			minY = _blockdrawStartScreen.y > _blockdrawEndScreen.y ? _blockdrawEndScreen.y : _blockdrawStartScreen.y;
+			maxX = _blockdrawStartScreen.x < _blockdrawEndScreen.x ? _blockdrawEndScreen.x : _blockdrawStartScreen.x;
+			maxY = _blockdrawStartScreen.y < _blockdrawEndScreen.y ? _blockdrawEndScreen.y : _blockdrawStartScreen.y;
+
+			SDL_Rect r = {
+				minX,
+				minY,
+				maxX - minX,
+				maxY - minY
+			};
+
+			SDL_RenderSetClipRect(_rend, &r);
+			SDL_SetRenderDrawColor(_rend, 0, 200, 0, 255);
+			SDL_RenderDrawRect(_rend, &r);
+			SDL_RenderSetClipRect(_rend, nullptr);
+		}
+
 	}
 }
 
 void LevelEditor::OnCleanUp()
 {
 	UI.OnCleanup();
-
+	_confScreen.OnCleanup();
 }
 
 void LevelEditor::OnLoadMap()
@@ -102,6 +109,8 @@ void LevelEditor::OnClearMap()
 
 void LevelEditor::OnEvent(SDL_Event* event)
 {
+	if (ConfigScreenOn) _confScreen.OnEvent(event);
+
 	if (event->type == EDITOR_EVENT_TYPE)
 	{
 		Userdata ud;
@@ -109,6 +118,14 @@ void LevelEditor::OnEvent(SDL_Event* event)
 
 		switch (event->user.code)
 		{
+		case (Sint32)UI_ACTION::GO_EDITOR:
+			ConfigScreenOn = false;
+			break;
+
+		case (Sint32)UI_ACTION::GO_EDITOR_CONFIG:
+			ConfigScreenOn = true;
+			break;
+
 		case (Sint32)UI_ACTION::SAVEMAP:
 			_map->SaveMap("ZZZ");
 			break;
@@ -125,10 +142,10 @@ void LevelEditor::OnEvent(SDL_Event* event)
 			Mode = UI_ACTION::BORDERDRAWMODE;
 			break;
 
-		case (Sint32)UI_ACTION::SCROLL_TO:			
-			ScrollMap((*(Userdata*)event->user.data2).Scrollposition);			
+		case (Sint32)UI_ACTION::SCROLL_TO:
+			ScrollMap((*(Userdata*)event->user.data2).Scrollposition);
 			break;
-			
+
 		case (Sint32)UI_ACTION::SET_FILL_COLOR:
 			ud = *(Userdata*)event->user.data2;
 			if (ud.ColorIndex < 0 || ud.ColorIndex >_map->ColorPallete.size() - 1) return;
@@ -200,6 +217,7 @@ void LevelEditor::OnEvent(SDL_Event* event)
 	}
 
 	UI.OnEvent(event);
+
 }
 
 void LevelEditor::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
@@ -480,7 +498,7 @@ void LevelEditor::OnMouseMove(int mX, int mY, int relX, int relY, bool Left, boo
 			else ColumnPosition++;
 
 			if (ColumnPosition < 0) ColumnPosition = 0;
-			if (ColumnPosition > _map->Setup.Cols - _map->Setup.DisplayCols ) ColumnPosition = _map->Setup.Cols - _map->Setup.DisplayCols;
+			if (ColumnPosition > _map->Setup.Cols - _map->Setup.DisplayCols) ColumnPosition = _map->Setup.Cols - _map->Setup.DisplayCols;
 
 			_mapScrollDiff.x = mX;
 		}
@@ -508,7 +526,7 @@ void LevelEditor::ScrollMap(SDL_Point p)
 		break;
 
 	case 2:
-		ColumnPosition += _map->Setup.DisplayCols;		
+		ColumnPosition += _map->Setup.DisplayCols;
 		break;
 
 	case 1:

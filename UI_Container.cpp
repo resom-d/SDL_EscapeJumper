@@ -14,13 +14,13 @@ void UI_Container::OnInit(SDL_Renderer* rend)
 
 	for (list<UI_Control>::iterator iter = _children.begin(); iter != _children.end(); iter++)
 	{
-		iter->OnInit(rend, "-Color-");
+		iter->OnInit(rend);
 	}
 }
 
 void UI_Container::OnInit(SDL_Renderer* rend, UI_ACTION actionCode)
 {
-	UI_Widget::OnInit(rend,  actionCode);
+	UI_Widget::OnInit(rend, actionCode);
 
 	for (list<UI_Control>::iterator iter = _children.begin(); iter != _children.end(); iter++)
 	{
@@ -32,19 +32,18 @@ void UI_Container::OnRender()
 {
 	UI_Widget::OnRender();
 
-	SDL_Rect destRect = 
+	SDL_Rect destRect =
 	{
 		DisplayRect.x + BorderWidth + Padding,
 		DisplayRect.y + BorderWidth + Padding,
 	};
 
-	int lastMargin;
-	for (list<UI_Control>::iterator iter = next(_children.begin(), 1); iter != _children.end(); iter++)
-	{		
+	for (list<UI_Control>::iterator iter = _children.begin(); iter != _children.end(); iter++)
+	{
 		if (Orientation == WIDGET_ORIENTATION::HORIZONTAL)
 		{
 			destRect.x += iter->Margin;
-			iter->DisplayRect.x = destRect.x;
+			iter->DisplayRect.x = destRect.x + iter->Margin;
 			iter->DisplayRect.y = destRect.y + iter->Margin;
 			destRect.x += iter->DisplayRect.w + iter->Margin;
 		}
@@ -56,11 +55,9 @@ void UI_Container::OnRender()
 			iter->DisplayRect.y = destRect.y;
 			destRect.y += iter->DisplayRect.w + iter->Margin;
 		}
-		lastMargin = iter->Margin;
-		
+		DisplayRect.w = destRect.x - DisplayRect.x + BorderWidth + Padding;
 		iter->OnRender();
 	}
-	DisplayRect.w= destRect.x + lastMargin + Padding;
 }
 
 void UI_Container::OnEvent(SDL_Event* event)
@@ -75,17 +72,15 @@ void UI_Container::OnEvent(SDL_Event* event)
 	case SDL_MOUSEMOTION:
 		OnMouseMove(event->button);
 		break;
-	}	
+	}
 }
 
 void UI_Container::OnMouseMove(SDL_MouseButtonEvent event)
 {
-	BorderColor = Control_BorderColor;
 	if (event.x > DisplayRect.x + DisplayRect.w || event.x < DisplayRect.x || event.y < DisplayRect.y || event.y > DisplayRect.y + DisplayRect.h) return;
-	BorderColor = Control_BorderColorHover;
 }
 
-void UI_Container::OnCleanUp(void)
+void UI_Container::OnCleanup(void)
 {
 	for (list<UI_Control>::iterator iter = _children.begin(); iter != _children.end(); iter++)
 	{

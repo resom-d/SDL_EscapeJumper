@@ -1,18 +1,19 @@
 #pragma once
 #include "UI_Types.h"
-#include "UI_Widget.h"
+#include "UI_Control.h"
 
-class UI_TextInput :	public UI_Widget
+class UI_TextInput :	public UI_Control
 {
 public:
-
 	UI_TextInput();
 
 	string* TextBuffer;
+	string Vocabular;
+	Uint16 MaxSize;
 
-	virtual void OnInit(SDL_Renderer* rend, CharacterTextureMap charMap, string* text);
+	virtual void OnInit(SDL_Renderer* rend, CharacterTextureMap charMap);
 	virtual void OnEvent(SDL_Event* event);
-	virtual void OnRender(void);
+	void OnRender(void);
 	virtual void OnCleanup(void);
 
 private:

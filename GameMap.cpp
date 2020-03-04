@@ -38,6 +38,14 @@ void GameMap::OnRender(SDL_Point blockpos, SDL_Point scrollpos)
 
 	SDL_Rect dRect = { 0,0, Setup.BlockSize, Setup.BlockSize };
 
+	int ctd = Setup.DisplayCols;
+	if(blockpos.x < 0)
+	{
+	}
+	if (blockpos.x > Setup.Cols - Setup.DisplayCols)
+	{
+	}
+
 	for (int x = 0; x <= Setup.DisplayCols; x++)
 	{
 		for (int y = 0; y < Setup.DisplayRows; y++)

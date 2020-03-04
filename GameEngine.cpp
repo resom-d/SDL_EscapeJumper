@@ -93,9 +93,9 @@ bool GameEngine::OnInit()
 	};
 	Editor.OnInit(AppWindow, Renderer, &Map, CharMap);
 
-	int r = Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+	/*int r = Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 	tune = Mix_LoadMUS("Resources/music/The impossible Mission.mp3");
-	Mix_PlayMusic(tune, -1);
+	Mix_PlayMusic(tune, -1);*/
 
 	_appIsRunning = true;
 	GameStatus = GameState::MainScreen;
@@ -222,9 +222,6 @@ void GameEngine::OnRender()
 
 	if (GameStatus == GameState::MainScreen)
 	{
-		/*SDL_Extras::SDL_RenderStringAt(Renderer, "Zehnfinger", { 180, 100 }, CharMap, 100, nullptr);
-		SDL_Extras::SDL_RenderStringAt(Renderer, "Präsentiert:", { 120, 200 }, CharMap, 100, nullptr);
-		SDL_Extras::SDL_RenderStringAt(Renderer, "ESCAPE JUMPER", { 100, 400 }, CharMap, 100, nullptr);*/
 		MainUI.OnRender("Zehnfinger", Player.Score, GameStatus == GameState::Running);
 		Map.OnRender({ 0,0 }, { 0,0 });
 		MessageScroller.OnRender();

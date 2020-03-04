@@ -7,6 +7,7 @@
 #include "GameTypes.h"
 #include "GameMap.h"
 #include "UI_Editor.h"
+#include "UI_MapConfig.h"
 
 using namespace std;
 
@@ -26,6 +27,7 @@ public:
 	int RowPosition = 0;
 	SDL_Point ScrollPosition = { 0,0 };
 	int ScrollSpeed = 1;
+	bool ConfigScreenOn;
 
 	void OnInit(SDL_Window* win, SDL_Renderer* rend, GameMap* map, CharacterTextureMap charMap);
 
@@ -60,7 +62,7 @@ private:
 	SDL_Renderer* _rend;
 	GameMap* _map;
 	CharacterTextureMap _charMap;
-	
+	UI_MapConfig _confScreen;
 	int _colorIndexFill;
 	int _colorIndexBorder;
 	int _outputHeight;

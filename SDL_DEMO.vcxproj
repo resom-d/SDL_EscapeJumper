@@ -153,6 +153,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GameComponentBase.cpp" />
     <ClCompile Include="GameMap.cpp" />
     <ClCompile Include="GamePlayer.cpp" />
     <ClCompile Include="GameTypes.cpp" />
@@ -172,11 +173,13 @@
     <ClCompile Include="UI_Control.cpp" />
     <ClCompile Include="UI_Editor.cpp" />
     <ClCompile Include="UI_GridContainer.cpp" />
+    <ClCompile Include="UI_MapConfig.cpp" />
     <ClCompile Include="UI_TextInput.cpp" />
     <ClCompile Include="UI_Types.cpp" />
     <ClCompile Include="UI_Widget.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GameComponentBase.h" />
     <ClInclude Include="GameMap.h" />
     <ClInclude Include="GamePlayer.h" />
     <ClInclude Include="GameEngine.h" />
@@ -196,6 +199,7 @@
     <ClInclude Include="UI_Control.h" />
     <ClInclude Include="UI_Editor.h" />
     <ClInclude Include="UI_GridContainer.h" />
+    <ClInclude Include="UI_MapConfig.h" />
     <ClInclude Include="UI_Styles.h" />
     <ClInclude Include="UI_TextInput.h" />
     <ClInclude Include="UI_Types.h" />

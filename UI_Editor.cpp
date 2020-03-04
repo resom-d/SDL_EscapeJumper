@@ -35,15 +35,15 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap
 		44
 	};
 	int x = 0;
-	for (_colorPaletteIter = _colorPalette.begin(); _colorPaletteIter != _colorPalette.end(); _colorPaletteIter++)
+	for (auto fillIter = _colorPalette.begin(); fillIter != _colorPalette.end(); fillIter++)
 	{
+		Userdata data;
 		UI_Control btn;
 		btn.ActionCode = UI_ACTION::SET_FILL_COLOR;
 		btn.EventType = UI_EDITOR_EVENT_TYPE;
-		Userdata data;
 		data.ColorIndex = x;
 		btn.UserData = data;
-		btn.FillColor = *_colorPaletteIter;
+		btn.FillColor = *fillIter;
 		btn.Margin = 5;
 		btn.BorderWidth = 1;
 		btn.DisplayRect.w = 30;
@@ -64,7 +64,7 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap
 		44
 	};
 	x = 0;
-	for (_colorPaletteIter = _colorPalette.begin(); _colorPaletteIter != _colorPalette.end(); _colorPaletteIter++)
+	for (auto borderIter = _colorPalette.begin(); borderIter != _colorPalette.end(); borderIter++)
 	{
 		UI_Control btn;
 		btn.ActionCode = UI_ACTION::SET_BORDER_COLOR;
@@ -72,7 +72,7 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap
 		Userdata data;
 		data.ColorIndex = x;
 		btn.UserData = data;
-		btn.FillColor = *_colorPaletteIter;
+		btn.FillColor = *borderIter;
 		btn.Margin = 5;
 		btn.BorderWidth = 1;
 		btn.DisplayRect.w = 30;
@@ -305,6 +305,18 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	Buttons.push_back(btn);
 	dRect.x += w + gap;
 
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/Cog.png", tex, *srcRect, *destRect, 0, SDL_FLIP_NONE);
+	btn = UI_Control();
+	btn.OnInit(_rend, tex);
+	btn.EventType = EDITOR_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::GO_EDITOR_CONFIG;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	dRect.x += w + gap;
+
 	_tileResourceDPoint.x  = dRect.x;
 }
 
@@ -409,8 +421,8 @@ void UI_Editor::OnCleanup()
 		iter->OnCleanup();
 	}
 
-	FillColorWidgets.OnCleanUp();
-	BorderColorWidgets.OnCleanUp();
+	FillColorWidgets.OnCleanup();
+	BorderColorWidgets.OnCleanup();
 
 }
 

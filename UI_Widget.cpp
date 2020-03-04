@@ -11,6 +11,7 @@ UI_Widget::UI_Widget()
 	BorderColor = Control_BorderColor;
 	BorderColorActive = Control_BorderColorActive;
 	BorderColorHover = Control_BorderColorHover;
+	BorderWidth = 1;
 }
 
 void UI_Widget::OnInit(SDL_Renderer* renderer)

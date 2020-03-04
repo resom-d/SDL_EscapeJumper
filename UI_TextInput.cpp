@@ -2,19 +2,19 @@
 
 UI_TextInput::UI_TextInput()
 {
-	UI_Widget::UI_Widget();
+	UI_Control::UI_Control();
 }
 
-void UI_TextInput::OnInit(SDL_Renderer* rend, unordered_map<char, SDL_Texture*> charMap, string* text)
+void UI_TextInput::OnInit(SDL_Renderer* rend, CharacterTextureMap charMap)
 {
-	UI_Widget::OnInit(rend);
+	UI_Control::OnInit(rend);
 	_rend = rend;
 	_charMap = charMap;
-	TextBuffer = text;
 }
 
 void UI_TextInput::OnEvent(SDL_Event* event)
 {
+	UI_Control::OnEvent(event);
 
 	switch (event->type)
 	{
@@ -33,26 +33,29 @@ void UI_TextInput::OnEvent(SDL_Event* event)
 
 	case SDL_TEXTINPUT:
 		if (!_hasFocus) break;
-		TextBuffer->append(event->text.text);
-		break;
+		if (Vocabular.find(event->text.text) != string::npos && TextBuffer->length() < MaxSize)
+		{
+			TextBuffer->append(event->text.text);
+			break;
+		}
 	}
 
 }
 
 void UI_TextInput::OnRender(void)
 {
-	UI_Widget::OnRender();
+	UI_Control::OnRender();
 
-	SDL_Rect dRect = 
+	SDL_Rect dRect =
 	{
-		DisplayRect.x + Padding, 
-		DisplayRect.y + Padding, 
-		DisplayRect.w - (Padding << 1), 
+		DisplayRect.x + Padding,
+		DisplayRect.y + Padding,
+		DisplayRect.w - (Padding << 1),
 		DisplayRect.h - (Padding << 1)
 	};
 
 	SDL_RenderStringAt(_rend, *TextBuffer, { DisplayRect.x, DisplayRect.y }, _charMap, 28, &dRect);
-	
+
 }
 
 void UI_TextInput::OnCleanup(void)

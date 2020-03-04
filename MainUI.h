@@ -3,6 +3,7 @@
 #include "GameTypes.h"
 #include "UI_Control.h"
 #include "UI_Container.h"
+#include "UI_GridContainer.h"
 #include "UI_TextInput.h"
 #include "SDL_Extras.h"
 using namespace std;
@@ -24,7 +25,7 @@ public:
 	CharacterTextureMap _charMap;
 	SDL_Rect DisplayRect;
 	list<UI_Control> Buttons;
-
+	
 	
 };
 
