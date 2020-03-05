@@ -32,7 +32,7 @@ void GameMap::OnInit(SDL_Renderer* rend)
 	ViewMode = EngineViewMode::Editor;
 }
 
-void GameMap::OnRender(SDL_Point blockpos, SDL_Point scrollpos)
+void GameMap::OnRender()
 {
 	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
 	SDL_RenderSetClipRect(_rend, &Setup.DisplayRect);
@@ -40,18 +40,18 @@ void GameMap::OnRender(SDL_Point blockpos, SDL_Point scrollpos)
 	SDL_Rect dRect = { 0,0, Setup.BlockSize, Setup.BlockSize };
 
 	int ctd = Setup.DisplayCols; // Columns to display
-	int csi = blockpos.x;				// Column start index
+	int csi = BlockPosition.x;				// Column start index
 	int cdi = 0;							// Column display index
-	if (blockpos.x < 0)
+	if (BlockPosition.x < 0)
 	{
-		ctd = Setup.DisplayCols + blockpos.x;
+		ctd = Setup.DisplayCols + BlockPosition.x;
 		if (ctd < 0) ctd = 0;
 		csi = 0;
 		cdi = Setup.DisplayCols - ctd;
 	}
-	if (blockpos.x > Setup.Cols - Setup.DisplayCols)
+	if (BlockPosition.x > Setup.Cols - Setup.DisplayCols)
 	{
-		ctd = Setup.Cols - blockpos.x;
+		ctd = Setup.Cols - BlockPosition.x;
 		if (ctd > Setup.DisplayCols) ctd = Setup.DisplayCols;
 		if (ctd < 0) ctd = 0;
 		csi = Setup.Cols - ctd;
@@ -59,18 +59,18 @@ void GameMap::OnRender(SDL_Point blockpos, SDL_Point scrollpos)
 	}
 
 	int rtd = Setup.DisplayRows;	// Rows to display
-	int rsi = blockpos.y;					// Row start index
+	int rsi = BlockPosition.y;					// Row start index
 	int rdi = 0;								// Row display index
-	if (blockpos.y < 0)
+	if (BlockPosition.y < 0)
 	{
-		rtd = Setup.DisplayRows + blockpos.y;
+		rtd = Setup.DisplayRows + BlockPosition.y;
 		if (rtd < 0) rtd = 0;
 		rsi = 0;
 		rdi = Setup.DisplayRows - rtd;
 	}
-	if (blockpos.y > Setup.Rows - Setup.DisplayRows)
+	if (BlockPosition.y > Setup.Rows - Setup.DisplayRows)
 	{
-		rtd = Setup.Rows - blockpos.y;
+		rtd = Setup.Rows - BlockPosition.y;
 		rsi = 0;
 	}
 	if (rtd < 0) rtd = 0;
@@ -92,11 +92,11 @@ void GameMap::OnRender(SDL_Point blockpos, SDL_Point scrollpos)
 			}
 			TilemapTile tile = TileMap[x][y];
 
-			if ((ViewMode == EngineViewMode::Editor && !tile.Visible) || (ViewMode== EngineViewMode::Game && !tile.InView)) continue;
+			if ((ViewMode == EngineViewMode::Editor && !tile.Visible) || (ViewMode == EngineViewMode::Game && !tile.InView)) continue;
 
-			int spx = blockpos.x  + Setup.DisplayCols > -1 ? scrollpos.x : -1;
+			int spx = BlockPosition.x + Setup.DisplayCols > -1 ? ScrollPosition.x : -1;
 			dRect.x = Setup.DisplayRect.x + ((xc + cdi) * (Setup.BlockSize + Setup.BlockSpacing) - spx + Setup.BlockSpacing);
-			dRect.y = Setup.DisplayRect.y + ((yc + rdi) * (Setup.BlockSize + Setup.BlockSpacing) + scrollpos.y + Setup.BlockSpacing);
+			dRect.y = Setup.DisplayRect.y + ((yc + rdi) * (Setup.BlockSize + Setup.BlockSpacing) + ScrollPosition.y + Setup.BlockSpacing);
 
 			if (tile.ResourceIndex < 1 || tile.ResourceIndex > TextureResources.size() || tile.TileIndex < 1)
 			{
@@ -129,6 +129,18 @@ void GameMap::OnRender(SDL_Point blockpos, SDL_Point scrollpos)
 	}
 }
 
+void GameMap::OnLoop(void)
+{
+	if (ScrollPosition.x++ >= Setup.BlockSize + Setup.BlockSpacing)
+	{
+		ScrollPosition.x = 0;
+		if (++BlockPosition.x > Setup.Cols + ScrollXOutDelay)
+		{
+			Reset();
+		}
+	}
+}
+
 void GameMap::OnCleanUp()
 {
 	free(TileMap);
@@ -155,6 +167,12 @@ void GameMap::InitMap()
 			TileMap[x][y] = tile;
 		}
 	}
+}
+
+void GameMap::Reset(void)
+{
+	BlockPosition.x = -Setup.DisplayCols + ScrollXInDelay;
+	ScrollPosition = { 0, 0 };
 }
 
 void GameMap::SaveMap(string filename)

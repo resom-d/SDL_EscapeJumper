@@ -29,6 +29,9 @@ void LevelEditor::OnLoop()
 {
 	UI.OnLoop();
 	if(ConfigScreenOn) _confScreen.OnLoop();
+
+	_map->BlockPosition = { ColumnPosition, RowPosition };
+	_map->ScrollPosition = { 0,0 };
 }
 
 void LevelEditor::OnRender()
@@ -62,7 +65,7 @@ void LevelEditor::OnRender()
 		}
 
 		UI.OnRender(ColumnPosition, RowPosition);
-		_map->OnRender({ ColumnPosition, RowPosition }, { ScrollPosition.x, ScrollPosition.y });
+		_map->OnRender();
 
 		if (Mode == UI_ACTION::BORDERDRAWMODE && (_drawActive || _eraseActive))
 		{

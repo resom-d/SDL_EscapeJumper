@@ -69,6 +69,8 @@ void MainUI::OnEvent(SDL_Event* event)
 
 void MainUI::OnRender(std::string playerName, int playerScore, bool gameOver)
 {
+	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
+
 	int h, w;
 	SDL_GetRendererOutputSize(_rend, &w, &h);
 

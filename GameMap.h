@@ -63,12 +63,22 @@ public:
 	ColorPalette ColorPallete;
 	TileMapTextureResourceList TextureResources;
 	EngineViewMode ViewMode;
-
+	SDL_Point ScrollPosition = { 0,0 };
+	SDL_Point BlockPosition = { 0,0 };
+	int ScrollSpeed = 1;
+	int ScrollXInDelay = 0;
+	int ScrollXOutDelay = 0;
+	int ScrollYInDelay = 0;
+	int ScrollYOutDelay = 0;
+	bool LevelDone = false;
+	
 	virtual void OnInit(SDL_Renderer* rend);
-	virtual void OnRender(SDL_Point blockpos, SDL_Point scrollpos);
-	virtual void OnCleanUp();
+	virtual void OnRender();
+	virtual void OnLoop(void);
+	virtual void OnCleanUp(void);
 
-	virtual void InitMap();
+	virtual void InitMap(void);
+	void Reset(void);
 	virtual void SaveMap(string filename);
 	virtual void LoadMap(string filename);
 	virtual void SetTileInMap(SDL_Point coords, TilemapTile settings);

@@ -3,12 +3,11 @@
 #include <string>
 #include "GameEvents.h"
 #include "GameTypes.h"
+#include "GameMap.h"
 
 
 class JumperPlayer : GameEvents
 {
-private:
-
 public:
 	std::string TextureSourcePath;
 
@@ -24,20 +23,25 @@ public:
 	Uint16 AnimationFrame;
 	Uint16 AnimationRate;
 	int Speed;
-
+	bool GameOver;
+	bool Landed = true;
 	MotionState MotionHor;
 	MotionState MotionVer;
-	bool IsTop, IsBottom, isLeft, IsRight;
-
+	
 	std::string Name;
 	int Score;
 
-	int OnInit(SDL_Renderer* rend);
+	int OnInit(SDL_Renderer* rend, GameMap* map);
 	int OnLoop();
 	void OnEvent(SDL_Event* Event);
 	int OnRender();
 	int OnCleanup();
 	void OnKeyDown(SDL_Keycode sym, SDL_Keycode mod);
 	void OnKeyUp(SDL_Keycode sym, SDL_Keycode mod);
+
+private:
+	GameMap* _map;
+
+	void OnCollisionCheck();
 };
 

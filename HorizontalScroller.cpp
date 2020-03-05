@@ -42,7 +42,7 @@ void HorizontalScroller::OnRender()
 	);
 	SDL_RenderFillRect(_rend, &_map->Setup.DisplayRect);
 		
-	_map->OnRender(BlockPosition, ScrollPosition);
+	_map->OnRender();
 	
 	SDL_RenderSetClipRect(_rend, nullptr);
 }

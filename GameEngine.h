@@ -40,7 +40,6 @@ public:
 	LevelEditor Editor;
 	GameMap Map;
 	JumperPlayer Player;
-	HorizontalScroller Scroller;
 	TextScroller MessageScroller;
 	CharacterTextureMap CharMap;
 

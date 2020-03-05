@@ -13,7 +13,7 @@ public:
 	void OnLoop(void);
 	void OnEvent(SDL_Event* event);
 	void OnCleanup(void);
-	void OnRender(string playerName, string playerScore);
+	void OnRender(string playerName, string playerScore, bool playerStatus);
 
 private:
 	UI_Container _bbox;

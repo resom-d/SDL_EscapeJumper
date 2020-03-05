@@ -50,6 +50,7 @@ void UI_Control::OnRender(void)
 			contentHeight
 		};
 
+		SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
 		SDL_RenderSetClipRect(_rend, &DisplayRect);
 		SDL_RenderCopy(_rend, _texture, &srcRect, &destRect);
 

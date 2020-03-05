@@ -387,6 +387,7 @@ void UI_Editor::OnEvent(SDL_Event* event)
 
 void UI_Editor::OnRender(Uint16 colPos, Uint16 rowPos)
 {
+	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
 	// Background and a border please...
 	SDL_RenderSetClipRect(_rend, &DisplayRect);
 	SDL_RenderSetDrawColor(_rend, FillColor);

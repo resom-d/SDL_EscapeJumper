@@ -2,8 +2,8 @@
 
 <- Map-Setup
 #SET#
-C:60
-R:30
+C:200
+R:20
 DC:40
 DR:20
 BD:35

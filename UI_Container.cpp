@@ -42,7 +42,7 @@ void UI_Container::OnRender()
 	{
 		if (Orientation == WIDGET_ORIENTATION::HORIZONTAL)
 		{
-			destRect.x += iter->Margin;
+			//destRect.x += iter->Margin;
 			iter->DisplayRect.x = destRect.x + iter->Margin;
 			iter->DisplayRect.y = destRect.y + iter->Margin;
 			destRect.x += iter->DisplayRect.w + iter->Margin;
