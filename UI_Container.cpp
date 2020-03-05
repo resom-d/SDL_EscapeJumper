@@ -55,7 +55,7 @@ void UI_Container::OnRender()
 			iter->DisplayRect.y = destRect.y;
 			destRect.y += iter->DisplayRect.w + iter->Margin;
 		}
-		DisplayRect.w = destRect.x - DisplayRect.x + BorderWidth + Padding;
+		DisplayRect.w = destRect.x - DisplayRect.x + BorderWidth + Padding + iter->Margin;
 		iter->OnRender();
 	}
 }

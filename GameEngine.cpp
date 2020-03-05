@@ -21,10 +21,10 @@ bool GameEngine::OnInit()
 	UI_Height = 200;
 
 	// Configure Map
-	Map.Setup.Cols = 200;
-	Map.Setup.Rows = 40;
+	Map.Setup.Cols = 60;
+	Map.Setup.Rows = 30;
 	Map.Setup.DisplayCols = 40;
-	Map.Setup.BlockSpacing = 1;
+	Map.Setup.BlockSpacing = 0;
 	Map.Setup.BlockSize = 35;
 	Map.Setup.DisplayRows = 20;
 	Map.Setup.ScreenOffsX = 0;
@@ -71,6 +71,9 @@ bool GameEngine::OnInit()
 
 	MainUI.DisplayRect = { 0,0,Map.Setup.DisplayRect.w, UI_Height };
 	MainUI.OnInit(Renderer, CharMap);
+	
+	GameUI.DisplayRect = { 0,0,Map.Setup.DisplayRect.w, UI_Height };
+	GameUI.OnInit(Renderer, &CharMap);
 
 	Scroller.OnInit(Renderer, &Map);
 	Scroller.ScrollSpeed = 1;
@@ -151,15 +154,15 @@ void GameEngine::OnEvent(SDL_Event* event)
 			break;
 
 		case (int)UI_ACTION::GO_MAINSCREEN:
-			GameStatus = GameState::MainScreen;
+			GoMainscreen();
 			break;
 
 		case (int)UI_ACTION::GO_EDITOR:
-			GameStatus = GameState::LevelEdit;
+			GoEditor();
 			break;
 
 		case (int)UI_ACTION::GO_GAME:
-			OnGameRestart();
+			GoGame();
 			break;
 		}
 	}
@@ -169,6 +172,11 @@ void GameEngine::OnEvent(SDL_Event* event)
 	if (GameStatus == GameState::Running)
 	{
 		Player.OnEvent(event);
+		GameUI.OnEvent(event);
+	}
+	if (GameStatus == GameState::GameOver)
+	{
+		GameUI.OnEvent(event);
 	}
 	if (GameStatus == GameState::LevelEdit)
 	{
@@ -180,6 +188,8 @@ void GameEngine::OnLoop()
 {
 	if (GameStatus == GameState::MainScreen)
 	{
+		Scroller.OnLoop();
+
 		MessageScroller.OnLoop();
 
 		MessageScroller.DestRect.y += inc;
@@ -197,6 +207,7 @@ void GameEngine::OnLoop()
 
 	if (GameStatus == GameState::Running)
 	{
+		GameUI.OnLoop();
 		Player.OnLoop();
 		Scroller.OnLoop();
 		OnCollisionCheck();
@@ -206,6 +217,10 @@ void GameEngine::OnLoop()
 			Scroller.LevelDone = false;
 			GameStatus = GameState::GameOver;
 		}
+	}
+	if (GameStatus == GameState::GameOver)
+	{
+		GameUI.OnLoop();
 	}
 
 	if (GameStatus == GameState::LevelEdit)
@@ -223,14 +238,14 @@ void GameEngine::OnRender()
 	if (GameStatus == GameState::MainScreen)
 	{
 		MainUI.OnRender("Zehnfinger", Player.Score, GameStatus == GameState::Running);
-		Map.OnRender({ 0,0 }, { 0,0 });
+		Scroller.OnRender();
 		MessageScroller.OnRender();
 	}
 
 	if (GameStatus == GameState::Running || GameStatus == GameState::Paused || GameStatus == GameState::GameOver)
 	{
 		// Render UI
-		MainUI.OnRender(Player.Name, Player.Score, GameStatus == GameState::GameOver);
+		GameUI.OnRender(Player.Name, to_string(Player.Score));
 		// Render background
 
 		// Render Scoller
@@ -259,6 +274,7 @@ void GameEngine::OnCleanup()
 	SDL_free(_font);
 	Map.OnCleanUp();
 	MainUI.OnCleanup();
+	GameUI.OnCleanup();
 	Editor.OnCleanUp();
 	Scroller.OnCleanUp();
 	Player.OnCleanup();
@@ -309,8 +325,8 @@ void GameEngine::OnCollisionCheck()
 			int obstY = playerScreenRow + y + Scroller.BlockPosition.y;
 			if (obstX < 0 || obstY < 0 || obstX > Map.Setup.Cols - 1 || obstY > Map.Setup.Rows - 1) continue;
 
-			TilemapTile tile = Map.TileMap[obstX][obstY];
-			if (!tile.Visible) continue;
+			TilemapTile* tile = &Map.TileMap[obstX][obstY];
+			if (!tile->Visible || !tile->InView) continue;
 
 			obstEdgeT = Map.Setup.DisplayRect.y + ((playerScreenRow + y) * (Map.Setup.BlockSize + Map.Setup.BlockSpacing));
 			obstEdgeL = Map.Setup.DisplayRect.x + ((playerScreenColumn + x + 1) * (Map.Setup.BlockSize + Map.Setup.BlockSpacing)) - Scroller.ScrollPosition.x;
@@ -327,7 +343,13 @@ void GameEngine::OnCollisionCheck()
 
 			if (SDL_IntersectRect(&Player.DisplayRect, &rObst, &result))
 			{
-				GameStatus = GameState::GameOver;
+				if (tile->TileIndex == 5)
+				{
+					tile->InView = false;
+					Player.Score++;
+				}
+				else	GameStatus = GameState::GameOver;
+				 
 
 			}
 
@@ -347,9 +369,9 @@ void GameEngine::OnInitPlayer()
 	Player.Speed = 4;
 	Player.Score = 0;
 
-	Player.MinPosition.x = Map.Setup.ScreenOffsX + 1;
+	Player.MinPosition.x = Map.Setup.ScreenOffsX;
 	Player.MaxPosition.x = Map.Setup.ScreenOffsX + ((Map.Setup.DisplayCols - 1) * (Map.Setup.BlockSize + Map.Setup.BlockSpacing));
-	Player.MinPosition.y = Map.Setup.DisplayRect.y + 1; // Bottom of Top-UI
+	Player.MinPosition.y = Map.Setup.DisplayRect.y;
 	Player.MaxPosition.y = Map.Setup.DisplayRect.y + ((Map.Setup.DisplayRows - 1) * (Map.Setup.BlockSize + Map.Setup.BlockSpacing));
 
 	Player.DisplayRect.w = Map.Setup.BlockSize;
@@ -370,11 +392,16 @@ void GameEngine::OnGameRestart()
 {
 	OnInitPlayer();
 
-	Scroller.ScrollPosition.x = 0;
-	Scroller.BlockPosition = { 0,0 };
+	Scroller.ScrollSpeed = 2;
+	Scroller.ScrollXInDelay = - 5;
+	Scroller.ScrollXOutDelay = 5;
+	Scroller.Reset();
 
 	Player.Score = 0;
 	Player.Speed = 2;
+
+	Map.ViewMode = EngineViewMode::Game;
+
 	GameStatus = GameState::Running;
 }
 
@@ -395,10 +422,9 @@ void GameEngine::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 		if (GameStatus == GameState::Running) GameStatus = GameState::Paused;
 		else if (GameStatus == GameState::Paused) GameStatus = GameState::Running;
 	}
-	if (sym == SDLK_F1) GameStatus = GameState::MainScreen;
-	if (sym == SDLK_F3) OnGameRestart();
-	if (sym == SDLK_F5) GameStatus = GameState::LevelEdit;
-
+	if (sym == SDLK_F1) GoMainscreen();
+	if (sym == SDLK_F3) GoGame();
+	if (sym == SDLK_F5) GoEditor();
 }
 
 void GameEngine::OnKeyUp(SDL_Keycode sym, SDL_Keycode mod)
@@ -408,4 +434,21 @@ void GameEngine::OnKeyUp(SDL_Keycode sym, SDL_Keycode mod)
 	{
 
 	}
+}
+
+void GameEngine::GoMainscreen(void)
+{
+	Scroller.ScrollSpeed = 2;
+	Scroller.Reset();
+	GameStatus = GameState::MainScreen;
+}
+
+void GameEngine::GoGame(void)
+{
+	OnGameRestart();
+}
+
+void GameEngine::GoEditor(void)
+{
+	GameStatus = GameState::LevelEdit;
 }

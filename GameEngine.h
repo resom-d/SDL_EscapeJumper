@@ -12,7 +12,8 @@
 #include "GameTypes.h"
 #include "GameMap.h"
 #include "HorizontalScoller.h"
-#include "MainUI.h"
+#include "UI_Main.h"
+#include "UI_Game.h"
 #include "GamePlayer.h"
 #include"JumperPlayer.h"
 #include "LevelEditor.h"
@@ -35,6 +36,7 @@ public:
 	SDL_Window* AppWindow;
 	SDL_Renderer* Renderer;
 	MainUI MainUI;
+	UI_Game GameUI;
 	LevelEditor Editor;
 	GameMap Map;
 	JumperPlayer Player;
@@ -71,6 +73,10 @@ public:
 	void OnKeyDown(SDL_Keycode sym, SDL_Keycode mod);
 
 	void OnKeyUp(SDL_Keycode sym, SDL_Keycode mod);
+
+	void GoMainscreen(void);
+	void GoGame(void);
+	void GoEditor(void);
 
 	
 private:

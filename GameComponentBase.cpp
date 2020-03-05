@@ -1,12 +1,16 @@
 #include "GameComponentBase.h"
 
-GameComponentBase::GameComponentBase()
+GameComponentBase::GameComponentBase(void)
 {}
 
-GameComponentBase::~GameComponentBase()
+GameComponentBase::~GameComponentBase(void)
 {}
 
-void GameComponentBase::OnInit(SDL_Renderer * rend)
+void GameComponentBase::OnInit(SDL_Renderer * rend, CharacterTextureMap* charMap)
 {
 	_rend = rend;
+	_charMap = charMap;
 }
+
+void GameComponentBase::OnRender(void)
+{}

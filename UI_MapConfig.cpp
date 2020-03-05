@@ -99,7 +99,7 @@ void UI_MapConfig::CreateControls()
 	SDL_Point iP = { _gridUpperLeft.x + 400, _gridUpperLeft.y};
 	UI_TextInput ti;
 	ti.OnInit(_rend, _charMap);
-	ti.MaxSize = 50;
+	ti.MaxSize = 30;
 	ti.Vocabular = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_";
 	ti.DisplayRect = { iP.x, iP.y, 600, 40 };
 	ti.TextBuffer = &sFilename;

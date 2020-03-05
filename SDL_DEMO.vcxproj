@@ -163,7 +163,8 @@
     <ClCompile Include="MainApplication.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameEvents.cpp" />
-    <ClCompile Include="MainUI.cpp" />
+    <ClCompile Include="UI_Game.cpp" />
+    <ClCompile Include="UI_Main.cpp" />
     <ClCompile Include="SDL_Extras.cpp" />
     <ClCompile Include="Size2D.cpp" />
     <ClCompile Include="Size3D.cpp" />
@@ -188,7 +189,8 @@
     <ClInclude Include="HorizontalScoller.h" />
     <ClInclude Include="JumperPlayer.h" />
     <ClInclude Include="LevelEditor.h" />
-    <ClInclude Include="MainUI.h" />
+    <ClInclude Include="UI_Game.h" />
+    <ClInclude Include="UI_Main.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SDL_Extras.h" />
     <ClInclude Include="Size2D.h" />

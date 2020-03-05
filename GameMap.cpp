@@ -29,33 +29,74 @@ void GameMap::OnInit(SDL_Renderer* rend)
 {
 	_rend = rend;
 	InitMap();
+	ViewMode = EngineViewMode::Editor;
 }
 
-// todo add option to scroll to edges on all sides. from -display colums to rows+display columns
 void GameMap::OnRender(SDL_Point blockpos, SDL_Point scrollpos)
 {
+	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
 	SDL_RenderSetClipRect(_rend, &Setup.DisplayRect);
 
 	SDL_Rect dRect = { 0,0, Setup.BlockSize, Setup.BlockSize };
 
-	int ctd = Setup.DisplayCols;
-	if(blockpos.x < 0)
+	int ctd = Setup.DisplayCols; // Columns to display
+	int csi = blockpos.x;				// Column start index
+	int cdi = 0;							// Column display index
+	if (blockpos.x < 0)
 	{
+		ctd = Setup.DisplayCols + blockpos.x;
+		if (ctd < 0) ctd = 0;
+		csi = 0;
+		cdi = Setup.DisplayCols - ctd;
 	}
 	if (blockpos.x > Setup.Cols - Setup.DisplayCols)
 	{
+		ctd = Setup.Cols - blockpos.x;
+		if (ctd > Setup.DisplayCols) ctd = Setup.DisplayCols;
+		if (ctd < 0) ctd = 0;
+		csi = Setup.Cols - ctd;
+		cdi = 0;
 	}
 
-	for (int x = 0; x <= Setup.DisplayCols; x++)
+	int rtd = Setup.DisplayRows;	// Rows to display
+	int rsi = blockpos.y;					// Row start index
+	int rdi = 0;								// Row display index
+	if (blockpos.y < 0)
 	{
-		for (int y = 0; y < Setup.DisplayRows; y++)
+		rtd = Setup.DisplayRows + blockpos.y;
+		if (rtd < 0) rtd = 0;
+		rsi = 0;
+		rdi = Setup.DisplayRows - rtd;
+	}
+	if (blockpos.y > Setup.Rows - Setup.DisplayRows)
+	{
+		rtd = Setup.Rows - blockpos.y;
+		rsi = 0;
+	}
+	if (rtd < 0) rtd = 0;
+	if (rtd > Setup.DisplayRows) ctd = Setup.DisplayRows;
+
+	int yc = -1;
+	int xc = -1;
+	for (int x = csi; x <= csi + ctd; x++)
+	{
+		yc = -1;
+		xc++;
+		for (int y = rsi; y < rtd; y++)
 		{
-			TilemapTile tile = TileMap[x + blockpos.x][y + blockpos.y];
+			yc++;
+			if (ctd < Setup.DisplayCols)
+			{
+				int xll = 0;
+				xll++;
+			}
+			TilemapTile tile = TileMap[x][y];
 
-			if (!tile.Visible) continue;
+			if ((ViewMode == EngineViewMode::Editor && !tile.Visible) || (ViewMode== EngineViewMode::Game && !tile.InView)) continue;
 
-			dRect.x = Setup.DisplayRect.x + (x * (Setup.BlockSize + Setup.BlockSpacing) - scrollpos.x + Setup.BlockSpacing);
-			dRect.y = Setup.DisplayRect.y + (y * (Setup.BlockSize + Setup.BlockSpacing) + scrollpos.y + Setup.BlockSpacing);
+			int spx = blockpos.x  + Setup.DisplayCols > -1 ? scrollpos.x : -1;
+			dRect.x = Setup.DisplayRect.x + ((xc + cdi) * (Setup.BlockSize + Setup.BlockSpacing) - spx + Setup.BlockSpacing);
+			dRect.y = Setup.DisplayRect.y + ((yc + rdi) * (Setup.BlockSize + Setup.BlockSpacing) + scrollpos.y + Setup.BlockSpacing);
 
 			if (tile.ResourceIndex < 1 || tile.ResourceIndex > TextureResources.size() || tile.TileIndex < 1)
 			{
@@ -84,9 +125,9 @@ void GameMap::OnRender(SDL_Point blockpos, SDL_Point scrollpos)
 
 			}
 		}
+
 	}
 }
-
 
 void GameMap::OnCleanUp()
 {
@@ -140,7 +181,7 @@ void GameMap::SaveMap(string filename)
 	{
 		for (auto iter = TextureResources.begin(); iter != TextureResources.end(); iter++)
 		{
-			theFile << "#RES#"<< endl;
+			theFile << "#RES#" << endl;
 			theFile << "P:" << iter->Path << endl;
 			theFile << "C:" << to_string(iter->Cols) << endl;
 			theFile << "R:" << to_string(iter->Rows) << endl;
@@ -166,9 +207,9 @@ void GameMap::SaveMap(string filename)
 		for (int y = 0; y <= Setup.Rows; y++)
 		{
 			TilemapTile tile = TileMap[x][y];
-			
-			if(!tile.Visible) continue;
-			
+
+			if (!tile.Visible) continue;
+
 			theFile << "T:"
 				<< to_string((int)tile.Type) << ":"
 				<< to_string(tile.ResourceIndex) << ":"

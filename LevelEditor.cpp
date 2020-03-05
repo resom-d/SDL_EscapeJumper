@@ -224,10 +224,6 @@ void LevelEditor::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 {
 	switch (sym)
 	{
-	case SDLK_q:
-		OnSaveMap();
-		break;
-
 	case SDLK_LEFT:
 		ColumnPosition--;
 		if (ColumnPosition < 0) ColumnPosition = 0;

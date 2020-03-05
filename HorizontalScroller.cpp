@@ -9,8 +9,8 @@ void HorizontalScroller::OnInit(SDL_Renderer* renderer, GameMap* map)
 {
 	_rend = renderer;
 	_map = map;
-	BlockPosition.x = 0;
-	BlockPosition.y = 0;
+	BlockPosition.x = -ScrollXInDelay;
+	BlockPosition.y = -ScrollYInDelay;
 	ScrollPosition.x = 0;
 	ScrollPosition.y = 0;
 	
@@ -20,12 +20,10 @@ void HorizontalScroller::OnLoop()
 {
 	if (ScrollPosition.x > _map->Setup.BlockSize + _map->Setup.BlockSpacing)
 	{
-		ScrollPosition.x = ScrollPosition.x % (_map->Setup.BlockSpacing + _map->Setup.BlockSpacing);
-		if (++BlockPosition.x > _map->Setup.Cols - _map->Setup.DisplayCols - 1)
-		{
-			BlockPosition.x = 0;
-			ScrollPosition.x = 0;
-			//LevelDone = true;
+		ScrollPosition.x = ScrollPosition.x % (_map->Setup.BlockSize + _map->Setup.BlockSpacing);
+		if (++BlockPosition.x > _map->Setup.Cols + ScrollXOutDelay)
+		{			
+			Reset();
 		}
 	}
 	ScrollPosition.x += ScrollSpeed;
@@ -52,4 +50,10 @@ void HorizontalScroller::OnRender()
 void HorizontalScroller::OnCleanUp()
 {
 
+}
+
+void HorizontalScroller::Reset(void)
+{
+	BlockPosition.x = -_map->Setup.DisplayCols + ScrollXInDelay;
+	ScrollPosition = { 0, 0 };
 }

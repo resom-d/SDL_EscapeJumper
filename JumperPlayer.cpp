@@ -93,12 +93,12 @@ void JumperPlayer::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 	if (sym == SDLK_UP && (IsBottom||true))
 	{
 		MotionVer = MotionState::Plus;
-		Score++;
+		
 	}
 	if (sym == SDLK_DOWN && (IsTop||true))
 	{
 		MotionVer = MotionState::Minus;
-		Score++;
+		
 	}
 
 	if (sym == SDLK_LEFT)

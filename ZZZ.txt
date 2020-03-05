@@ -2,12 +2,12 @@
 
 <- Map-Setup
 #SET#
-C:200
-R:40
+C:60
+R:30
 DC:40
 DR:20
 BD:35
-BS::1
+BS::0
 BGR:0
 BGG:0
 BGB:0

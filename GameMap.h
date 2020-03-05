@@ -19,6 +19,12 @@ enum class TileType
 	HealhUp
 };
 
+enum class EngineViewMode
+{
+	Game,
+	Editor
+};
+
 typedef struct TilemapTile
 {
 	TileType Type = TileType::Background;
@@ -27,6 +33,7 @@ typedef struct TilemapTile
 	Uint16 FillColor = 0;
 	Uint16 BorderColor = 0;
 	bool Visible = false;
+	bool InView = true;
 };
 
 typedef struct TilemapSetup
@@ -55,6 +62,7 @@ public:
 	TileMap TileMap;
 	ColorPalette ColorPallete;
 	TileMapTextureResourceList TextureResources;
+	EngineViewMode ViewMode;
 
 	virtual void OnInit(SDL_Renderer* rend);
 	virtual void OnRender(SDL_Point blockpos, SDL_Point scrollpos);
