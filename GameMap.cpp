@@ -38,7 +38,8 @@ void GameMap::OnRender()
 
 	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
 	SDL_RenderSetClipRect(_rend, &Setup.DisplayRect);
-
+	SDL_RenderSetDrawColor(_rend, Setup.Background);
+	SDL_RenderFillRect(_rend, &Setup.DisplayRect);
 	SDL_Rect dRect = { 0,0, Setup.BlockSize, Setup.BlockSize };
 
 	int ctd = Setup.DisplayCols; // Columns to display
@@ -138,6 +139,7 @@ void GameMap::OnLoop(void)
 		ScrollPosition.x = 0;
 		if (++BlockPosition.x > Setup.Cols + ScrollXOutDelay)
 		{
+			LevelDone = true;
 			ResetScroller();
 		}
 	}
@@ -145,7 +147,7 @@ void GameMap::OnLoop(void)
 
 void GameMap::OnCleanUp()
 {
-	free(TileMap);
+	if(TileMap != nullptr) free(TileMap);
 }
 
 void GameMap::InitMap()
@@ -194,9 +196,13 @@ void GameMap::ResetInView(void)
 void GameMap::SaveMap(string filename)
 {
 	ofstream theFile;
-	theFile.open(filename + ".txt");
-	theFile << "<- Zehnfinger Tilemap-Description" << endl << endl;;
+	theFile.open(filename);
+	if (!theFile.is_open())
+	{
+		int nn = 0;
+	}
 
+	theFile << "<- Zehnfinger Tilemap-Description" << endl << endl;;
 	theFile << "<- Map-Setup" << endl;
 	theFile << "#SET#" << endl;
 	theFile << "C:" << to_string(Setup.Cols) << endl;

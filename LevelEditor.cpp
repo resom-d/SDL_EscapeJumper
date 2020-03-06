@@ -70,6 +70,9 @@ void LevelEditor::OnRender()
 		SDL_SetRenderDrawColor(_rend, Map.Setup.Background.r, Map.Setup.Background.g, Map.Setup.Background.b, Map.Setup.Background.a);
 		SDL_RenderFillRect(_rend, &Map.Setup.DisplayRect);
 
+		UI.OnRender(ColumnPosition, RowPosition);
+		Map.OnRender();
+		
 		// Draw a grid
 		SDL_SetRenderDrawColor(_rend, 255, 255, 255, 255);
 		for (auto x = 0; x <= Map.Setup.DisplayRows; x++)
@@ -91,8 +94,6 @@ void LevelEditor::OnRender()
 			);
 		}
 
-		UI.OnRender(ColumnPosition, RowPosition);
-		Map.OnRender();
 
 		if (Mode == UI_ACTION::BORDERDRAWMODE && (_drawActive || _eraseActive))
 		{
@@ -127,15 +128,13 @@ void LevelEditor::OnCleanUp()
 
 void LevelEditor::OnLoadMap()
 {
-	GameMap theMap = GameMap::LoadMap(_rend, _confScreen.sFilename + ".txt");
-	Map.OnCleanUp();
-	Map = theMap;
+	Map = GameMap::LoadMap(_rend, "Resources/levels/" + _confScreen.sFilename + ".txt");
 
 }
 
 void LevelEditor::OnSaveMap()
 {
-	Map.SaveMap(_confScreen.sFilename);
+	Map.SaveMap("Resources/levels/" + _confScreen.sFilename + ".txt");
 }
 
 void LevelEditor::OnClearMap()
@@ -254,7 +253,7 @@ void LevelEditor::OnEvent(SDL_Event* event)
 
 	}
 
-	UI.OnEvent(event);
+	if (!ConfigScreenOn) UI.OnEvent(event);
 
 }
 
@@ -282,34 +281,7 @@ void LevelEditor::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 		if (RowPosition > Map.Setup.Rows - Map.Setup.DisplayRows) RowPosition = Map.Setup.Rows - Map.Setup.DisplayRows;
 		break;
 
-	case SDLK_d:
-		Mode = UI_ACTION::DRAWMODE;
-		break;
-
-	case SDLK_e:
-		Mode = UI_ACTION::ERASEMODE;
-		break;
-
-	case SDLK_1:
-		if (--_colorIndexFill < 1) _colorIndexFill = 1;
-		break;
-
-	case SDLK_2:
-		if (++_colorIndexFill > Map.ColorPallete.size() - 1) _colorIndexFill = Map.ColorPallete.size() - 1;
-		break;
-
-	case SDLK_3:
-		if (--_colorIndexBorder < 1) _colorIndexBorder = 1;
-		break;
-
-	case SDLK_4:
-		if (++_colorIndexBorder > Map.ColorPallete.size() - 1) _colorIndexBorder = Map.ColorPallete.size() - 1;
-		break;
-
-
-	case SDLK_0:
-		_colorIndexFill = 9;
-		break;
+	
 	}
 }
 

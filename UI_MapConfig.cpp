@@ -84,7 +84,7 @@ void UI_MapConfig::CreateControls()
 	co.DisplayRect = { 0,0, 70, 70 };
 	_bbox.AddChild(co);
 
-	co = UI_Control();
+	/*co = UI_Control();
 	co.EventType = EDITOR_EVENT_TYPE;
 	co.ActionCode = UI_ACTION::LOADMAP;
 	co.DisplayRect = { 0,0, 70, 70 };
@@ -94,7 +94,7 @@ void UI_MapConfig::CreateControls()
 	co.EventType = EDITOR_EVENT_TYPE;
 	co.ActionCode = UI_ACTION::SAVEMAP;
 	co.DisplayRect = { 0,0, 70, 70 };
-	_bbox.AddChild(co);
+	_bbox.AddChild(co);*/
 
 	// Properties-Grid
 	SDL_Point iP = { _gridUpperLeft.x + 400, _gridUpperLeft.y};

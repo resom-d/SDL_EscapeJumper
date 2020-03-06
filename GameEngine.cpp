@@ -12,6 +12,11 @@ GameEngine::GameEngine()
 
 bool GameEngine::OnInit()
 {
+	Levels.push_back("Resources/levels/Level-001.txt");
+	Levels.push_back("Resources/levels/Level-002.txt");
+	Levels.push_back("Resources/levels/Level-003.txt");
+
+
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) 	return false;
 	if (TTF_Init() == -1) return false;
 	if (SDL_NumJoysticks() > 0) GamePad = SDL_JoystickOpen(0);
@@ -30,7 +35,7 @@ bool GameEngine::OnInit()
 	if ((Renderer = SDL_CreateRenderer(AppWindow, -1, SDL_RENDERER_ACCELERATED)) == nullptr) return false;
 
 	Map.OnInit(Renderer);
-	Map = GameMap::LoadMap(Renderer, "ZF-Map-001-v001.txt");
+	Map = GameMap::LoadMap(Renderer,* Levels.begin());
 
 	SDL_SetWindowSize(AppWindow, Map.Setup.DisplayRect.w, Map.Setup.DisplayRect.h + UI_Height);
 	SDL_ShowWindow(AppWindow);
@@ -47,17 +52,7 @@ bool GameEngine::OnInit()
 
 	GameUI.DisplayRect = { 0,0,Map.Setup.DisplayRect.w, UI_Height };
 	GameUI.OnInit(Renderer, &CharMap);
-
-	MessageScroller.OnInit(Renderer,
-		"ESCAPE JUMPER - Ein Spiel für Kinder von 6 bis 100 Jahre. Drücke F1 um hier her zurück zu kommen, F3 um mit dem Spiel zu beginnen oder F5 um zum Level-Editor zu gelangen. Viel Spass damit.                           Let Peace Grow.       ",
-		_font,
-		{ 0, 61, 115, 255 },
-		1
-	);
-	MessageScroller.DestRect.x = 320;
-	MessageScroller.DestRect.y = 320;
-	MessageScroller.DestRect.w = 800;
-
+		
 	Editor.DisplayRect = {
 		0,
 		0,
@@ -72,7 +67,6 @@ bool GameEngine::OnInit()
 
 	_appIsRunning = true;
 	GameStatus = GameState::MainScreen;
-
 
 	return true;
 };
@@ -158,10 +152,7 @@ void GameEngine::OnLoop()
 {
 	if (GameStatus == GameState::MainScreen)
 	{
-		Map.OnLoop();
-
-		MessageScroller.OnLoop();
-
+		Map.OnLoop();		
 	}
 
 	if (GameStatus == GameState::Running)
@@ -180,8 +171,17 @@ void GameEngine::OnLoop()
 
 		if (Map.LevelDone)
 		{
+			_level++;			
+			if(_level > Levels.size()-1) _level = 0;
 			Map.LevelDone = false;
-			GameStatus = GameState::GameOver;
+			Map.OnCleanUp();
+			Map = GameMap::LoadMap(Renderer, *next(Levels.begin(), _level));
+			Map.ViewMode = EngineViewMode::Game;
+			Map.ScrollSpeed = 4;
+			Map.ScrollXInDelay = 0;
+			Map.ScrollXOutDelay = 0;
+			Map.ResetScroller();
+			Map.ResetInView();
 		}
 	}
 	if (GameStatus == GameState::GameOver)
@@ -205,8 +205,7 @@ void GameEngine::OnRender()
 	if (GameStatus == GameState::MainScreen)
 	{
 		MainUI.OnRender("Zehnfinger", Player.Score, GameStatus == GameState::Running);
-		Map.OnRender();
-		MessageScroller.OnRender();
+		Map.OnRender();		
 	}
 
 	if (GameStatus == GameState::Running || GameStatus == GameState::Paused || GameStatus == GameState::GameOver)
@@ -244,8 +243,7 @@ void GameEngine::OnCleanup()
 	GameUI.OnCleanup();
 	Editor.OnCleanUp();
 	Player.OnCleanup();
-	MessageScroller.OnCleanUp();
-
+	
 	Mix_CloseAudio();
 	Mix_FreeMusic(tune);
 
@@ -259,11 +257,15 @@ void GameEngine::OnInitPlayer()
 {
 	Player.AnimationRate = 40;		// t=1000/framesPerSecond e.g. 1000/25 = 40
 	Player.Name = "Mollmops";
-	Player.TextureSourcePath = "Resources/sprites/Spritesheet_Alien_01.png";
+	Player.TextureSourcePath = "Resources/sprites/Block_001.png";
 	Player.HorizontalTiling = 6;
 	Player.VerticalTiling = 4;
-	Player.Speed = 8;
+	
+	Player.GameOver = false;
 	Player.Score = 0;
+	Player.Speed = 3;
+	Player.MotionHor = MotionState::None;
+	Player.MotionVer = MotionState::None;
 
 	Player.MinPosition.x = Map.Setup.ScreenOffsX;
 	Player.MaxPosition.x = Map.Setup.ScreenOffsX + ((Map.Setup.DisplayCols - 1) * (Map.Setup.BlockSize + Map.Setup.BlockSpacing));
@@ -275,26 +277,21 @@ void GameEngine::OnInitPlayer()
 	Player.DisplayRect.x = Map.Setup.ScreenOffsX + (Map.Setup.DisplayRect.w / 2);
 	Player.DisplayRect.y = Map.Setup.DisplayRect.y + (Map.Setup.DisplayRect.h / 2);
 
-	Player.MotionHor = MotionState::None;
-	Player.MotionVer = MotionState::None;
 }
 
 void GameEngine::OnGameRestart()
 {
-	OnInitPlayer();
-	Player.GameOver = false;
-
+	Map.OnCleanUp();
+	Map = GameMap::LoadMap(Renderer, *next(Levels.begin(), _level));
+	Map.ViewMode = EngineViewMode::Game;
 	Map.ScrollSpeed = 4;
 	Map.ScrollXInDelay = 0;
 	Map.ScrollXOutDelay = 0;
 	Map.ResetScroller();
 	Map.ResetInView();
-	Player.Score = 0;
-	Player.Speed = 3;
-	Player.MotionVer = MotionState::Plus;
-
-	Map.ViewMode = EngineViewMode::Game;
-
+	
+	OnInitPlayer();
+	
 	GameStatus = GameState::Running;
 }
 
@@ -331,6 +328,7 @@ void GameEngine::OnKeyUp(SDL_Keycode sym, SDL_Keycode mod)
 
 void GameEngine::GoMainscreen(void)
 {
+	Map = GameMap::LoadMap(Renderer, *Levels.begin());
 	Map.ScrollSpeed = 1;
 	Map.ResetScroller();
 	Map.ViewMode = EngineViewMode::Editor;
@@ -339,7 +337,7 @@ void GameEngine::GoMainscreen(void)
 
 void GameEngine::GoGame(void)
 {
-	Map.ViewMode = EngineViewMode::Game;
+	_level = 0;
 	OnGameRestart();
 }
 

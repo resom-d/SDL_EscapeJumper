@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <string>
 #include <iostream>
+#include <filesystem>
 #include <list>
 #include "GameEvents.h"
 #include "GameTypes.h"
@@ -20,7 +21,8 @@
 #include "TextScroller.h"
 #include "SDL_Extras.h"
 
-using namespace std;
+//using namespace std;
+
 
 class GameEngine : public GameEvents
 {
@@ -40,7 +42,7 @@ public:
 	LevelEditor Editor;
 	GameMap Map;
 	JumperPlayer Player;
-	TextScroller MessageScroller;
+	list<string> Levels;
 	CharacterTextureMap CharMap;
 
 	SDL_Joystick* GamePad = NULL;
@@ -81,6 +83,7 @@ public:
 private:
 	TTF_Font* _font;
 	Mix_Music* tune;
+	Uint16 _level;
 
 protected:
 
