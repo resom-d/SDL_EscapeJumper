@@ -17,6 +17,7 @@ public:
 
 	LevelEditor();
 
+	GameMap Map;
 	UI_Editor UI;
 	UI_ACTION Mode = UI_ACTION::DRAWMODE;
 	SDL_Rect DisplayRect;
@@ -29,7 +30,7 @@ public:
 	int ScrollSpeed = 1;
 	bool ConfigScreenOn;
 
-	void OnInit(SDL_Window* win, SDL_Renderer* rend, GameMap* map, CharacterTextureMap charMap);
+	void OnInit(SDL_Window* win, SDL_Renderer* rend, CharacterTextureMap charMap);
 
 	void OnLoop();
 
@@ -60,7 +61,6 @@ public:
 private:
 	SDL_Window* _appWindow;
 	SDL_Renderer* _rend;
-	GameMap* _map;
 	CharacterTextureMap _charMap;
 	UI_MapConfig _confScreen;
 	int _colorIndexFill;

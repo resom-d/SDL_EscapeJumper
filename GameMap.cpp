@@ -34,6 +34,8 @@ void GameMap::OnInit(SDL_Renderer* rend)
 
 void GameMap::OnRender()
 {
+	if (Setup.Cols < 1) return;
+
 	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
 	SDL_RenderSetClipRect(_rend, &Setup.DisplayRect);
 
@@ -136,7 +138,7 @@ void GameMap::OnLoop(void)
 		ScrollPosition.x = 0;
 		if (++BlockPosition.x > Setup.Cols + ScrollXOutDelay)
 		{
-			Reset();
+			ResetScroller();
 		}
 	}
 }
@@ -169,10 +171,24 @@ void GameMap::InitMap()
 	}
 }
 
-void GameMap::Reset(void)
+void GameMap::ResetScroller(void)
 {
 	BlockPosition.x = -Setup.DisplayCols + ScrollXInDelay;
 	ScrollPosition = { 0, 0 };
+}
+
+void GameMap::ResetInView(void)
+{
+	if (Setup.Cols < 1) return;
+
+	for (auto x = 0; x < Setup.Cols; x++)
+	{
+		for (auto y = 0; y < Setup.Rows; y++)
+		{
+			if (!TileMap[x][y].Visible) continue;
+			TileMap[x][y].InView = true;
+		}
+	}
 }
 
 void GameMap::SaveMap(string filename)
@@ -188,7 +204,7 @@ void GameMap::SaveMap(string filename)
 	theFile << "DC:" << to_string(Setup.DisplayCols) << endl;
 	theFile << "DR:" << to_string(Setup.DisplayRows) << endl;
 	theFile << "BD:" << to_string(Setup.BlockSize) << endl;
-	theFile << "BS::" << to_string(Setup.BlockSpacing) << endl;
+	theFile << "BS:" << to_string(Setup.BlockSpacing) << endl;
 	theFile << "BGR:" << to_string(Setup.Background.r) << endl;
 	theFile << "BGG:" << to_string(Setup.Background.g) << endl;
 	theFile << "BGB:" << to_string(Setup.Background.b) << endl;
@@ -229,6 +245,8 @@ void GameMap::SaveMap(string filename)
 			if (!tile.Visible) continue;
 
 			theFile << "T:"
+				<< to_string((int)x) << ":"
+				<< to_string((int)y) << ":"
 				<< to_string((int)tile.Type) << ":"
 				<< to_string(tile.ResourceIndex) << ":"
 				<< to_string(tile.TileIndex) << ":"
@@ -240,8 +258,158 @@ void GameMap::SaveMap(string filename)
 	theFile.close();
 }
 
-void GameMap::LoadMap(string filename)
-{}
+GameMap GameMap::LoadMap(SDL_Renderer* rend, string filename)
+{
+	GameMap newMap;
+	newMap.OnInit(rend);
+	newMap.ColorPallete.clear();
+	fstream fr;
+	fr.open(filename.c_str());
+	if (!fr.is_open()) return GameMap();
+	int tilecount = 0;
+	string component="";
+	string line = "";
+	TileMapTextureResource tr;
+	while (getline(fr, line))
+	{
+		if (line.length() < 2) continue;
+		if (line.substr(0, 2) == "<-") continue;
+
+		if (component == "SET")
+		{
+			list<string> splittedStrings = SplitString(line, ':');
+			auto item = splittedStrings.begin();
+			if (*item == "C")
+			{				
+				newMap.Setup.Cols = stoi(*next(item, 1));
+			}
+			if (*item == "R")
+			{
+				newMap.Setup.Rows = stoi(*next(item, 1));
+			}
+			if (*item == "DC")
+			{
+				newMap.Setup.DisplayCols = stoi(*next(item, 1));
+			}
+			if (*item == "DR")
+			{
+				newMap.Setup.DisplayRows = stoi(*next(item, 1));
+			}
+			if (*item == "BD")
+			{
+				newMap.Setup.BlockSize = stoi(*next(item, 1));
+			}
+			if (*item == "BS")
+			{
+				newMap.Setup.BlockSpacing = stoi(*next(item, 1));
+			}
+			if (*item == "BGR")
+			{
+				newMap.Setup.Background.r = stoi(*next(item, 1));
+			}
+			if (*item == "BGG")
+			{
+				newMap.Setup.Background.g = stoi(*next(item, 1));
+			}
+			if (*item == "BGB")
+			{
+				newMap.Setup.Background.b = stoi(*next(item, 1));
+			}
+			if (*item == "BGA")
+			{
+				newMap.Setup.Background.a = stoi(*next(item, 1));
+				newMap.InitMap();
+
+				newMap.Setup.DisplayRect =
+				{
+					newMap.Setup.ScreenOffsX,
+					 200,
+					(newMap.Setup.BlockSize + newMap.Setup.BlockSpacing) * newMap.Setup.DisplayCols + 1,
+					(newMap.Setup.BlockSize + newMap.Setup.BlockSpacing) * newMap.Setup.DisplayRows + 1
+				};
+
+			}
+		}		
+		if (component == "RES")
+		{
+			list<string> splittedStrings = SplitString(line, ':');
+			auto item = splittedStrings.begin();
+			if (*item == "P")
+			{
+				tr.Path = *next(item, 1);
+			}
+			if (*item == "C")
+			{
+				tr.Cols = stoi(*next(item, 1));
+			}
+			if (*item == "R")
+			{
+				tr.Rows = stoi(*next(item, 1));
+			}
+			if (*item == "M")
+			{
+				tr.MaxIndex = stoi(*next(item, 1));
+			}
+			if (*item == "T")
+			{
+				SDL_Surface* surf = IMG_Load(tr.Path.c_str());
+				tr.Texture = SDL_CreateTextureFromSurface(rend, surf);
+				SDL_FreeSurface(surf);
+				tr.Tilesize.w = stoi(*next(item, 1));
+				tr.Tilesize.h = stoi(*next(item, 2));
+				newMap.TextureResources.push_back(tr);
+			}			
+		}
+		if (component == "COL")
+		{
+			list<string> splittedStrings = SplitString(line, ':');
+			auto item = splittedStrings.begin();
+			if (*item == "C")
+			{
+				SDL_Color c =
+				{
+					stoi(*next(item, 1)),
+					stoi(*next(item, 2)),
+					stoi(*next(item, 3)),
+					stoi(*next(item, 4))
+				};
+				newMap.ColorPallete.push_back(c);
+			}			
+		}
+		if (component == "TLM")
+		{
+			list<string> splittedStrings = SplitString(line, ':');
+			auto item = splittedStrings.begin();
+			if (*item == "T")
+			{
+				TilemapTile tile;
+				int x = stoi(*next(item, 1));
+				int y = stoi(*next(item, 2));
+				tile.Type = (TileType)stoi(*next(item, 3));
+				tile.ResourceIndex = stoi(*next(item, 4));
+				tile.TileIndex = stoi(*next(item, 5));
+				tile.FillColor = stoi(*next(item, 6));
+				tile.BorderColor= stoi(*next(item, 7));
+				tile.Visible = true;
+				tile.InView = true;
+
+				newMap.TileMap[x][y] = tile;
+				tilecount++;
+			}
+			
+		}
+
+		if (line.substr(0, 1) == "#")
+		{
+			component = line.substr(1, line.length() - 2);
+			if (component == "RES") tr = TileMapTextureResource();
+		}
+	}
+
+	fr.close();
+
+	return newMap;
+}
 
 void GameMap::SetTileInMap(SDL_Point cords, TilemapTile settings)
 {

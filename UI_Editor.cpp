@@ -13,10 +13,8 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap
 	_map = map;
 	_charmap = charMap;
 	_colorPalette = colors;
-
-	_tileResourceDPoint = { 750,5 };
-
 	_activeTool = UI_ACTION::DRAWMODE;
+	_tileResourceDPoint ={ 750,5 };
 	
 	SDL_Texture* orgTex = SDL_GetRenderTarget(_rend);
 
@@ -83,9 +81,8 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap
 	BorderColorWidgets.OnInit(_rend, UI_ACTION::DRAWMODE);
 
 	// Cleanup
-	SDL_RenderSetScale(_rend, 1.0, 1.0);
-	SDL_SetRenderTarget(_rend, orgTex);
 	SDL_RenderSetClipRect(_rend, nullptr);
+	
 
 }
 
@@ -362,6 +359,7 @@ void UI_Editor::OnEvent(SDL_Event* event)
 
 	if (event->type == SDL_MOUSEBUTTONDOWN)
 	{
+		if (_map->TextureResources.size() < 1) return;
 		Size2D texSize;
 		auto iter = _map->TextureResources.begin();
 		int mx = event->button.x, my = event->button.y;

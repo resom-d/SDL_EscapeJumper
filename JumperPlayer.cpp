@@ -7,6 +7,10 @@ int JumperPlayer::OnInit(SDL_Renderer* rend, GameMap* map)
 	int screenWidth, screenHeight;
 	SDL_GetRendererOutputSize(_rend, &screenWidth, &screenHeight);
 
+	SDL_Surface* surf = IMG_Load("Resources/sprites/Block_001.png");
+	_tex = SDL_CreateTextureFromSurface(_rend, surf);
+	SDL_FreeSurface(surf);
+
 	return 0;
 }
 
@@ -58,12 +62,14 @@ int JumperPlayer::OnLoop()
 
 int JumperPlayer::OnRender()
 {
-	SDL_RenderSetClipRect(_rend, &DisplayRect);
-	SDL_SetRenderDrawColor(_rend, 24, 141, 199, 255);
-	SDL_RenderFillRect(_rend, &DisplayRect);
-	SDL_SetRenderDrawColor(_rend, 0, 0, 0, 255);
-	SDL_RenderDrawRect(_rend, &DisplayRect);
+	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
 
+	SDL_RenderSetClipRect(_rend, &DisplayRect);
+	
+	int w, h;
+	SDL_QueryTexture(_tex, nullptr, nullptr, &w, &h);
+	SDL_Rect srcRect = { 0,0, w,h };
+	SDL_RenderCopy(_rend, _tex, &srcRect, &DisplayRect);
 	return 0;
 }
 
@@ -177,12 +183,12 @@ void JumperPlayer::OnCollisionCheck()
 					{
 						if (MotionVer == MotionState::Minus)
 						{
-							DisplayRect.y = rObst.y + _map->Setup.BlockSize + 1;
+							DisplayRect.y = rObst.y + _map->Setup.BlockSize;
 							Landed = true;
 						}							
 						else if (MotionVer == MotionState::Plus)
 						{
-							DisplayRect.y = rObst.y - _map->Setup.BlockSize - 1;
+							DisplayRect.y = rObst.y - _map->Setup.BlockSize;
 							Landed = true;
 						}
 					}

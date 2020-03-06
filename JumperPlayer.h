@@ -41,7 +41,7 @@ public:
 
 private:
 	GameMap* _map;
-
+	SDL_Texture* _tex;
 	void OnCollisionCheck();
 };
 

@@ -160,3 +160,15 @@ void CreateWidgetTexture(SDL_Renderer* rend, string filePath, SDL_Texture* destT
 	SDL_DestroyTexture(t);
 	SDL_SetRenderTarget(rend, orgTex);
 }
+
+list<string> SplitString(string sourceString, const char splitter)
+{
+	stringstream ss(sourceString);
+	list<string> splittedStrings;
+	string item;
+	while (getline(ss, item, splitter))
+	{
+		splittedStrings.push_back(item);
+	}
+	return splittedStrings;
+}

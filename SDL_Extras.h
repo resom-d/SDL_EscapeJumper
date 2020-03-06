@@ -6,6 +6,7 @@
 #include <string>
 #include <list>
 #include <unordered_map>
+#include <sstream>
 #include "UI_Types.h"
 #include "GameTypes.h"
 
@@ -30,3 +31,5 @@ using namespace std;
 	
 	
 	void CreateWidgetTexture(SDL_Renderer* rend, string filePath, SDL_Texture* destTex, SDL_Rect srcRect, SDL_Rect destRect, double rot, SDL_RendererFlip flip);
+
+	list<string> SplitString(string sourceString, const char splitter);

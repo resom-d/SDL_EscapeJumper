@@ -18,47 +18,22 @@ bool GameEngine::OnInit()
 
 	UI_Height = 200;
 
-	// Configure Map
-	Map.Setup.Cols = 200;
-	Map.Setup.Rows = 20;
-	Map.Setup.DisplayCols = 40;
-	Map.Setup.DisplayRows = 20;
-	Map.Setup.BlockSize = 35;
-	Map.Setup.BlockSpacing = 0;
-	Map.Setup.ScreenOffsX = 0;
-	Map.Setup.DisplayRect =
-	{
-		Map.Setup.ScreenOffsX,
-		 UI_Height,
-		(Map.Setup.BlockSize + Map.Setup.BlockSpacing) * Map.Setup.DisplayCols + 1,
-		(Map.Setup.BlockSize + Map.Setup.BlockSpacing) * Map.Setup.DisplayRows + 1
-	};
-	Map.Setup.Background = { 0,0,0, 255 };
-
 	if ((AppWindow = SDL_CreateWindow(
 		"EscapeJumper - Ein Zehnfinger Spiel",
-		Properties.WindowFrame.x,
-		Properties.WindowFrame.y,
-		Map.Setup.DisplayRect.w,
-		Map.Setup.DisplayRect.h + UI_Height,
+		20,
+		50,
+		0,
+		0,
 		SDL_WINDOW_SHOWN)
 		) == nullptr) return false;
 
 	if ((Renderer = SDL_CreateRenderer(AppWindow, -1, SDL_RENDERER_ACCELERATED)) == nullptr) return false;
 
 	Map.OnInit(Renderer);
-	TileMapTextureResource res;
-	res.Cols = 3;
-	res.Rows = 3;
-	res.MaxIndex = 9;
-	res.Tilesize = Size2D(35, 35);
-	res.Path = "Resources/tilemaps/tilemap_001.png";
-	SDL_Surface* surf = IMG_Load(res.Path.c_str());
-	res.Texture = SDL_CreateTextureFromSurface(Renderer, surf);
-	SDL_FreeSurface(surf);
+	Map = GameMap::LoadMap(Renderer, "ZF-Map-001-v001.txt");
 
-	Map.TextureResources.push_back(res);
-
+	SDL_SetWindowSize(AppWindow, Map.Setup.DisplayRect.w, Map.Setup.DisplayRect.h + UI_Height);
+	SDL_ShowWindow(AppWindow);
 
 	// Create a texure map from a string 
 	_font = TTF_OpenFont("Resources/fonts/NovaMono-Regular.ttf", 36);
@@ -89,7 +64,7 @@ bool GameEngine::OnInit()
 		Map.Setup.DisplayRect.w,
 		Map.Setup.DisplayRect.w + UI_Height
 	};
-	Editor.OnInit(AppWindow, Renderer, &Map, CharMap);
+	Editor.OnInit(AppWindow, Renderer, CharMap);
 
 	/*int r = Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 	tune = Mix_LoadMUS("Resources/music/The impossible Mission.mp3");
@@ -224,6 +199,7 @@ void GameEngine::OnRender()
 {
 	SDL_SetRenderDrawBlendMode(Renderer, SDL_BLENDMODE_BLEND);
 	SDL_SetRenderDrawColor(Renderer, 255, 208, 99, 255);
+	SDL_RenderSetClipRect(Renderer, &Map.Setup.DisplayRect);
 	SDL_RenderClear(Renderer);
 
 	if (GameStatus == GameState::MainScreen)
@@ -311,8 +287,8 @@ void GameEngine::OnGameRestart()
 	Map.ScrollSpeed = 4;
 	Map.ScrollXInDelay = 0;
 	Map.ScrollXOutDelay = 0;
-	Map.Reset();
-
+	Map.ResetScroller();
+	Map.ResetInView();
 	Player.Score = 0;
 	Player.Speed = 3;
 	Player.MotionVer = MotionState::Plus;
@@ -356,7 +332,7 @@ void GameEngine::OnKeyUp(SDL_Keycode sym, SDL_Keycode mod)
 void GameEngine::GoMainscreen(void)
 {
 	Map.ScrollSpeed = 1;
-	Map.Reset();
+	Map.ResetScroller();
 	Map.ViewMode = EngineViewMode::Editor;
 	GameStatus = GameState::MainScreen;
 }

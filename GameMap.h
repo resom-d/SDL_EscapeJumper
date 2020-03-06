@@ -1,4 +1,5 @@
 #pragma once
+#include <sstream>
 #include "GameTypes.h"
 #include "SDL_Extras.h"
 #include "TilemapTextureResource.h"
@@ -38,12 +39,12 @@ typedef struct TilemapTile
 
 typedef struct TilemapSetup
 {
-	int Rows = 100;
-	int Cols = 1000;
-	Uint16 BlockSize = 35;
-	Uint16 BlockSpacing = 1;
-	Uint16 DisplayCols = 40;
-	Uint16 DisplayRows = 20;
+	int Rows = 0;
+	int Cols = 0;
+	Uint16 BlockSize = 50;
+	Uint16 BlockSpacing = 0;
+	Uint16 DisplayCols = 20;
+	Uint16 DisplayRows = 10;
 	SDL_Rect DisplayRect = { 1, 1, 1,1 };
 	int ScreenOffsX;
 	SDL_Color Background;
@@ -78,9 +79,10 @@ public:
 	virtual void OnCleanUp(void);
 
 	virtual void InitMap(void);
-	void Reset(void);
+	void ResetScroller(void);
+	void ResetInView(void);
 	virtual void SaveMap(string filename);
-	virtual void LoadMap(string filename);
+	static GameMap LoadMap(SDL_Renderer* rend, string filename);
 	virtual void SetTileInMap(SDL_Point coords, TilemapTile settings);
 	virtual void FillArea(SDL_Point p1, SDL_Point p2, SDL_Point offs, TilemapTile org);
 	virtual TilemapTile GetTileAt(Uint16 col, Uint16 row);
