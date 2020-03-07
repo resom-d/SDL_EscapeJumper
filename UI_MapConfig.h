@@ -9,7 +9,7 @@
 class UI_MapConfig : public GameComponentBase
 {
 public: 
-	string sFilename = "ZF-Map-001-v001",
+	string sFilename = "Level-001",
 		sCols = "500", 
 		sRows= "200", 
 		sDCols = "30", 

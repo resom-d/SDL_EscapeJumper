@@ -86,6 +86,7 @@ void UI_Container::OnCleanup(void)
 	{
 		iter->OnCleanup();
 	}
+	_children.clear();
 }
 
 void UI_Container::AddChild(UI_Control widg)

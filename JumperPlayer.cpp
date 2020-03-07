@@ -7,7 +7,7 @@ int JumperPlayer::OnInit(SDL_Renderer* rend, GameMap* map)
 	int screenWidth, screenHeight;
 	SDL_GetRendererOutputSize(_rend, &screenWidth, &screenHeight);
 
-	SDL_Surface* surf = IMG_Load("Resources/sprites/Block_001.png");
+	SDL_Surface* surf = IMG_Load("Resources/sprites/Block_004.png");
 	_tex = SDL_CreateTextureFromSurface(_rend, surf);
 	SDL_FreeSurface(surf);
 

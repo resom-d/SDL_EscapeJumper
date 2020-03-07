@@ -128,8 +128,14 @@ void LevelEditor::OnCleanUp()
 
 void LevelEditor::OnLoadMap()
 {
-	Map = GameMap::LoadMap(_rend, "Resources/levels/" + _confScreen.sFilename + ".txt");
+	GameMap map = GameMap::LoadMap(_rend, "Resources/levels/" + _confScreen.sFilename + ".txt");
+	if (map.Setup.Cols < 1) return;
+	Map.OnCleanUp();
+	Map = map;
+	UI.OnCleanup();
+	UI.OnInit(_rend, &Map, _charMap, Map.ColorPallete);
 
+	ConfigScreenOn = false;
 }
 
 void LevelEditor::OnSaveMap()

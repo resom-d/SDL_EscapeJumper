@@ -6,10 +6,10 @@ void UI_MapConfig::OnInit(SDL_Renderer* rend)
 	TTF_Font* font = TTF_OpenFont("Resources/fonts/ShareTechMono-Regular.ttf", 40);
 	_charMap = SDL_GetTexturesFromString(_rend, " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜßabcdefghijklmnopqrstuvwxyzäöü,.;:*#-_|<>^°?=()!\"§$%&/()@€~", font);
 	_gridUpperLeft = { DisplayRect.x + 10, DisplayRect.y + 120 };
-	CreateControls();
 
-	_bbox.DisplayRect = { 10, 10, 0, 70 };
+	_bbox.DisplayRect = { 5, 5, 0, 80 };
 	_bbox.OnInit(_rend);
+	CreateControls();
 }
 
 void UI_MapConfig::OnLoop(void)
@@ -75,26 +75,45 @@ void UI_MapConfig::OnCleanup(void)
 
 void UI_MapConfig::CreateControls()
 {	
-	int pad = 5;
+	SDL_Texture* tex;
+	Userdata ud;
 
-	// Toolbar
+	int w = 50;
+	int bordW = 2;
+	int gap = 5;
+	int pad = 5;
+	SDL_Rect dRect = { 5,5, 76, 76 };
+
+	// Load
 	UI_Control co;
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, dRect.w, dRect.h);
+	CreateWidgetTexture(_rend, "Resources/icons/Editor.png", tex, dRect, dRect, 0, SDL_FLIP_NONE);
+	co.OnInit(_rend, tex);
 	co.EventType = EDITOR_EVENT_TYPE;
 	co.ActionCode = UI_ACTION::GO_EDITOR;
 	co.DisplayRect = { 0,0, 70, 70 };
-	_bbox.AddChild(co);
-
-	/*co = UI_Control();
-	co.EventType = EDITOR_EVENT_TYPE;
-	co.ActionCode = UI_ACTION::LOADMAP;
-	co.DisplayRect = { 0,0, 70, 70 };
+	co.Margin = gap;
 	_bbox.AddChild(co);
 
 	co = UI_Control();
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, dRect.w, dRect.h);
+	CreateWidgetTexture(_rend, "Resources/icons/FileOpen.png", tex, dRect, dRect, 0, SDL_FLIP_NONE);
+	co.OnInit(_rend, tex);
+	co.EventType = EDITOR_EVENT_TYPE;
+	co.ActionCode = UI_ACTION::LOADMAP;
+	co.DisplayRect = { 0,0, 70, 70 };
+	co.Margin = gap;
+	_bbox.AddChild(co);
+
+	co = UI_Control();
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, dRect.w, dRect.h);
+	CreateWidgetTexture(_rend, "Resources/icons/FileSave.png", tex, dRect, dRect, 0, SDL_FLIP_NONE);
+	co.OnInit(_rend, tex);
 	co.EventType = EDITOR_EVENT_TYPE;
 	co.ActionCode = UI_ACTION::SAVEMAP;
 	co.DisplayRect = { 0,0, 70, 70 };
-	_bbox.AddChild(co);*/
+	co.Margin = gap;
+	_bbox.AddChild(co);
 
 	// Properties-Grid
 	SDL_Point iP = { _gridUpperLeft.x + 400, _gridUpperLeft.y};

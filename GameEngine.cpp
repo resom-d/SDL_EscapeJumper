@@ -35,8 +35,12 @@ bool GameEngine::OnInit()
 	if ((Renderer = SDL_CreateRenderer(AppWindow, -1, SDL_RENDERER_ACCELERATED)) == nullptr) return false;
 
 	Map.OnInit(Renderer);
+	Map.OnCleanUp();
 	Map = GameMap::LoadMap(Renderer,* Levels.begin());
-
+	if (Map.Setup.Cols < 1)
+	{
+		return false;
+	}
 	SDL_SetWindowSize(AppWindow, Map.Setup.DisplayRect.w, Map.Setup.DisplayRect.h + UI_Height);
 	SDL_ShowWindow(AppWindow);
 
@@ -198,9 +202,11 @@ void GameEngine::OnLoop()
 void GameEngine::OnRender()
 {
 	SDL_SetRenderDrawBlendMode(Renderer, SDL_BLENDMODE_BLEND);
-	SDL_SetRenderDrawColor(Renderer, 255, 208, 99, 255);
 	SDL_RenderSetClipRect(Renderer, &Map.Setup.DisplayRect);
 	SDL_RenderClear(Renderer);
+
+	SDL_Color c = { 200,0,0,255 };
+	SDL_SetRenderDrawColor(Renderer, c.r, c.g, c.b, c.a);
 
 	if (GameStatus == GameState::MainScreen)
 	{
@@ -238,7 +244,9 @@ void GameEngine::OnPostRender()
 void GameEngine::OnCleanup()
 {
 	SDL_free(_font);
-	Map.OnCleanUp();
+	
+	if(Map.Setup.Cols > 0) Map.OnCleanUp();
+
 	MainUI.OnCleanup();
 	GameUI.OnCleanup();
 	Editor.OnCleanUp();
@@ -265,7 +273,7 @@ void GameEngine::OnInitPlayer()
 	Player.Score = 0;
 	Player.Speed = 3;
 	Player.MotionHor = MotionState::None;
-	Player.MotionVer = MotionState::None;
+	Player.MotionVer = MotionState::Plus;
 
 	Player.MinPosition.x = Map.Setup.ScreenOffsX;
 	Player.MaxPosition.x = Map.Setup.ScreenOffsX + ((Map.Setup.DisplayCols - 1) * (Map.Setup.BlockSize + Map.Setup.BlockSpacing));

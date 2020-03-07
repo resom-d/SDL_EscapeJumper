@@ -11,6 +11,14 @@ void UI_Game::OnInit(SDL_Renderer* rend, CharacterTextureMap* charMap)
 	_rend = rend;
 	_charMap = charMap;
 
+	SDL_Surface* surf = IMG_Load("Resources/avatars/Happy.png");
+	_texHappy = SDL_CreateTextureFromSurface(_rend, surf);
+	SDL_FreeSurface(surf);
+
+	surf = IMG_Load("Resources/avatars/Dead.png");
+	_texSad = SDL_CreateTextureFromSurface(_rend, surf);
+	SDL_FreeSurface(surf);
+
 	SDL_Texture* tex;
 	Userdata ud;
 
@@ -69,15 +77,29 @@ void UI_Game::OnEvent(SDL_Event* event)
 void UI_Game::OnCleanup(void)
 {
 	_bbox.OnCleanup();
+	SDL_DestroyTexture(_texHappy);
+	SDL_DestroyTexture(_texSad);
 }
 
-void UI_Game::OnRender(string playerName, string playerScore, bool playerStatus)
+void UI_Game::OnRender(string playerName, string playerScore, bool gameOver)
 {
 	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
+	
+	
+	SDL_RenderFillRect(_rend, &DisplayRect);
+
 	_bbox.OnRender();
 
-	SDL_RenderStringAt(_rend, "Spieler: " + playerName, { DisplayRect.x + 10, DisplayRect.y + 10 }, *_charMap, 42, nullptr);
-	SDL_RenderStringAt(_rend, "Punkte: " + playerScore, { DisplayRect.x + 10, DisplayRect.y + 62 }, *_charMap, 42, nullptr);
-	string stat = playerStatus ? "Dead" : "Alive";
-	SDL_RenderStringAt(_rend, "Status: " + stat, { DisplayRect.x + 1000, DisplayRect.y + 62 }, *_charMap, 22, nullptr);
+	SDL_RenderStringAt(_rend, "Spieler: " + playerName, { DisplayRect.x + 10, DisplayRect.y + 10 }, *_charMap, 36, nullptr);
+	SDL_RenderStringAt(_rend, "Punkte: " + playerScore, { DisplayRect.x + 10, DisplayRect.y + 62 }, *_charMap, 36, nullptr);
+	
+
+	int h, w;
+	SDL_QueryTexture(_texHappy, nullptr, nullptr, &w, &h);
+	SDL_Rect srect = {0,0, w, h};
+	SDL_Rect drect = { 1000,10, 180, 180 };
+
+	if (!gameOver)SDL_RenderCopyEx(_rend, _texHappy, &srect, &drect, 5, nullptr, SDL_FLIP_NONE);
+	else SDL_RenderCopyEx(_rend, _texSad, &srect, &drect, 5, nullptr, SDL_FLIP_NONE);
+
 }

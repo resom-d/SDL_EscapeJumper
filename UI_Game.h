@@ -17,5 +17,7 @@ public:
 
 private:
 	UI_Container _bbox;
+	SDL_Texture* _texHappy;
+	SDL_Texture* _texSad;
 };
 

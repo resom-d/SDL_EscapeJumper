@@ -423,6 +423,8 @@ void UI_Editor::OnCleanup()
 	FillColorWidgets.OnCleanup();
 	BorderColorWidgets.OnCleanup();
 
+	Buttons.clear();
+	
 }
 
 void UI_Editor::RenderTileResource(Uint16 index, SDL_Point dispPoint)
