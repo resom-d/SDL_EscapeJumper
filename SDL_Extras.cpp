@@ -172,3 +172,15 @@ list<string> SplitString(string sourceString, const char splitter)
 	}
 	return splittedStrings;
 }
+
+list<path> GetFilesInDirectory(path dir)
+{
+	list<path> files;
+	if (!is_directory(dir)) return files;
+
+	for (directory_iterator itr(dir); itr != directory_iterator(); ++itr)
+	{
+		if (!is_directory(itr->path()))	files.push_back(itr->path());
+	}
+	return files;
+}

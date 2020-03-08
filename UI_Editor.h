@@ -18,7 +18,8 @@ public:
 	list<UI_Control> Buttons;
 	UI_Container FillColorWidgets;
 	UI_Container BorderColorWidgets;
-	string FilenameSave = "Unbenannt";
+	UI_TextInput txtFilename;
+	string FilenameSave = "";
 
 	void OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap charMap, ColorPalette colors);
 	void LoadTextures(const SDL_Rect* srcRect, const SDL_Rect* destRect);

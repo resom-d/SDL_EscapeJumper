@@ -36,21 +36,21 @@ void UI_Game::OnInit(SDL_Renderer* rend, CharacterTextureMap* charMap)
 	
 	UI_Control btn;
 	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, dRect.w, dRect.h);
-	CreateWidgetTexture(_rend, "Resources/icons/Run.png", tex, dRect, dRect, 0, SDL_FLIP_NONE);
-	btn.OnInit(_rend, tex);
-	btn.Margin = 5;
-	btn.DisplayRect = { 0,0, 70,70 };
-	btn.EventType = GAME_EVENT_TYPE;
-	btn.ActionCode = UI_ACTION::GO_GAME;
-	_bbox.AddChild(btn);
-
-	btn = UI_Control();
-	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, dRect.w, dRect.h);
 	CreateWidgetTexture(_rend, "Resources/icons/Home.png", tex, dRect, dRect, 0, SDL_FLIP_NONE);
 	btn.OnInit(_rend, tex); btn.Margin = 5;
 	btn.DisplayRect = { 0,0, 70,70 };
 	btn.EventType = GAME_EVENT_TYPE;
 	btn.ActionCode = UI_ACTION::GO_MAINSCREEN;
+	_bbox.AddChild(btn);
+
+	btn = UI_Control();
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, dRect.w, dRect.h);
+	CreateWidgetTexture(_rend, "Resources/icons/Joypad.png", tex, dRect, dRect, 0, SDL_FLIP_NONE);
+	btn.OnInit(_rend, tex);
+	btn.Margin = 5;
+	btn.DisplayRect = { 0,0, 70,70 };
+	btn.EventType = GAME_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::GO_GAME;
 	_bbox.AddChild(btn);
 
 	btn = UI_Control();
@@ -84,9 +84,14 @@ void UI_Game::OnCleanup(void)
 void UI_Game::OnRender(string playerName, string playerScore, bool gameOver)
 {
 	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
-	
-	
+	// Give us Background and a Border
+	SDL_RenderSetClipRect(_rend, &DisplayRect);
+	SDL_Color col = UI_GameFill;
+	SDL_RenderSetDrawColor(_rend, col);
 	SDL_RenderFillRect(_rend, &DisplayRect);
+	col = UI_GameBorder;
+	SDL_RenderSetDrawColor(_rend, col);
+	SDL_RenderDrawRect(_rend, &DisplayRect);
 
 	_bbox.OnRender();
 

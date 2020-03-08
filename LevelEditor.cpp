@@ -14,42 +14,16 @@ void LevelEditor::OnInit(SDL_Window* win, SDL_Renderer* rend, CharacterTextureMa
 	_blockdrawStart = { -1, -1 };
 	_blockdrawEnd = { -1, -1 };
 
-	Map.Setup.Cols = 200;
-	Map.Setup.Rows = 20;
-	Map.Setup.DisplayCols = 40;
-	Map.Setup.DisplayRows = 20;
-	Map.Setup.BlockSize = 35;
-	Map.Setup.BlockSpacing = 0;
-	Map.Setup.ScreenOffsX = 0;
-	Map.Setup.DisplayRect =
-	{
-		Map.Setup.ScreenOffsX,
-		 UI_Height,
-		(Map.Setup.BlockSize + Map.Setup.BlockSpacing) * Map.Setup.DisplayCols + 1,
-		(Map.Setup.BlockSize + Map.Setup.BlockSpacing) * Map.Setup.DisplayRows + 1
-	};
-	Map.Setup.Background = { 0,0,0, 255 };
-	Map.OnInit(_rend);
-
-	TileMapTextureResource res;
-	res.Cols = 3;
-	res.Rows = 3;
-	res.MaxIndex = 9;
-	res.Tilesize = Size2D(35, 35);
-	res.Path = "Resources/tilemaps/tilemap_001.png";
-	SDL_Surface* surf = IMG_Load(res.Path.c_str());
-	res.Texture = SDL_CreateTextureFromSurface(_rend, surf);
-	SDL_FreeSurface(surf);
-	Map.TextureResources.push_back(res);
+	UI.DisplayRect = { DisplayRect.x, DisplayRect.y, DisplayRect.w, 200 };
 
 	// Assign active colors
 	_colorIndexFill = 1;
 	_colorIndexBorder = 1;
-
-	UI.DisplayRect = { 0,0, DisplayRect.w, UI_Height };
-	UI.OnInit(_rend, &Map, _charMap, Map.ColorPallete);
-	_confScreen.DisplayRect = DisplayRect;
-	_confScreen.OnInit(_rend);
+	
+	Levels = GetFilesInDirectory("Resources/levels");
+	_level = 0;
+		
+	OnLoadMap();
 }
 
 void LevelEditor::OnLoop()
@@ -62,10 +36,7 @@ void LevelEditor::OnLoop()
 }
 
 void LevelEditor::OnRender()
-{
-	if (ConfigScreenOn) _confScreen.OnRender();
-	else
-	{
+{	
 		SDL_RenderSetClipRect(_rend, nullptr);
 		SDL_SetRenderDrawColor(_rend, Map.Setup.Background.r, Map.Setup.Background.g, Map.Setup.Background.b, Map.Setup.Background.a);
 		SDL_RenderFillRect(_rend, &Map.Setup.DisplayRect);
@@ -117,7 +88,6 @@ void LevelEditor::OnRender()
 			SDL_RenderSetClipRect(_rend, nullptr);
 		}
 
-	}
 }
 
 void LevelEditor::OnCleanUp()
@@ -128,7 +98,11 @@ void LevelEditor::OnCleanUp()
 
 void LevelEditor::OnLoadMap()
 {
-	GameMap map = GameMap::LoadMap(_rend, "Resources/levels/" + _confScreen.sFilename + ".txt");
+	string p = next(Levels.begin(), _level)->string();
+	path fn = next(Levels.begin(), _level)->stem();
+	UI.FilenameSave = fn.string();
+
+	GameMap map = GameMap::LoadMap(_rend, p);
 	if (map.Setup.Cols < 1) return;
 	Map.OnCleanUp();
 	Map = map;
@@ -140,7 +114,8 @@ void LevelEditor::OnLoadMap()
 
 void LevelEditor::OnSaveMap()
 {
-	Map.SaveMap("Resources/levels/" + _confScreen.sFilename + ".txt");
+	Map.SaveMap("Resources/levels/" + UI.FilenameSave + ".txt");
+	Levels = GetFilesInDirectory("Resources/levels");
 }
 
 void LevelEditor::OnClearMap()
@@ -169,7 +144,15 @@ void LevelEditor::OnEvent(SDL_Event* event)
 			OnSaveMap();
 			break;
 
-		case (Sint32)UI_ACTION::LOADMAP:
+		case (Sint32)UI_ACTION::EDIT_LOAD_NEXT:
+			_level++;
+			if (_level > Levels.size()-1) _level = 0;
+			OnLoadMap();
+			break;
+
+		case (Sint32)UI_ACTION::EDIT_LOAD_PREV:
+			_level--;
+			if (_level < 0) _level = Levels.size() - 1;
 			OnLoadMap();
 			break;
 

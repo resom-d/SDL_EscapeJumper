@@ -12,6 +12,7 @@ public:
 	std::string TextureSourcePath;
 
 	SDL_Renderer* _rend;
+	SDL_Texture* Texture;
 	SDL_Point MaxPosition;
 	SDL_Point MinPosition;
 	SDL_Rect DisplayRect;
@@ -41,7 +42,6 @@ public:
 
 private:
 	GameMap* _map;
-	SDL_Texture* _tex;
 	void OnCollisionCheck();
 };
 

@@ -12,31 +12,29 @@ GameEngine::GameEngine()
 
 bool GameEngine::OnInit()
 {
-	Levels.push_back("Resources/levels/Level-001.txt");
-	Levels.push_back("Resources/levels/Level-002.txt");
-	Levels.push_back("Resources/levels/Level-003.txt");
-
-
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) 	return false;
 	if (TTF_Init() == -1) return false;
 	if (SDL_NumJoysticks() > 0) GamePad = SDL_JoystickOpen(0);
 
 	UI_Height = 200;
+	Avatars = GetFilesInDirectory("Resources/sprites");
+	Levels = GetFilesInDirectory("Resources/levels");
+	TileTextureResources = GetFilesInDirectory("Resources/tilemaps");
 
 	if ((AppWindow = SDL_CreateWindow(
-		"EscapeJumper - Ein Zehnfinger Spiel",
+		"Escape Jumper",
 		20,
 		50,
 		0,
 		0,
-		SDL_WINDOW_SHOWN)
+		SDL_WINDOW_HIDDEN)
 		) == nullptr) return false;
 
 	if ((Renderer = SDL_CreateRenderer(AppWindow, -1, SDL_RENDERER_ACCELERATED)) == nullptr) return false;
 
 	Map.OnInit(Renderer);
 	Map.OnCleanUp();
-	Map = GameMap::LoadMap(Renderer,* Levels.begin());
+	Map = GameMap::LoadMap(Renderer, Levels.begin()->string());
 	if (Map.Setup.Cols < 1)
 	{
 		return false;
@@ -45,7 +43,7 @@ bool GameEngine::OnInit()
 	SDL_ShowWindow(AppWindow);
 
 	// Create a texure map from a string 
-	_font = TTF_OpenFont("Resources/fonts/NovaMono-Regular.ttf", 36);
+	_font = TTF_OpenFont("Resources/fonts/NovaMono-Regular.ttf", 72);
 	CharMap = SDL_GetTexturesFromString(Renderer, " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜßabcdefghijklmnopqrstuvwxyzäöü,.;:*#-_|<>^°?=()!\"§$%&/()@€~", _font);
 
 	Player.OnInit(Renderer, &Map);
@@ -71,6 +69,7 @@ bool GameEngine::OnInit()
 
 	_appIsRunning = true;
 	GameStatus = GameState::MainScreen;
+
 
 	return true;
 };
@@ -132,6 +131,11 @@ void GameEngine::OnEvent(SDL_Event* event)
 		case (int)UI_ACTION::GO_GAME:
 			GoGame();
 			break;
+
+		case (int)UI_ACTION::SET_PLAYER_AVATAR:
+			Player.Texture = ((Userdata*)event->user.data2)->Texture;
+
+			break;
 		}
 	}
 	GameEvents::OnEvent(event);
@@ -171,6 +175,7 @@ void GameEngine::OnLoop()
 				Player.OnLoop();
 			}
 		}
+	
 		if (Player.GameOver) GameStatus = GameState::GameOver;
 
 		if (Map.LevelDone)
@@ -179,7 +184,7 @@ void GameEngine::OnLoop()
 			if(_level > Levels.size()-1) _level = 0;
 			Map.LevelDone = false;
 			Map.OnCleanUp();
-			Map = GameMap::LoadMap(Renderer, *next(Levels.begin(), _level));
+			Map = GameMap::LoadMap(Renderer, next(Levels.begin(), _level)->string());
 			Map.ViewMode = EngineViewMode::Game;
 			Map.ScrollSpeed = 4;
 			Map.ScrollXInDelay = 0;
@@ -188,6 +193,7 @@ void GameEngine::OnLoop()
 			Map.ResetInView();
 		}
 	}
+	
 	if (GameStatus == GameState::GameOver)
 	{
 		GameUI.OnLoop();
@@ -201,12 +207,12 @@ void GameEngine::OnLoop()
 
 void GameEngine::OnRender()
 {
-	SDL_SetRenderDrawBlendMode(Renderer, SDL_BLENDMODE_BLEND);
-	SDL_RenderSetClipRect(Renderer, &Map.Setup.DisplayRect);
+	SDL_SetRenderDrawBlendMode(Renderer, SDL_BLENDMODE_NONE);
+	SDL_Color c = { 0,0,0,255 };
+	SDL_RenderSetDrawColor(Renderer, c);
+	SDL_RenderSetClipRect(Renderer, nullptr);
 	SDL_RenderClear(Renderer);
-
-	SDL_Color c = { 200,0,0,255 };
-	SDL_SetRenderDrawColor(Renderer, c.r, c.g, c.b, c.a);
+	SDL_RenderFillRect(Renderer, nullptr);
 
 	if (GameStatus == GameState::MainScreen)
 	{
@@ -218,9 +224,7 @@ void GameEngine::OnRender()
 	{
 		// Render UI
 		GameUI.OnRender(Player.Name, to_string(Player.Score), GameStatus == GameState::GameOver);
-		// Render background
-
-		// Render Scoller
+		// Render Map
 		Map.OnRender();
 		// Render player(s)
 		Player.OnRender();
@@ -290,7 +294,7 @@ void GameEngine::OnInitPlayer()
 void GameEngine::OnGameRestart()
 {
 	Map.OnCleanUp();
-	Map = GameMap::LoadMap(Renderer, *next(Levels.begin(), _level));
+	Map = GameMap::LoadMap(Renderer, next(Levels.begin(), _level)->string());
 	Map.ViewMode = EngineViewMode::Game;
 	Map.ScrollSpeed = 4;
 	Map.ScrollXInDelay = 0;
@@ -336,7 +340,8 @@ void GameEngine::OnKeyUp(SDL_Keycode sym, SDL_Keycode mod)
 
 void GameEngine::GoMainscreen(void)
 {
-	Map = GameMap::LoadMap(Renderer, *Levels.begin());
+	Levels = GetFilesInDirectory("Resources/levels");
+	Map = GameMap::LoadMap(Renderer, Levels.begin()->string());
 	Map.ScrollSpeed = 1;
 	Map.ResetScroller();
 	Map.ViewMode = EngineViewMode::Editor;
@@ -354,3 +359,5 @@ void GameEngine::GoEditor(void)
 	Map.ViewMode = EngineViewMode::Editor;
 	GameStatus = GameState::LevelEdit;
 }
+
+

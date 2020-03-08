@@ -38,9 +38,8 @@ void GameMap::OnRender()
 
 	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
 	SDL_RenderSetClipRect(_rend, &Setup.DisplayRect);
-	SDL_RenderSetDrawColor(_rend, Setup.Background);
-	SDL_RenderFillRect(_rend, &Setup.DisplayRect);
 	SDL_Rect dRect = { 0,0, Setup.BlockSize, Setup.BlockSize };
+	
 
 	int ctd = Setup.DisplayCols; // Columns to display
 	int csi = BlockPosition.x;				// Column start index
@@ -195,7 +194,7 @@ void GameMap::ResetInView(void)
 
 void GameMap::SaveMap(string filename)
 {
-	ofstream theFile;
+	std::ofstream theFile;
 	theFile.open(filename);
 	if (!theFile.is_open())
 	{
@@ -269,7 +268,7 @@ GameMap GameMap::LoadMap(SDL_Renderer* rend, string filename)
 	GameMap newMap;
 	newMap.OnInit(rend);
 	newMap.ColorPallete.clear();
-	fstream fr;
+	std::fstream fr;
 	fr.open(filename.c_str());
 	if (!fr.is_open()) return GameMap();
 	int tilecount = 0;

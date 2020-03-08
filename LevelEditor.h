@@ -8,6 +8,7 @@
 #include "GameMap.h"
 #include "UI_Editor.h"
 #include "UI_MapConfig.h"
+#include "SDL_Extras.h"
 
 using namespace std;
 
@@ -18,6 +19,7 @@ public:
 	LevelEditor();
 
 	GameMap Map;
+	list<path> Levels;
 	UI_Editor UI;
 	UI_ACTION Mode = UI_ACTION::DRAWMODE;
 	SDL_Rect DisplayRect;
@@ -63,6 +65,7 @@ private:
 	SDL_Renderer* _rend;
 	CharacterTextureMap _charMap;
 	UI_MapConfig _confScreen;
+	int _level = 0;
 	int _colorIndexFill;
 	int _colorIndexBorder;
 	int _outputHeight;

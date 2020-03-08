@@ -55,6 +55,8 @@ enum class UI_ACTION
 	GO_GAME,
 	LOADMAP,
 	SAVEMAP,
+	EDIT_LOAD_PREV,
+	EDIT_LOAD_NEXT,
 	DRAWMODE,
 	ERASEMODE,
 	SCROLL_TO,
@@ -62,7 +64,8 @@ enum class UI_ACTION
 	SET_FILL_COLOR,
 	SET_BORDER_COLOR,
 	SET_TILEINDEX,
-	SET_RESSOURCEINDEX
+	SET_RESSOURCEINDEX,
+	SET_PLAYER_AVATAR
 };
 		  
 enum class WIDGET_EVENT_TYPE
@@ -80,4 +83,5 @@ public:
 	Uint16 ResourceIndex;
 	Uint16 TileIndex;
 	SDL_Point Scrollposition;
+	SDL_Texture* Texture;
 };

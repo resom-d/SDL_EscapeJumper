@@ -47,12 +47,11 @@ void UI_Widget::OnEvent(SDL_Event* event)
 
 void UI_Widget::OnRender()
 {
+	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
 	SDL_RenderSetClipRect(_rend, &DisplayRect);
 	if (!IsActive) SDL_SetRenderDrawColor(_rend, FillColor.r, FillColor.g, FillColor.b, FillColor.a);
 	else SDL_SetRenderDrawColor(_rend, FillColorActive.r, FillColorActive.g, FillColorActive.b, FillColorActive.a);
-	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
 	SDL_RenderFillRect(_rend, &DisplayRect);
-	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_NONE);
 	if (!IsActive) SDL_RenderDrawBorder(_rend, DisplayRect, BorderWidth, BorderColor);
 	else SDL_RenderDrawBorder(_rend, DisplayRect, BorderWidth, BorderColorActive);
 	SDL_RenderSetClipRect(_rend, nullptr);

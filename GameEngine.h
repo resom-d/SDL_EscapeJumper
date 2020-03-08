@@ -9,6 +9,7 @@
 #include <iostream>
 #include <filesystem>
 #include <list>
+#include <boost/filesystem.hpp>
 #include "GameEvents.h"
 #include "GameTypes.h"
 #include "GameMap.h"
@@ -21,8 +22,8 @@
 #include "TextScroller.h"
 #include "SDL_Extras.h"
 
-//using namespace std;
-
+using namespace std;
+using namespace boost::filesystem;
 
 class GameEngine : public GameEvents
 {
@@ -42,42 +43,30 @@ public:
 	LevelEditor Editor;
 	GameMap Map;
 	JumperPlayer Player;
-	list<string> Levels;
+	list<path> Levels;
+	list<path> Avatars;
+	list<path> TileTextureResources;
 	CharacterTextureMap CharMap;
 
 	SDL_Joystick* GamePad = NULL;
 
 	bool OnInit();
-
 	void OnEvent(SDL_Event* Event);
-
 	int OnExecute();
-
 	void OnLoop();
-
 	void OnRender();
-
 	void OnPostRender();
-
 	void OnCleanup();
-
-	void OnCollisionCheck();
-
 	void OnInitPlayer();
-
 	void OnGameRestart();
-
-	// Overrides from ZF_DemoEvents
-
 	void OnExit();
-
 	void OnKeyDown(SDL_Keycode sym, SDL_Keycode mod);
-
 	void OnKeyUp(SDL_Keycode sym, SDL_Keycode mod);
-
 	void GoMainscreen(void);
 	void GoGame(void);
 	void GoEditor(void);
+
+	
 
 	
 private:

@@ -24,8 +24,13 @@ void UI_MapConfig::OnLoop(void)
 void UI_MapConfig::OnRender(void)
 {
 	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
-	SDL_SetRenderDrawColor(_rend, 170, 170, 170, 255);
 	SDL_RenderSetClipRect(_rend, &DisplayRect);
+	SDL_Color col = EDITOR_Fill;
+	SDL_RenderSetDrawColor(_rend, col);
+	SDL_RenderFillRect(_rend, &DisplayRect);
+	
+	col = UI_EditorFill;
+	SDL_RenderSetDrawColor(_rend, col);
 	SDL_Rect r = { DisplayRect.x, DisplayRect.y, DisplayRect.w, 100 };
 	SDL_RenderFillRect(_rend, &r);
 	SDL_SetRenderDrawColor(_rend, 0, 0, 0, 255);

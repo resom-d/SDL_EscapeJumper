@@ -25,7 +25,7 @@ public:
 	CharacterTextureMap _charMap;
 	SDL_Rect DisplayRect;
 	list<UI_Control> Buttons;
-	
+	list<path> Avatars;
 	
 };
 

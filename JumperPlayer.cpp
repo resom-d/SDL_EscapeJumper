@@ -8,7 +8,7 @@ int JumperPlayer::OnInit(SDL_Renderer* rend, GameMap* map)
 	SDL_GetRendererOutputSize(_rend, &screenWidth, &screenHeight);
 
 	SDL_Surface* surf = IMG_Load("Resources/sprites/Block_004.png");
-	_tex = SDL_CreateTextureFromSurface(_rend, surf);
+	Texture = SDL_CreateTextureFromSurface(_rend, surf);
 	SDL_FreeSurface(surf);
 
 	return 0;
@@ -67,9 +67,9 @@ int JumperPlayer::OnRender()
 	SDL_RenderSetClipRect(_rend, &DisplayRect);
 	
 	int w, h;
-	SDL_QueryTexture(_tex, nullptr, nullptr, &w, &h);
+	SDL_QueryTexture(Texture, nullptr, nullptr, &w, &h);
 	SDL_Rect srcRect = { 0,0, w,h };
-	SDL_RenderCopy(_rend, _tex, &srcRect, &DisplayRect);
+	SDL_RenderCopy(_rend, Texture, &srcRect, &DisplayRect);
 	return 0;
 }
 

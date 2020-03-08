@@ -57,7 +57,7 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap
 	BorderColorWidgets.DisplayRect =
 	{
 		DisplayRect.x + 5,
-		DisplayRect.y + 115,
+		DisplayRect.y + 110,
 		0,
 		44
 	};
@@ -80,12 +80,16 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap
 	}
 	BorderColorWidgets.OnInit(_rend, UI_ACTION::DRAWMODE);
 
+	txtFilename.MaxSize = 30;
+	txtFilename.Padding = 5;
+	txtFilename.Vocabular = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_";
+	txtFilename.OnInit(_rend, _charmap);
+	txtFilename.TextBuffer = &FilenameSave;
+	txtFilename.DisplayRect = { 220, 160, 600, 35 };
+
 	// Cleanup
 	SDL_RenderSetClipRect(_rend, nullptr);
-	
-
 }
-
 
 void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 {
@@ -99,12 +103,51 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	int gap = 5;
 	SDL_Rect dRect = { 5,5, 50,50 };
 
-	// Load
+	// home
 	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
-	CreateWidgetTexture(_rend, "Resources/icons/FileOpen.png", tex, *srcRect, *destRect, 0 , SDL_FLIP_NONE);
+	CreateWidgetTexture(_rend, "Resources/icons/Home.png", tex, *srcRect, *destRect, 0, SDL_FLIP_NONE);
+	btn.OnInit(_rend, tex);
+	btn.EventType = GAME_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::GO_MAINSCREEN;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	dRect.x += w + gap;
+
+	// Game
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/Joypad.png", tex, *srcRect, *destRect, 0, SDL_FLIP_NONE);
+	btn = UI_Control();
+	btn.OnInit(_rend, tex);
+	btn.EventType = GAME_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::GO_GAME;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	dRect.x += w + gap;
+	
+	// Load Prev
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/Back.png", tex, *srcRect, *destRect, 0 , SDL_FLIP_NONE);
+	btn = UI_Control();
 	btn.OnInit(_rend, tex);;
 	btn.EventType = EDITOR_EVENT_TYPE;
-	btn.ActionCode = UI_ACTION::LOADMAP;
+	btn.ActionCode = UI_ACTION::EDIT_LOAD_PREV;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	dRect.x += w + gap;
+
+	// Load next
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/Back.png", tex, *srcRect, *destRect, 0, SDL_FLIP_HORIZONTAL);
+	btn = UI_Control();
+	btn.OnInit(_rend, tex);;
+	btn.EventType = EDITOR_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::EDIT_LOAD_NEXT;
 	btn.DisplayRect = dRect;
 	btn.BorderWidth = bordW;
 	btn.Padding = pad;
@@ -114,6 +157,7 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	// Save 
 	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
 	CreateWidgetTexture(_rend, "Resources/icons/FileSave.png", tex, *srcRect, *destRect, 0, SDL_FLIP_NONE);
+	btn = UI_Control();
 	btn.OnInit(_rend, tex);;
 	btn.EventType = EDITOR_EVENT_TYPE;
 	btn.ActionCode = UI_ACTION::SAVEMAP;
@@ -126,6 +170,7 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	// Drawmode
 	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
 	CreateWidgetTexture(_rend, "Resources/icons/Draw.png", tex, *srcRect, *destRect, 0, SDL_FLIP_NONE);
+	btn = UI_Control();
 	btn.OnInit(_rend, tex);;
 	btn.EventType = EDITOR_EVENT_TYPE;
 	btn.ActionCode = UI_ACTION::DRAWMODE;
@@ -213,7 +258,6 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	Buttons.push_back(btn);
 	dRect.x += w + gap;
 
-
 	// Scroll Y Start
 	ud = Userdata();
 	ud.Scrollposition = { 0, -3 };
@@ -278,49 +322,15 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	Buttons.push_back(btn);
 	dRect.x += w + gap;
 
-	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
-	CreateWidgetTexture(_rend, "Resources/icons/Joypad.png", tex, *srcRect, *destRect, 0, SDL_FLIP_NONE);
-	btn = UI_Control();
-	btn.OnInit(_rend, tex);
-	btn.EventType = GAME_EVENT_TYPE;
-	btn.ActionCode = UI_ACTION::GO_GAME;
-	btn.DisplayRect = dRect;
-	btn.BorderWidth = bordW;
-	btn.Padding = pad;
-	Buttons.push_back(btn);
-	dRect.x += w + gap;
-
-	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
-	CreateWidgetTexture(_rend, "Resources/icons/Home.png", tex, *srcRect, *destRect, 0, SDL_FLIP_NONE);
-	btn = UI_Control();
-	btn.OnInit(_rend, tex);
-	btn.EventType = GAME_EVENT_TYPE;
-	btn.ActionCode = UI_ACTION::GO_MAINSCREEN;
-	btn.DisplayRect = dRect;
-	btn.BorderWidth = bordW;
-	btn.Padding = pad;
-	Buttons.push_back(btn);
-	dRect.x += w + gap;
-
-	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
-	CreateWidgetTexture(_rend, "Resources/icons/Cog.png", tex, *srcRect, *destRect, 0, SDL_FLIP_NONE);
-	btn = UI_Control();
-	btn.OnInit(_rend, tex);
-	btn.EventType = EDITOR_EVENT_TYPE;
-	btn.ActionCode = UI_ACTION::GO_EDITOR_CONFIG;
-	btn.DisplayRect = dRect;
-	btn.BorderWidth = bordW;
-	btn.Padding = pad;
-	Buttons.push_back(btn);
-	dRect.x += w + gap;
-
 	_tileResourceDPoint.x  = dRect.x;
 }
 
 void UI_Editor::OnLoop()
 {
 	list<UI_Control>::iterator iter = Buttons.begin();
-	advance(iter, 2);
+	txtFilename.OnLoop();
+
+	advance(iter, 5);
 	iter->IsActive = _activeTool == UI_ACTION::DRAWMODE;
 	advance(iter, 1);
 	iter->IsActive = _activeTool == UI_ACTION::BORDERDRAWMODE;
@@ -328,6 +338,8 @@ void UI_Editor::OnLoop()
 
 void UI_Editor::OnEvent(SDL_Event* event)
 {
+	txtFilename.OnEvent(event);
+
 	for (_widgetsIter = Buttons.begin(); _widgetsIter != Buttons.end(); _widgetsIter++)
 	{
 		_widgetsIter->OnEvent(event);
@@ -386,11 +398,16 @@ void UI_Editor::OnEvent(SDL_Event* event)
 void UI_Editor::OnRender(Uint16 colPos, Uint16 rowPos)
 {
 	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
-	// Background and a border please...
+	// Give us Background and a Border
 	SDL_RenderSetClipRect(_rend, &DisplayRect);
-	SDL_RenderSetDrawColor(_rend, FillColor);
+	SDL_Color col = UI_EditorFill;
+	SDL_RenderSetDrawColor(_rend, col);
 	SDL_RenderFillRect(_rend, &DisplayRect);
-	SDL_RenderDrawBorder(_rend, DisplayRect, 2, BorderColor);
+	col = UI_EditorBorder;
+	SDL_RenderSetDrawColor(_rend, col);
+	SDL_RenderDrawRect(_rend, &DisplayRect);
+
+	txtFilename.OnRender();
 
 	for (_widgetsIter = Buttons.begin(); _widgetsIter != Buttons.end(); _widgetsIter++)
 	{
@@ -414,6 +431,7 @@ void UI_Editor::OnPostRender()
 
 void UI_Editor::OnCleanup()
 {
+	txtFilename.OnCleanup();
 
 	for (list<UI_Control>::iterator iter = Buttons.begin(); iter != Buttons.end(); iter++)
 	{
