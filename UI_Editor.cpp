@@ -449,7 +449,7 @@ void UI_Editor::OnEvent(SDL_Event* event)
 		{
 			int col = (mx - _tileResourceDPoint.x) / iter->Tilesize.w;
 			int row = (my - _tileResourceDPoint.y) / iter->Tilesize.h;
-			_setTileData.ResourceIndex = 1;
+			_setTileData.ResourceIndex = ResourceIndex;
 			_setTileData.TileIndex = (row * iter->Cols) + col + 1;
 
 			SDL_zero(_setTileIdEvent);

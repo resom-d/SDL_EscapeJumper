@@ -160,14 +160,12 @@ void LevelEditor::OnEvent(SDL_Event* event)
 				{
 					for (int y = 0; y < Map.Setup.Cols; y++)
 					{
-						if (Map.TileMap[x][y].TileIndex == TileIndex && Map.TileMap[x][y].ResourceIndex == UI.ResourceIndex)
+						if (Map.TileMap[x][y].Visible && Map.TileMap[x][y].TileIndex== TileIndex && Map.TileMap[x][y].ResourceIndex == UI.ResourceIndex)
 						{
-							Map.TileMap[x][y].ResourceIndex = UI.ResourceIndex;
 							Map.TileMap[x][y].TileIndex = ud.TileIndex;
 						}
 					}
 				}
-				_colorIndexFill = ud.ColorIndex;
 			}
 			else if (mod & KMOD_ALT)
 			{
@@ -261,12 +259,14 @@ void LevelEditor::OnEvent(SDL_Event* event)
 			break;
 
 		case (int)UI_ACTION::NEXT_RESOURCEINDEX:
+			UI.ResourceIndex_1n = UI.ResourceIndex;
 			UI.ResourceIndex++;
 			TileIndex = 1;
 			if (UI.ResourceIndex > Map.TextureResources.size()) UI.ResourceIndex = 1;
 			break;
 
 		case (int)UI_ACTION::PREV_RESOURCEINDEX:
+			UI.ResourceIndex_1n = UI.ResourceIndex;
 			UI.ResourceIndex--;
 			TileIndex = 1;
 			if (UI.ResourceIndex < 1) UI.ResourceIndex = Map.TextureResources.size();

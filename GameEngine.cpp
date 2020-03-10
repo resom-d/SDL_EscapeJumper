@@ -12,9 +12,6 @@ GameEngine::GameEngine()
 
 bool GameEngine::OnInit()
 {
-	/*SDL_Color ccol = { 60, 146, 150 ,255 };
-	CreateTilemap("Resources/tilemaps/input", "Resources/tilemaps", "tilemap_002.png", 3, 3, Size2D(35, 35), &ccol);*/
-
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) 	return false;
 	if (TTF_Init() == -1) return false;
 	if (SDL_NumJoysticks() > 0) GamePad = SDL_JoystickOpen(0);
@@ -45,6 +42,15 @@ bool GameEngine::OnInit()
 	SDL_SetWindowSize(AppWindow, Map.Setup.DisplayRect.w, Map.Setup.DisplayRect.h + UI_Height);
 	SDL_ShowWindow(AppWindow);
 
+	// CreateMap of GameItems
+	list<path> items = GetFilesInDirectory("Resources/items");
+	for (auto item = items.begin(); item != items.end(); item++)
+	{
+		SDL_Surface* sItem = IMG_Load(item->string().c_str());
+		SDL_Texture* tItem = SDL_CreateTextureFromSurface(Renderer, sItem);
+		GameItems.insert(pair<string, SDL_Texture*>(item->stem().string(), tItem));
+	}
+
 	// Create a texure map from a string 
 	_font = TTF_OpenFont("Resources/fonts/NovaMono-Regular.ttf", 72);
 	CharMap = SDL_GetTexturesFromString(Renderer, " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜßabcdefghijklmnopqrstuvwxyzäöü,.;:*#-_|<>^°?=()!\"§$%&/()@€~", _font);
@@ -57,7 +63,7 @@ bool GameEngine::OnInit()
 
 	GameUI.DisplayRect = { 0,0,Map.Setup.DisplayRect.w, UI_Height };
 	GameUI.OnInit(Renderer, &CharMap);
-		
+
 	Editor.DisplayRect = {
 		0,
 		0,
@@ -143,7 +149,6 @@ void GameEngine::OnEvent(SDL_Event* event)
 	}
 	GameEvents::OnEvent(event);
 	if (GameStatus == GameState::MainScreen) MainUI.OnEvent(event);
-	if (GameStatus != GameState::LevelEdit)	MainUI.OnEvent(event);
 	if (GameStatus == GameState::Running)
 	{
 		Player.OnEvent(event);
@@ -163,7 +168,7 @@ void GameEngine::OnLoop()
 {
 	if (GameStatus == GameState::MainScreen)
 	{
-		Map.OnLoop();		
+		Map.OnLoop();
 	}
 
 	if (GameStatus == GameState::Running)
@@ -176,15 +181,17 @@ void GameEngine::OnLoop()
 			for (int pl = 0; pl < Player.Speed; pl++)
 			{
 				Player.OnLoop();
+				if (Player.GameOver) break;
 			}
+			if (Player.GameOver) break;
 		}
-	
+
 		if (Player.GameOver) GameStatus = GameState::GameOver;
 
 		if (Map.LevelDone)
 		{
-			_level++;			
-			if(_level > Levels.size()-1) _level = 0;
+			_level++;
+			if (_level > Levels.size() - 1) _level = 0;
 			Map.LevelDone = false;
 			Map.OnCleanUp();
 			Map = GameMap::LoadMap(Renderer, next(Levels.begin(), _level)->string());
@@ -194,9 +201,14 @@ void GameEngine::OnLoop()
 			Map.ScrollXOutDelay = 0;
 			Map.ResetScroller();
 			Map.ResetInView();
+
+			_timerCatch = SDL_GetTicks();
+			GameStatus = GameState::LevelComplete;
 		}
 	}
-	
+
+	if (GameStatus == GameState::LevelComplete && SDL_GetTicks() - _timerCatch > 2000) GameStatus = GameState::Running;
+
 	if (GameStatus == GameState::GameOver)
 	{
 		GameUI.OnLoop();
@@ -220,17 +232,70 @@ void GameEngine::OnRender()
 	if (GameStatus == GameState::MainScreen)
 	{
 		MainUI.OnRender("Zehnfinger", Player.Score, GameStatus == GameState::Running);
-		Map.OnRender();		
+		Map.OnRender();
 	}
 
-	if (GameStatus == GameState::Running || GameStatus == GameState::Paused || GameStatus == GameState::GameOver)
+	if (GameStatus == GameState::Running 
+		|| GameStatus == GameState::Paused 
+		|| GameStatus == GameState::LevelComplete
+		|| GameStatus == GameState::GameOver)
 	{
 		// Render UI
-		GameUI.OnRender(Player.Name, to_string(Player.Score), GameStatus == GameState::GameOver);
+		GameUI.OnRender(GameStatus == GameState::GameOver, &Player);
 		// Render Map
 		Map.OnRender();
 		// Render player(s)
 		Player.OnRender();
+
+		if (GameStatus == GameState::GameOver)
+		{
+			SDL_RenderSetClipRect(Renderer, &Map.Setup.DisplayRect);
+
+			SDL_Rect dRect = {
+					Map.Setup.DisplayRect.x + 100,
+					Map.Setup.DisplayRect.y + 200,
+					1200,
+					400
+			};
+
+			SDL_Rect sRect = {
+					0,
+					0,
+					1200,
+					400
+			};
+
+			SDL_RenderCopy(Renderer,
+				GameItems["GameOver"],
+				&sRect,
+				&dRect
+			);			
+		}
+
+		if (GameStatus == GameState::LevelComplete)
+		{
+			SDL_RenderSetClipRect(Renderer, &Map.Setup.DisplayRect);
+
+			SDL_Rect dRect = {
+					Map.Setup.DisplayRect.x + 100,
+					Map.Setup.DisplayRect.y + 200,
+					1200,
+					400
+			};
+
+			SDL_Rect sRect = {
+					0,
+					0,
+					1200,
+					400
+			};
+
+			SDL_RenderCopy(Renderer,
+				GameItems["LevelComplete"],
+				&sRect,
+				&dRect
+			);
+		}
 	}
 
 	if (GameStatus == GameState::LevelEdit)
@@ -251,14 +316,19 @@ void GameEngine::OnPostRender()
 void GameEngine::OnCleanup()
 {
 	SDL_free(_font);
-	
-	if(Map.Setup.Cols > 0) Map.OnCleanUp();
+
+	for (auto item = GameItems.begin(); item != GameItems.end(); item++)
+	{
+		SDL_DestroyTexture(item->second);
+	}
+
+	if (Map.Setup.Cols > 0) Map.OnCleanUp();
 
 	MainUI.OnCleanup();
 	GameUI.OnCleanup();
 	Editor.OnCleanUp();
 	Player.OnCleanup();
-	
+
 	Mix_CloseAudio();
 	Mix_FreeMusic(tune);
 
@@ -275,9 +345,11 @@ void GameEngine::OnInitPlayer()
 	Player.TextureSourcePath = "Resources/sprites/Block_001.png";
 	Player.HorizontalTiling = 6;
 	Player.VerticalTiling = 4;
-	
+
 	Player.GameOver = false;
 	Player.Score = 0;
+	Player.Jumps = 0;
+	
 	Player.Speed = 3;
 	Player.MotionHor = MotionState::None;
 	Player.MotionVer = MotionState::Plus;
@@ -304,9 +376,9 @@ void GameEngine::OnGameRestart()
 	Map.ScrollXOutDelay = 0;
 	Map.ResetScroller();
 	Map.ResetInView();
-	
+
 	OnInitPlayer();
-	
+
 	GameStatus = GameState::Running;
 }
 

@@ -22,6 +22,7 @@ public:
 	UI_TextInput txtFilename;
 	string FilenameSave = "";
 	int ResourceIndex=0;
+	int ResourceIndex_1n = 0;
 	int TileIndex = 0;
 	bool ConfigShown = false;
 

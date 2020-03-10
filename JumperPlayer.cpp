@@ -100,11 +100,13 @@ void JumperPlayer::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 	{
 		MotionVer = MotionState::Minus;
 		Landed = false;
+		Jumps++;
 	}
 	if (sym == SDLK_DOWN && Landed)
 	{
 		MotionVer = MotionState::Plus;
 		Landed = false;
+		Jumps++;
 	}
 
 	if (sym == SDLK_LEFT)
@@ -197,6 +199,7 @@ void JumperPlayer::OnCollisionCheck()
 					else
 					{
 						GameOver = true;
+						return;
 					}
 				}
 			}

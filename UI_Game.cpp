@@ -19,6 +19,8 @@ void UI_Game::OnInit(SDL_Renderer* rend, CharacterTextureMap* charMap)
 	_texSad = SDL_CreateTextureFromSurface(_rend, surf);
 	SDL_FreeSurface(surf);
 
+	return;
+
 	SDL_Texture* tex;
 	Userdata ud;
 
@@ -66,22 +68,22 @@ void UI_Game::OnInit(SDL_Renderer* rend, CharacterTextureMap* charMap)
 
 void UI_Game::OnLoop(void)
 {
-	_bbox.OnLoop();
+	//_bbox.OnLoop();
 }
 
 void UI_Game::OnEvent(SDL_Event* event)
 {
-	_bbox.OnEvent(event);
+	//_bbox.OnEvent(event);
 }
 
 void UI_Game::OnCleanup(void)
 {
-	_bbox.OnCleanup();
+	//_bbox.OnCleanup();
 	SDL_DestroyTexture(_texHappy);
 	SDL_DestroyTexture(_texSad);
 }
 
-void UI_Game::OnRender(string playerName, string playerScore, bool gameOver)
+void UI_Game::OnRender(bool gameOver, JumperPlayer* player)
 {
 	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
 	// Give us Background and a Border
@@ -93,18 +95,18 @@ void UI_Game::OnRender(string playerName, string playerScore, bool gameOver)
 	SDL_RenderSetDrawColor(_rend, col);
 	SDL_RenderDrawRect(_rend, &DisplayRect);
 
-	_bbox.OnRender();
+	//_bbox.OnRender();
 
-	SDL_RenderStringAt(_rend, "Spieler: " + playerName, { DisplayRect.x + 10, DisplayRect.y + 10 }, *_charMap, 36, nullptr);
-	SDL_RenderStringAt(_rend, "Punkte: " + playerScore, { DisplayRect.x + 10, DisplayRect.y + 62 }, *_charMap, 36, nullptr);
+	SDL_RenderStringAt(_rend, "Spieler: " + player->Name, { DisplayRect.x + 10, DisplayRect.y + 10 }, *_charMap, 36, nullptr);
+	SDL_RenderStringAt(_rend, "Punkte : " + to_string(player->Score), { DisplayRect.x + 10, DisplayRect.y + 62 }, *_charMap, 36, nullptr);
+	SDL_RenderStringAt(_rend, "Sprünge: " + to_string(player->Jumps), { DisplayRect.x + 10, DisplayRect.y + 114 }, *_charMap, 36, nullptr);
 	
-
 	int h, w;
 	SDL_QueryTexture(_texHappy, nullptr, nullptr, &w, &h);
 	SDL_Rect srect = {0,0, w, h};
 	SDL_Rect drect = { 1000,10, 180, 180 };
 
-	if (!gameOver)SDL_RenderCopyEx(_rend, _texHappy, &srect, &drect, 5, nullptr, SDL_FLIP_NONE);
+	if (!gameOver)SDL_RenderCopyEx(_rend, player->Texture, &srect, &drect, 5, nullptr, SDL_FLIP_NONE);
 	else SDL_RenderCopyEx(_rend, _texSad, &srect, &drect, 5, nullptr, SDL_FLIP_NONE);
 
 }

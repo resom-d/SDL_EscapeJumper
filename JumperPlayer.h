@@ -36,7 +36,10 @@ public:
 	MotionState MotionVer;
 	
 	std::string Name;
-	int Score;
+	Uint32 Score;
+	Uint32 Jumps;
+	Uint16 Continues;
+	Uint16 Energy;
 
 	int OnInit(SDL_Renderer* rend, GameMap* map);
 	int OnLoop();

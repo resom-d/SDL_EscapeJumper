@@ -175,7 +175,7 @@ void GameMap::InitMap()
 void GameMap::ResetScroller(void)
 {
 	BlockPosition.x = -Setup.DisplayCols + ScrollXInDelay;
-	ScrollPosition = { 0, 0 };
+	ScrollPosition = { -1, 0 };
 }
 
 void GameMap::ResetInView(void)

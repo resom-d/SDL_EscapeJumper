@@ -34,7 +34,8 @@ enum class GameState
 	Running,
 	Paused,
 	Highscore,
-	GameOver
+	GameOver,
+	LevelComplete
 
 };
 typedef struct GameProperties
@@ -64,7 +65,7 @@ public:
 	list<path> Avatars;
 	list<path> TileTextureResources;
 	CharacterTextureMap CharMap;
-
+	unordered_map<string, SDL_Texture*> GameItems;
 	SDL_Joystick* GamePad = NULL;
 
 	bool OnInit();
@@ -90,6 +91,7 @@ private:
 	TTF_Font* _font;
 	Mix_Music* tune;
 	Uint16 _level;
+	int _timerCatch;
 
 protected:
 
