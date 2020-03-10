@@ -4,11 +4,11 @@ LevelEditor::LevelEditor()
 {}
 
 void LevelEditor::OnInit(SDL_Window* win, SDL_Renderer* rend, CharacterTextureMap charMap)
-{	
+{
 	_appWindow = win;
 	_rend = rend;
 	_charMap = charMap;
-	ResourceIndex = 1;
+	UI.ResourceIndex = 1;
 	_colorIndexBorder = 1;
 	_colorIndexFill = 2;
 	_blockdrawStart = { -1, -1 };
@@ -19,81 +19,80 @@ void LevelEditor::OnInit(SDL_Window* win, SDL_Renderer* rend, CharacterTextureMa
 	// Assign active colors
 	_colorIndexFill = 1;
 	_colorIndexBorder = 1;
-	
+
 	Levels = GetFilesInDirectory("Resources/levels");
 	_level = 0;
-		
+
 	OnLoadMap();
 }
 
 void LevelEditor::OnLoop()
 {
 	UI.OnLoop();
-	if(ConfigScreenOn) _confScreen.OnLoop();
 
 	Map.BlockPosition = { ColumnPosition, RowPosition };
 	Map.ScrollPosition = { 0,0 };
 }
 
 void LevelEditor::OnRender()
-{	
+{
+	SDL_RenderSetClipRect(_rend, nullptr);
+	SDL_SetRenderDrawColor(_rend, Map.Setup.Background.r, Map.Setup.Background.g, Map.Setup.Background.b, Map.Setup.Background.a);
+	SDL_RenderFillRect(_rend, &Map.Setup.DisplayRect);
+
+	Map.OnRender();
+
+	// Draw a grid
+	SDL_SetRenderDrawColor(_rend, 255, 255, 255, 255);
+	for (auto x = 0; x <= Map.Setup.DisplayRows; x++)
+	{
+		SDL_RenderDrawLine(_rend,
+			Map.Setup.DisplayRect.x,
+			Map.Setup.DisplayRect.y + (x * (Map.Setup.BlockSize + Map.Setup.BlockSpacing)),
+			Map.Setup.DisplayRect.x + DisplayRect.w,
+			Map.Setup.DisplayRect.y + (x * (Map.Setup.BlockSize + Map.Setup.BlockSpacing))
+		);
+	}
+	for (auto y = 0; y <= Map.Setup.DisplayCols; y++)
+	{
+		SDL_RenderDrawLine(_rend,
+			Map.Setup.DisplayRect.x + (y * (Map.Setup.BlockSize + Map.Setup.BlockSpacing)),
+			Map.Setup.DisplayRect.y,
+			Map.Setup.DisplayRect.x + (y * (Map.Setup.BlockSize + Map.Setup.BlockSpacing)),
+			Map.Setup.DisplayRect.y + DisplayRect.h
+		);
+	}
+
+	// Draw borderselect-box
+	if (Mode == UI_ACTION::BORDERDRAWMODE && (_drawActive || _eraseActive))
+	{
+		int minX, minY, maxX, maxY;
+
+		minX = _blockdrawStartScreen.x > _blockdrawEndScreen.x ? _blockdrawEndScreen.x : _blockdrawStartScreen.x;
+		minY = _blockdrawStartScreen.y > _blockdrawEndScreen.y ? _blockdrawEndScreen.y : _blockdrawStartScreen.y;
+		maxX = _blockdrawStartScreen.x < _blockdrawEndScreen.x ? _blockdrawEndScreen.x : _blockdrawStartScreen.x;
+		maxY = _blockdrawStartScreen.y < _blockdrawEndScreen.y ? _blockdrawEndScreen.y : _blockdrawStartScreen.y;
+
+		SDL_Rect r = {
+			minX,
+			minY,
+			maxX - minX,
+			maxY - minY
+		};
+
+		SDL_RenderSetClipRect(_rend, &r);
+		SDL_SetRenderDrawColor(_rend, 0, 200, 0, 255);
+		SDL_RenderDrawRect(_rend, &r);
 		SDL_RenderSetClipRect(_rend, nullptr);
-		SDL_SetRenderDrawColor(_rend, Map.Setup.Background.r, Map.Setup.Background.g, Map.Setup.Background.b, Map.Setup.Background.a);
-		SDL_RenderFillRect(_rend, &Map.Setup.DisplayRect);
+	}
 
-		UI.OnRender(ColumnPosition, RowPosition);
-		Map.OnRender();
-		
-		// Draw a grid
-		SDL_SetRenderDrawColor(_rend, 255, 255, 255, 255);
-		for (auto x = 0; x <= Map.Setup.DisplayRows; x++)
-		{
-			SDL_RenderDrawLine(_rend,
-				Map.Setup.DisplayRect.x,
-				Map.Setup.DisplayRect.y + (x * (Map.Setup.BlockSize + Map.Setup.BlockSpacing)),
-				Map.Setup.DisplayRect.x + DisplayRect.w,
-				Map.Setup.DisplayRect.y + (x * (Map.Setup.BlockSize + Map.Setup.BlockSpacing))
-			);
-		}
-		for (auto y = 0; y <= Map.Setup.DisplayCols; y++)
-		{
-			SDL_RenderDrawLine(_rend,
-				Map.Setup.DisplayRect.x + (y * (Map.Setup.BlockSize + Map.Setup.BlockSpacing)),
-				Map.Setup.DisplayRect.y,
-				Map.Setup.DisplayRect.x + (y * (Map.Setup.BlockSize + Map.Setup.BlockSpacing)),
-				Map.Setup.DisplayRect.y + DisplayRect.h
-			);
-		}
-
-
-		if (Mode == UI_ACTION::BORDERDRAWMODE && (_drawActive || _eraseActive))
-		{
-			int minX, minY, maxX, maxY;
-
-			minX = _blockdrawStartScreen.x > _blockdrawEndScreen.x ? _blockdrawEndScreen.x : _blockdrawStartScreen.x;
-			minY = _blockdrawStartScreen.y > _blockdrawEndScreen.y ? _blockdrawEndScreen.y : _blockdrawStartScreen.y;
-			maxX = _blockdrawStartScreen.x < _blockdrawEndScreen.x ? _blockdrawEndScreen.x : _blockdrawStartScreen.x;
-			maxY = _blockdrawStartScreen.y < _blockdrawEndScreen.y ? _blockdrawEndScreen.y : _blockdrawStartScreen.y;
-
-			SDL_Rect r = {
-				minX,
-				minY,
-				maxX - minX,
-				maxY - minY
-			};
-
-			SDL_RenderSetClipRect(_rend, &r);
-			SDL_SetRenderDrawColor(_rend, 0, 200, 0, 255);
-			SDL_RenderDrawRect(_rend, &r);
-			SDL_RenderSetClipRect(_rend, nullptr);
-		}
-
+	UI.OnRender(ColumnPosition, RowPosition);
 }
 
 void LevelEditor::OnCleanUp()
 {
 	UI.OnCleanup();
-	_confScreen.OnCleanup();
+	Map.OnCleanUp();
 }
 
 void LevelEditor::OnLoadMap()
@@ -108,8 +107,8 @@ void LevelEditor::OnLoadMap()
 	Map = map;
 	UI.OnCleanup();
 	UI.OnInit(_rend, &Map, _charMap, Map.ColorPallete);
-
-	ConfigScreenOn = false;
+	UI.ResourceIndex = 1;
+	TileIndex = 1;
 }
 
 void LevelEditor::OnSaveMap()
@@ -123,73 +122,200 @@ void LevelEditor::OnClearMap()
 
 void LevelEditor::OnEvent(SDL_Event* event)
 {
-	if (ConfigScreenOn) _confScreen.OnEvent(event);
 
 	if (event->type == EDITOR_EVENT_TYPE)
 	{
 		Userdata ud;
 		list<SDL_Color>::iterator iter;
+		SDL_Surface* surf;
+		SDL_Texture* tex;
+		TileMapTextureResource tr;
+		SDL_Keymod mod;
 
 		switch (event->user.code)
 		{
-		case (Sint32)UI_ACTION::GO_EDITOR:
-			ConfigScreenOn = false;
-			break;
-
-		case (Sint32)UI_ACTION::GO_EDITOR_CONFIG:
-			ConfigScreenOn = true;
-			break;
-
-		case (Sint32)UI_ACTION::SAVEMAP:
+		case (int)UI_ACTION::SAVEMAP:
 			OnSaveMap();
 			break;
 
-		case (Sint32)UI_ACTION::EDIT_LOAD_NEXT:
+		case (int)UI_ACTION::EDIT_LOAD_NEXT:
 			_level++;
-			if (_level > Levels.size()-1) _level = 0;
+			if (_level > Levels.size() - 1) _level = 0;
 			OnLoadMap();
 			break;
 
-		case (Sint32)UI_ACTION::EDIT_LOAD_PREV:
+		case (int)UI_ACTION::EDIT_LOAD_PREV:
 			_level--;
 			if (_level < 0) _level = Levels.size() - 1;
 			OnLoadMap();
 			break;
 
-		case (Sint32)UI_ACTION::SET_TILEINDEX:
+		case (int)UI_ACTION::SET_TILEINDEX:
 			ud = *(Userdata*)event->user.data2;
-			TileIndex = ud.TileIndex;
+			mod = SDL_GetModState();
+
+			if (mod & KMOD_CTRL)
+			{
+				for (int x = 0; x < Map.Setup.Cols; x++)
+				{
+					for (int y = 0; y < Map.Setup.Cols; y++)
+					{
+						if (Map.TileMap[x][y].TileIndex == TileIndex && Map.TileMap[x][y].ResourceIndex == UI.ResourceIndex)
+						{
+							Map.TileMap[x][y].ResourceIndex = UI.ResourceIndex;
+							Map.TileMap[x][y].TileIndex = ud.TileIndex;
+						}
+					}
+				}
+				_colorIndexFill = ud.ColorIndex;
+			}
+			else if (mod & KMOD_ALT)
+			{
+				for (int x = 0; x < Map.Setup.Cols; x++)
+				{
+					for (int y = 0; y < Map.Setup.Cols; y++)
+					{
+						if (Map.TileMap[x][y].FillColor == _colorIndexFill)
+						{
+							Map.TileMap[x][y].ResourceIndex = UI.ResourceIndex;
+							Map.TileMap[x][y].TileIndex = ud.TileIndex;
+							Map.TileMap[x][y].FillColor = _colorIndexFill;
+						}
+					}
+				}
+				_colorIndexFill = ud.ColorIndex;
+			}
+			else	TileIndex = ud.TileIndex;
 			break;
 
-		case (Sint32)UI_ACTION::DRAWMODE:
+		case (int)UI_ACTION::DRAWMODE:
 			Mode = UI_ACTION::DRAWMODE;
 			break;
-		case (Sint32)UI_ACTION::BORDERDRAWMODE:
+
+		case (int)UI_ACTION::BORDERDRAWMODE:
 			Mode = UI_ACTION::BORDERDRAWMODE;
 			break;
 
-		case (Sint32)UI_ACTION::SCROLL_TO:
+		case (int)UI_ACTION::SCROLL_TO:
 			ScrollMap((*(Userdata*)event->user.data2).Scrollposition);
 			break;
 
-		case (Sint32)UI_ACTION::SET_FILL_COLOR:
+		case (int)UI_ACTION::SET_FILL_COLOR:
 			ud = *(Userdata*)event->user.data2;
 			if (ud.ColorIndex < 0 || ud.ColorIndex >Map.ColorPallete.size() - 1) return;
+
+			if (SDL_GetModState() & KMOD_CTRL)
+			{
+				for (int x = 0; x < Map.Setup.Cols; x++)
+				{
+					for (int y = 0; y < Map.Setup.Cols; y++)
+					{
+						if (Map.TileMap[x][y].FillColor == _colorIndexFill)
+						{
+							Map.TileMap[x][y].ResourceIndex = 0;
+							Map.TileMap[x][y].TileIndex = 0;
+							Map.TileMap[x][y].FillColor = ud.ColorIndex;
+						}
+					}
+				}
+			}
+			else if (SDL_GetModState() & KMOD_ALT)
+			{
+				for (int x = 0; x < Map.Setup.Cols; x++)
+				{
+					for (int y = 0; y < Map.Setup.Cols; y++)
+					{
+						if (Map.TileMap[x][y].TileIndex == TileIndex && Map.TileMap[x][y].ResourceIndex == UI.ResourceIndex)
+						{
+							Map.TileMap[x][y].ResourceIndex = 0;
+							Map.TileMap[x][y].TileIndex = 0;
+							Map.TileMap[x][y].FillColor = ud.ColorIndex;
+						}
+					}
+				}
+			}
+			
 			_colorIndexFill = ud.ColorIndex;
 			TileIndex = 0;
 			break;
 
-		case (Sint32)UI_ACTION::SET_BORDER_COLOR:
+		case (int)UI_ACTION::SET_BORDER_COLOR:
 			ud = *(Userdata*)event->user.data2;
 			if (ud.ColorIndex < 0 || ud.ColorIndex >Map.ColorPallete.size() - 1) return;
+			if (SDL_GetModState() & KMOD_CTRL)
+			{
+				for (int x = 0; x < Map.Setup.Cols; x++)
+				{
+					for (int y = 0; y < Map.Setup.Cols; y++)
+					{
+						if (Map.TileMap[x][y].FillColor == _colorIndexFill)
+						{
+							Map.TileMap[x][y].BorderColor = ud.ColorIndex;
+						}
+					}
+				}
+			}
+			
 			_colorIndexBorder = ud.ColorIndex;
 			TileIndex = 0;
+			break;
+
+		case (int)UI_ACTION::NEXT_RESOURCEINDEX:
+			UI.ResourceIndex++;
+			TileIndex = 1;
+			if (UI.ResourceIndex > Map.TextureResources.size()) UI.ResourceIndex = 1;
+			break;
+
+		case (int)UI_ACTION::PREV_RESOURCEINDEX:
+			UI.ResourceIndex--;
+			TileIndex = 1;
+			if (UI.ResourceIndex < 1) UI.ResourceIndex = Map.TextureResources.size();
+			break;
+
+		case (int)UI_ACTION::ADD_TILEMAP:
+			ud = *(Userdata*)event->user.data2;
+			if (ud.TilemapResource == nullptr) break;
+
+			tr.Type = ud.TilemapResource->Type;
+			tr.Cols = ud.TilemapResource->Cols;
+			tr.Rows = ud.TilemapResource->Rows;
+			tr.MaxIndex = ud.TilemapResource->MaxIndex;
+			tr.Tilesize = ud.TilemapResource->Tilesize;
+			tr.Path = ud.TilemapResource->Path;
+
+			surf = IMG_Load(tr.Path.c_str());
+			tex = SDL_CreateTextureFromSurface(_rend, surf);
+			SDL_FreeSurface(surf);
+			tr.Texture = tex;
+
+			Map.TextureResources.push_back(tr);
+			break;
+
+		case (int)UI_ACTION::REPLACE_TILEMAP:
+			ud = *(Userdata*)event->user.data2;
+			if (ud.TilemapResource == nullptr) break;
+
+			tr.Type = ud.TilemapResource->Type;
+			tr.Cols = ud.TilemapResource->Cols;
+			tr.Rows = ud.TilemapResource->Rows;
+			tr.MaxIndex = ud.TilemapResource->MaxIndex;
+			tr.Tilesize = ud.TilemapResource->Tilesize;
+			tr.Path = ud.TilemapResource->Path;
+
+			surf = IMG_Load(tr.Path.c_str());
+			tex = SDL_CreateTextureFromSurface(_rend, surf);
+			SDL_FreeSurface(surf);
+			tr.Texture = tex;
+
+			auto tar = Map.TextureResources.erase(next(Map.TextureResources.begin(), UI.ResourceIndex - 1));
+			Map.TextureResources.insert(tar, tr);
+
 			break;
 		}
 
 	}
 
-	switch (event->type)
+	if (!UI.ConfigShown)	switch (event->type)
 	{
 	case SDL_KEYDOWN:
 		OnKeyDown(event->key.keysym.sym, event->key.keysym.mod);
@@ -242,7 +368,7 @@ void LevelEditor::OnEvent(SDL_Event* event)
 
 	}
 
-	if (!ConfigScreenOn) UI.OnEvent(event);
+	UI.OnEvent(event);
 
 }
 
@@ -270,7 +396,7 @@ void LevelEditor::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 		if (RowPosition > Map.Setup.Rows - Map.Setup.DisplayRows) RowPosition = Map.Setup.Rows - Map.Setup.DisplayRows;
 		break;
 
-	
+
 	}
 }
 
@@ -298,7 +424,7 @@ void LevelEditor::OnLeftButtonDown(int mX, int mY)
 		TilemapTile tile;
 		tile.Visible = true;
 		tile.TileIndex = TileIndex;
-		tile.ResourceIndex = ResourceIndex;
+		tile.ResourceIndex = UI.ResourceIndex;
 		tile.FillColor = _colorIndexFill;
 		tile.BorderColor = _colorIndexBorder;
 
@@ -343,7 +469,7 @@ void LevelEditor::OnLeftButtonUp(int mX, int mY)
 		tile.BorderColor = _colorIndexBorder;
 		tile.Visible = true;
 		tile.TileIndex = TileIndex;
-		tile.ResourceIndex = ResourceIndex;
+		tile.ResourceIndex = UI.ResourceIndex;
 
 		Map.FillArea({ _blockdrawStart.x,  _blockdrawStart.y }, { _blockdrawEnd.x,  _blockdrawEnd.y }, { ColumnPosition, RowPosition }, tile);
 	}
@@ -456,7 +582,7 @@ void LevelEditor::OnMouseMove(int mX, int mY, int relX, int relY, bool Left, boo
 		{
 			TilemapTile tile;
 			tile.Visible = true;
-			tile.ResourceIndex = ResourceIndex;
+			tile.ResourceIndex = UI.ResourceIndex;
 			tile.TileIndex = TileIndex;
 			tile.FillColor = _colorIndexFill;
 			tile.BorderColor = _colorIndexBorder;

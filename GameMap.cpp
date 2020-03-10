@@ -222,10 +222,11 @@ void GameMap::SaveMap(string filename)
 		{
 			theFile << "#RES#" << endl;
 			theFile << "P:" << iter->Path << endl;
+			theFile << "T:" << to_string((int)iter->Type) << endl;
 			theFile << "C:" << to_string(iter->Cols) << endl;
 			theFile << "R:" << to_string(iter->Rows) << endl;
 			theFile << "M:" << to_string(iter->MaxIndex) << endl;
-			theFile << "T:" << to_string(iter->Tilesize.w) << ":" << to_string(iter->Tilesize.h) << endl;
+			theFile << "S:" << to_string(iter->Tilesize.w) << ":" << to_string(iter->Tilesize.h) << endl;
 		}
 	}
 
@@ -343,6 +344,10 @@ GameMap GameMap::LoadMap(SDL_Renderer* rend, string filename)
 			{
 				tr.Path = *next(item, 1);
 			}
+			if (*item == "T")
+			{
+				tr.Type = (TileType)stoi(*next(item, 1));
+			}
 			if (*item == "C")
 			{
 				tr.Cols = stoi(*next(item, 1));
@@ -355,7 +360,7 @@ GameMap GameMap::LoadMap(SDL_Renderer* rend, string filename)
 			{
 				tr.MaxIndex = stoi(*next(item, 1));
 			}
-			if (*item == "T")
+			if (*item == "S")
 			{
 				SDL_Surface* surf = IMG_Load(tr.Path.c_str());
 				tr.Texture = SDL_CreateTextureFromSurface(rend, surf);

@@ -10,6 +10,7 @@ public:
 	UI_Container();
 	~UI_Container();
 
+	list<UI_Control> Children;
 	WIDGET_ORIENTATION Orientation = WIDGET_ORIENTATION::HORIZONTAL;
 
 	virtual void OnInit(SDL_Renderer*);
@@ -21,6 +22,5 @@ public:
 	virtual void AddChild(UI_Control);
 
 private:
-	list<UI_Control> _children;
 };
 

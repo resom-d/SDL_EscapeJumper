@@ -24,14 +24,13 @@ public:
 	UI_ACTION Mode = UI_ACTION::DRAWMODE;
 	SDL_Rect DisplayRect;
 	Uint16 UI_Height = 200;
-	Uint16 TileIndex = 0;
-	Uint16 ResourceIndex = 0;
+	int TileIndex = 0;
+	/*int ResourceIndex = 0;*/
 	int ColumnPosition = 0;
 	int RowPosition = 0;
 	SDL_Point ScrollPosition = { 0,0 };
 	int ScrollSpeed = 1;
-	bool ConfigScreenOn;
-
+	
 	void OnInit(SDL_Window* win, SDL_Renderer* rend, CharacterTextureMap charMap);
 
 	void OnLoop();
@@ -60,11 +59,11 @@ public:
 	void OnMiddleButtonDown(int mX, int mY);
 	void OnMouseMove(int mX, int mY, int relX, int relY, bool Left, bool Right, bool Middle);
 	void ScrollMap(SDL_Point p);
+
 private:
 	SDL_Window* _appWindow;
 	SDL_Renderer* _rend;
 	CharacterTextureMap _charMap;
-	UI_MapConfig _confScreen;
 	int _level = 0;
 	int _colorIndexFill;
 	int _colorIndexBorder;

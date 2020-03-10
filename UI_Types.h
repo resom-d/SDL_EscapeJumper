@@ -6,8 +6,7 @@
 #include <string>
 #include "SDL_Extras.h"
 #include "UI_Styles.h"
-
-
+#include "TilemapTextureResource.h"
 using namespace std;
 
 const Uint32 GAME_EVENT_TYPE = 40000;
@@ -52,6 +51,7 @@ enum class UI_ACTION
 	GO_MAINSCREEN,
 	GO_EDITOR,
 	GO_EDITOR_CONFIG,
+	CLOSE_EDITOR_CONFIG,
 	GO_GAME,
 	LOADMAP,
 	SAVEMAP,
@@ -64,8 +64,15 @@ enum class UI_ACTION
 	SET_FILL_COLOR,
 	SET_BORDER_COLOR,
 	SET_TILEINDEX,
-	SET_RESSOURCEINDEX,
-	SET_PLAYER_AVATAR
+	PREV_RESOURCEINDEX,
+	NEXT_RESOURCEINDEX,
+	PREV_TILEMAP,
+	NEXT_TILEMAP,
+	SET_PLAYER_AVATAR,
+	ADD_TILEMAP,
+	SET_TILETYPE_BGND,
+	SET_TILETYPE_COIN,
+	REPLACE_TILEMAP
 };
 		  
 enum class WIDGET_EVENT_TYPE
@@ -79,9 +86,10 @@ class Userdata
 {
 public:
 	Userdata();
-	Uint16 ColorIndex;
-	Uint16 ResourceIndex;
-	Uint16 TileIndex;
+	Uint16 ColorIndex = 0;
+	Uint16 ResourceIndex = 0;
+	Uint16 TileIndex = 0;
 	SDL_Point Scrollposition;
-	SDL_Texture* Texture;
+	SDL_Texture* Texture = nullptr;
+	TileMapTextureResource* TilemapResource = nullptr;
 };

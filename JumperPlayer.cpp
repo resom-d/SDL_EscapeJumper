@@ -7,7 +7,7 @@ int JumperPlayer::OnInit(SDL_Renderer* rend, GameMap* map)
 	int screenWidth, screenHeight;
 	SDL_GetRendererOutputSize(_rend, &screenWidth, &screenHeight);
 
-	SDL_Surface* surf = IMG_Load("Resources/sprites/Block_004.png");
+	SDL_Surface* surf = IMG_Load("Resources/sprites/Block_001.png");
 	Texture = SDL_CreateTextureFromSurface(_rend, surf);
 	SDL_FreeSurface(surf);
 
@@ -171,7 +171,9 @@ void JumperPlayer::OnCollisionCheck()
 
 			if (SDL_IntersectRect(&DisplayRect, &rObst, &result))
 			{
-				if (tile->TileIndex == 5)
+				int ri = tile->ResourceIndex - 1;
+				TileType tt = next(_map->TextureResources.begin(), ri)->Type;
+				if (tt == TileType::Coin)
 				{
 					tile->InView = false;
 					Score++;

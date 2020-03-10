@@ -10,6 +10,7 @@
 #include <sstream>
 #include "UI_Types.h"
 #include "GameTypes.h"
+#include "Size2D.h"
 
 using namespace std;
 using namespace boost::filesystem;
@@ -27,9 +28,8 @@ using namespace boost::filesystem;
 	void SDL_RenderDrawBorder(SDL_Renderer* rend, SDL_Rect rect, Uint16 borderWidth, SDL_Color color);
 
 	void SDL_RenderSetDrawColor(SDL_Renderer* rend, SDL_Color col);
-
-	SDL_Texture* SD_RenderLoadTexture(SDL_Renderer* renderer, std::string path);
-	
+		
+	void CreateTilemap(path sdir, path ddir, string filename, Uint16 cols, Uint16 rows, Size2D outsize, SDL_Color* fillcolor);
 	
 	void CreateWidgetTexture(SDL_Renderer* rend, string filePath, SDL_Texture* destTex, SDL_Rect srcRect, SDL_Rect destRect, double rot, SDL_RendererFlip flip);
 

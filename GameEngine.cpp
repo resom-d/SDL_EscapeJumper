@@ -12,6 +12,9 @@ GameEngine::GameEngine()
 
 bool GameEngine::OnInit()
 {
+	/*SDL_Color ccol = { 60, 146, 150 ,255 };
+	CreateTilemap("Resources/tilemaps/input", "Resources/tilemaps", "tilemap_002.png", 3, 3, Size2D(35, 35), &ccol);*/
+
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) 	return false;
 	if (TTF_Init() == -1) return false;
 	if (SDL_NumJoysticks() > 0) GamePad = SDL_JoystickOpen(0);
@@ -134,7 +137,7 @@ void GameEngine::OnEvent(SDL_Event* event)
 
 		case (int)UI_ACTION::SET_PLAYER_AVATAR:
 			Player.Texture = ((Userdata*)event->user.data2)->Texture;
-
+			GoGame();
 			break;
 		}
 	}
@@ -306,9 +309,6 @@ void GameEngine::OnGameRestart()
 	
 	GameStatus = GameState::Running;
 }
-
-
-// Overrides from GameEvents
 
 void GameEngine::OnExit()
 {

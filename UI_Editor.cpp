@@ -14,8 +14,10 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap
 	_charmap = charMap;
 	_colorPalette = colors;
 	_activeTool = UI_ACTION::DRAWMODE;
-	_tileResourceDPoint ={ 750,5 };
-	
+	_tileResourceDPoint = { 750,5 };
+
+	_confScreen.DisplayRect = { 800, 20, 375, 185 };
+
 	SDL_Texture* orgTex = SDL_GetRenderTarget(_rend);
 
 	SDL_Rect srcRect = { 0,0,76,76 };
@@ -127,10 +129,10 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	btn.Padding = pad;
 	Buttons.push_back(btn);
 	dRect.x += w + gap;
-	
+
 	// Load Prev
 	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
-	CreateWidgetTexture(_rend, "Resources/icons/Back.png", tex, *srcRect, *destRect, 0 , SDL_FLIP_NONE);
+	CreateWidgetTexture(_rend, "Resources/icons/Forward.png", tex, *srcRect, *destRect, 0, SDL_FLIP_HORIZONTAL);
 	btn = UI_Control();
 	btn.OnInit(_rend, tex);;
 	btn.EventType = EDITOR_EVENT_TYPE;
@@ -143,7 +145,7 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 
 	// Load next
 	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
-	CreateWidgetTexture(_rend, "Resources/icons/Back.png", tex, *srcRect, *destRect, 0, SDL_FLIP_HORIZONTAL);
+	CreateWidgetTexture(_rend, "Resources/icons/Forward.png", tex, *srcRect, *destRect, 0, SDL_FLIP_NONE);
 	btn = UI_Control();
 	btn.OnInit(_rend, tex);;
 	btn.EventType = EDITOR_EVENT_TYPE;
@@ -153,7 +155,7 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	btn.Padding = pad;
 	Buttons.push_back(btn);
 	dRect.x += w + gap;
-	
+
 	// Save 
 	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
 	CreateWidgetTexture(_rend, "Resources/icons/FileSave.png", tex, *srcRect, *destRect, 0, SDL_FLIP_NONE);
@@ -196,7 +198,7 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	// +/- 3 means scroll start,+/ -2 means scroll page, +/-1 mean scroll increment
 	// Scroll X Start
 	ud = Userdata();
-	ud.Scrollposition = { -3, 0};
+	ud.Scrollposition = { -3, 0 };
 	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
 	CreateWidgetTexture(_rend, "Resources/icons/ScrollEnd.png", tex, *srcRect, *destRect, 0, SDL_FLIP_HORIZONTAL);
 	btn = UI_Control();
@@ -209,7 +211,7 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	btn.Padding = pad;
 	Buttons.push_back(btn);
 	dRect.x += w + gap;
-	
+
 	// Scroll X left
 	ud = Userdata();
 	ud.Scrollposition = { -1, 0 };
@@ -246,7 +248,7 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	ud = Userdata();
 	ud.Scrollposition = { 3, 0 };
 	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
-	CreateWidgetTexture(_rend, "Resources/icons/ScrollEnd.png", tex, *srcRect, *destRect, 0 , SDL_FLIP_NONE);
+	CreateWidgetTexture(_rend, "Resources/icons/ScrollEnd.png", tex, *srcRect, *destRect, 0, SDL_FLIP_NONE);
 	btn = UI_Control();
 	btn.UserData = ud;
 	btn.OnInit(_rend, tex);
@@ -322,54 +324,121 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	Buttons.push_back(btn);
 	dRect.x += w + gap;
 
-	_tileResourceDPoint.x  = dRect.x;
+	// Prev Tilemap
+	ud = Userdata();
+	ud.Scrollposition = { 0, 3 };
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/Prev.png", tex, *srcRect, *destRect, 0, SDL_FLIP_NONE);
+	btn = UI_Control();
+	btn.UserData = ud;
+	btn.OnInit(_rend, tex);
+	btn.EventType = EDITOR_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::PREV_RESOURCEINDEX;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	dRect.x += w + gap;
+
+	// Next Tilemap
+	ud = Userdata();
+	ud.Scrollposition = { 0, 3 };
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/Prev.png", tex, *srcRect, *destRect, 0, SDL_FLIP_HORIZONTAL);
+	btn = UI_Control();
+	btn.UserData = ud;
+	btn.OnInit(_rend, tex);
+	btn.EventType = EDITOR_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::NEXT_RESOURCEINDEX;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	dRect.x += w + gap;
+
+	// Tilemap Config
+	ud = Userdata();
+	ud.Scrollposition = { 0, 3 };
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/Cog.png", tex, *srcRect, *destRect, 0, SDL_FLIP_HORIZONTAL);
+	btn = UI_Control();
+	btn.UserData = ud;
+	btn.OnInit(_rend, tex);
+	btn.EventType = EDITOR_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::GO_EDITOR_CONFIG;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	dRect.x += w + gap;
+
+	_tileResourceDPoint.x = dRect.x;
 }
 
 void UI_Editor::OnLoop()
 {
-	list<UI_Control>::iterator iter = Buttons.begin();
-	txtFilename.OnLoop();
+	if (ConfigShown) _confScreen.OnLoop();
+	else
+	{
+		list<UI_Control>::iterator iter = Buttons.begin();
+		advance(iter, 5);
+		iter->IsActive = _activeTool == UI_ACTION::DRAWMODE;
+		advance(iter, 1);
+		iter->IsActive = _activeTool == UI_ACTION::BORDERDRAWMODE;
+		txtFilename.OnLoop();
+	}
 
-	advance(iter, 5);
-	iter->IsActive = _activeTool == UI_ACTION::DRAWMODE;
-	advance(iter, 1);
-	iter->IsActive = _activeTool == UI_ACTION::BORDERDRAWMODE;
 }
 
 void UI_Editor::OnEvent(SDL_Event* event)
 {
-	txtFilename.OnEvent(event);
-
-	for (_widgetsIter = Buttons.begin(); _widgetsIter != Buttons.end(); _widgetsIter++)
-	{
-		_widgetsIter->OnEvent(event);
-	}
-
-	FillColorWidgets.OnEvent(event);
-	BorderColorWidgets.OnEvent(event);
-	
 	if (event->type == EDITOR_EVENT_TYPE)
 	{
-		if (event->user.code == (Sint32)UI_ACTION::DRAWMODE || event->user.code == (Sint32)UI_ACTION::BORDERDRAWMODE)
+		switch (event->user.code)
 		{
+		case (Sint32)UI_ACTION::DRAWMODE:
 			_activeTool = (UI_ACTION)event->user.code;
+			break;
+
+			case (Sint32)UI_ACTION::BORDERDRAWMODE:
+			_activeTool = (UI_ACTION)event->user.code;
+			break;
+
+			case (Sint32)UI_ACTION::GO_EDITOR_CONFIG:
+				_confScreen.OnInit(_rend, &_charmap);
+				ConfigShown = true;
+				break;
+
+			case (Sint32)UI_ACTION::CLOSE_EDITOR_CONFIG:
+				_confScreen.OnCleanup();
+				ConfigShown = false;
+				break;
 		}
-	}
 
-	if (event->type == UI_EDITOR_EVENT_TYPE)
+	}
+	if (ConfigShown) _confScreen.OnEvent(event);
+	else
 	{
-		SDL_Event newEvent;
-		SDL_zero(newEvent);
-				
-		newEvent.type = EDITOR_EVENT_TYPE;
-		newEvent.user.data1 = this;
-		newEvent.user.data2 = event->user.data2;
-		newEvent.user.code = event->user.code;
+		txtFilename.OnEvent(event);
+		for (_widgetsIter = Buttons.begin(); _widgetsIter != Buttons.end(); _widgetsIter++)
+		{
+			_widgetsIter->OnEvent(event);
+		}
+		FillColorWidgets.OnEvent(event);
+		BorderColorWidgets.OnEvent(event);
+		if (event->type == UI_EDITOR_EVENT_TYPE)
+		{
+			SDL_Event newEvent;
+			SDL_zero(newEvent);
 
-		SDL_PushEvent(&newEvent);
-	}
+			newEvent.type = EDITOR_EVENT_TYPE;
+			newEvent.user.data1 = this;
+			newEvent.user.data2 = event->user.data2;
+			newEvent.user.code = event->user.code;
 
-	if (event->type == SDL_MOUSEBUTTONDOWN)
+			SDL_PushEvent(&newEvent);
+		}
+		if (event->type == SDL_MOUSEBUTTONDOWN)
 	{
 		if (_map->TextureResources.size() < 1) return;
 		Size2D texSize;
@@ -386,13 +455,13 @@ void UI_Editor::OnEvent(SDL_Event* event)
 			SDL_zero(_setTileIdEvent);
 			_setTileIdEvent.type = UI_EDITOR_EVENT_TYPE;
 			_setTileIdEvent.user.code = (int)UI_ACTION::SET_TILEINDEX;
-			_setTileIdEvent.user.data1= this;
-			_setTileIdEvent.user.data2 = &_setTileData;;			
-									
+			_setTileIdEvent.user.data1 = this;
+			_setTileIdEvent.user.data2 = &_setTileData;;
+
 			SDL_PushEvent(&_setTileIdEvent);
 		}
 	}
-
+	}
 }
 
 void UI_Editor::OnRender(Uint16 colPos, Uint16 rowPos)
@@ -416,12 +485,14 @@ void UI_Editor::OnRender(Uint16 colPos, Uint16 rowPos)
 
 	FillColorWidgets.OnRender();
 	BorderColorWidgets.OnRender();
-	
+
 
 	SDL_RenderStringAt(_rend, "X " + to_string(colPos + 1) + "-" + to_string(colPos + 1 + _map->Setup.DisplayCols), { 10, 160 }, _charmap, 22, nullptr);
 	SDL_RenderStringAt(_rend, "Y " + to_string(rowPos + 1) + "-" + to_string(rowPos + 1 + _map->Setup.DisplayRows), { 10, 175 }, _charmap, 22, nullptr);
 
-	RenderTileResource(1, _tileResourceDPoint);
+	RenderTileResource(ResourceIndex, _tileResourceDPoint);
+
+	if (ConfigShown) _confScreen.OnRender();
 }
 
 void UI_Editor::OnPostRender()
@@ -442,7 +513,8 @@ void UI_Editor::OnCleanup()
 	BorderColorWidgets.OnCleanup();
 
 	Buttons.clear();
-	
+
+	_confScreen.OnCleanup();
 }
 
 void UI_Editor::RenderTileResource(Uint16 index, SDL_Point dispPoint)

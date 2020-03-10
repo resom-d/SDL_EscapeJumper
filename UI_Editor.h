@@ -4,6 +4,7 @@
 #include "UI_Container.h"
 #include "UI_TextInput.h"
 #include "GameMap.h"
+#include "UI_TextureResourceSelector.h"
 using namespace std;
 
 
@@ -20,9 +21,11 @@ public:
 	UI_Container BorderColorWidgets;
 	UI_TextInput txtFilename;
 	string FilenameSave = "";
+	int ResourceIndex=0;
+	int TileIndex = 0;
+	bool ConfigShown = false;
 
 	void OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap charMap, ColorPalette colors);
-	void LoadTextures(const SDL_Rect* srcRect, const SDL_Rect* destRect);
 	void ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect);
 	void OnLoop();
 	void OnEvent(SDL_Event*);
@@ -34,6 +37,7 @@ protected:
 	
 	
 private:
+	UI_TextureResourceSelector _confScreen;
 	GameMap* _map;
 	CharacterTextureMap _charmap;
 	list<UI_Control>::iterator _widgetsIter;

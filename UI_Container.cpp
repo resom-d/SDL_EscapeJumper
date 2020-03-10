@@ -12,7 +12,7 @@ void UI_Container::OnInit(SDL_Renderer* rend)
 {
 	UI_Widget::OnInit(rend);
 
-	for (list<UI_Control>::iterator iter = _children.begin(); iter != _children.end(); iter++)
+	for (list<UI_Control>::iterator iter = Children.begin(); iter != Children.end(); iter++)
 	{
 		iter->OnInit(rend);
 	}
@@ -22,7 +22,7 @@ void UI_Container::OnInit(SDL_Renderer* rend, UI_ACTION actionCode)
 {
 	UI_Widget::OnInit(rend, actionCode);
 
-	for (list<UI_Control>::iterator iter = _children.begin(); iter != _children.end(); iter++)
+	for (list<UI_Control>::iterator iter = Children.begin(); iter != Children.end(); iter++)
 	{
 		iter->OnInit(rend, "");
 	}
@@ -38,7 +38,7 @@ void UI_Container::OnRender()
 		DisplayRect.y + BorderWidth + Padding,
 	};
 
-	for (list<UI_Control>::iterator iter = _children.begin(); iter != _children.end(); iter++)
+	for (list<UI_Control>::iterator iter = Children.begin(); iter != Children.end(); iter++)
 	{
 		if (Orientation == WIDGET_ORIENTATION::HORIZONTAL)
 		{
@@ -62,7 +62,7 @@ void UI_Container::OnRender()
 
 void UI_Container::OnEvent(SDL_Event* event)
 {
-	for (list<UI_Control>::iterator iter = _children.begin(); iter != _children.end(); iter++)
+	for (list<UI_Control>::iterator iter = Children.begin(); iter != Children.end(); iter++)
 	{
 		iter->OnEvent(event);
 	}
@@ -82,14 +82,14 @@ void UI_Container::OnMouseMove(SDL_MouseButtonEvent event)
 
 void UI_Container::OnCleanup(void)
 {
-	for (list<UI_Control>::iterator iter = _children.begin(); iter != _children.end(); iter++)
+	for (list<UI_Control>::iterator iter = Children.begin(); iter != Children.end(); iter++)
 	{
 		iter->OnCleanup();
 	}
-	_children.clear();
+	Children.clear();
 }
 
 void UI_Container::AddChild(UI_Control widg)
 {
-	_children.push_back(widg);
+	Children.push_back(widg);
 }

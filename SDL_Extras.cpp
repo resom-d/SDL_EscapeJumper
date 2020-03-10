@@ -146,6 +146,41 @@ void SDL_RenderSetDrawColor(SDL_Renderer* rend, SDL_Color col)
 	SDL_SetRenderDrawColor(rend, col.r, col.g, col.b, col.a);
 }
 
+void CreateTilemap(path sdir, path ddir, string filename, Uint16 cols, Uint16 rows, Size2D outsize, SDL_Color* fillcolor)
+{
+	list<path> files = GetFilesInDirectory("Resources/tilemaps/input");
+
+	SDL_Surface* surf = SDL_CreateRGBSurface(0, cols * outsize.w, rows * outsize.h, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+	if (fillcolor != nullptr)
+	{
+		SDL_Rect fillrect = { 0,0,cols * outsize.w, rows * outsize.h };
+		SDL_FillRect(surf, nullptr, SDL_MapRGB(surf->format, fillcolor->r, fillcolor->g, fillcolor->b));
+	}
+
+	int x = 0, y = 0;
+	SDL_Rect sRect = { 0, 0, 0, 0 };
+	SDL_Rect dRect = { 0, 0 ,outsize.w, outsize.h };
+	SDL_Surface* sourceImg;
+	for (auto fiter = files.begin(); fiter != files.end(); fiter++)
+	{
+		string sif = fiter->string();
+		sourceImg = IMG_Load(sif.c_str());
+		sRect.w = sourceImg->w;
+		sRect.h = sourceImg->h;
+
+		dRect.x = (x % cols) * outsize.w;
+		dRect.y = (x / cols) * outsize.h;
+		SDL_BlitScaled(sourceImg, &sRect, surf, &dRect);
+		x++;
+		SDL_FreeSurface(sourceImg);
+	}
+
+	string outfile = ddir.string() + "/" + filename;
+	IMG_SavePNG(surf, outfile.c_str());
+	SDL_FreeSurface(surf);
+
+}
+
 void CreateWidgetTexture(SDL_Renderer* rend, string filePath, SDL_Texture* destTex, SDL_Rect srcRect, SDL_Rect destRect, double rot, SDL_RendererFlip flip)
 {
 	SDL_Texture* orgTex = SDL_GetRenderTarget(rend);

@@ -25,6 +25,23 @@
 using namespace std;
 using namespace boost::filesystem;
 
+enum class GameState
+{
+	Idle,
+	MainScreen,
+	LevelEdit,
+	PlayerEdit,
+	Running,
+	Paused,
+	Highscore,
+	GameOver
+
+};
+typedef struct GameProperties
+{
+	SDL_Rect WindowFrame;
+};
+
 class GameEngine : public GameEvents
 {
 

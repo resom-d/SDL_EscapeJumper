@@ -5,6 +5,12 @@
 #include "GameTypes.h"
 #include "GameMap.h"
 
+enum class MotionState
+{
+	None = 0,
+	Plus,
+	Minus
+};
 
 class JumperPlayer : GameEvents
 {
