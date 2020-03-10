@@ -11,12 +11,9 @@ public:
 	virtual void OnInit(SDL_Renderer* rend);
 	virtual void OnInit(SDL_Renderer* rend, string text);
 	virtual void OnInit(SDL_Renderer* rend, SDL_Texture* tex);
-	virtual void OnEvent(SDL_Event* event);
 	virtual void OnRender(void);
 	virtual void OnCleanup(void);
-	
-	virtual void OnMouseButtonDown(SDL_MouseButtonEvent event);
-	virtual void OnMouseMove(SDL_MouseButtonEvent event);
+
 
 private:
 	SDL_Texture* _texture = nullptr;

@@ -68,38 +68,3 @@ void UI_Control::OnCleanup(void)
 {
 	SDL_DestroyTexture(_texture);
 }
-
-void UI_Control::OnEvent(SDL_Event* event)
-{
-	switch (event->type)
-	{
-	case SDL_MOUSEBUTTONDOWN:
-		OnMouseButtonDown(event->button);
-		break;
-
-	case SDL_MOUSEMOTION:
-		OnMouseMove(event->button);
-		break;
-	}
-}
-
-void UI_Control::OnMouseButtonDown(SDL_MouseButtonEvent event)
-{
-	if (event.x > DisplayRect.x + DisplayRect.w || event.x < DisplayRect.x || event.y < DisplayRect.y || event.y > DisplayRect.y + DisplayRect.h) return;
-
-	SDL_zero(Event);
-	Event.type = EventType;
-	Event.user.code = (Sint32)ActionCode;
-	Event.user.data1 = this;
-	Event.user.data2 = &UserData;
-	SDL_PushEvent(&Event);
-
-}
-
-void UI_Control::OnMouseMove(SDL_MouseButtonEvent event)
-{
-	BorderColor = Control_BorderColor;
-	if (event.x > DisplayRect.x + DisplayRect.w || event.x < DisplayRect.x || event.y < DisplayRect.y || event.y > DisplayRect.y + DisplayRect.h) return;
-	BorderColor = Control_BorderColorHover;
-}
-

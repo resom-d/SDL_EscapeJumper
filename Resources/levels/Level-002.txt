@@ -22,7 +22,7 @@ R:3
 M:9
 S:35:35
 #RES#
-P:Resources/tilemaps/tilemap_002.png
+P:Resources/tilemaps\tilemap_005.png
 T:1
 C:3
 R:3

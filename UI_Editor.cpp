@@ -218,6 +218,7 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
 	CreateWidgetTexture(_rend, "Resources/icons/Scroll.png", tex, *srcRect, *destRect, 0, SDL_FLIP_HORIZONTAL);
 	btn = UI_Control();
+	btn.IsRepeatActive = true;
 	btn.UserData = ud;
 	btn.OnInit(_rend, tex);
 	btn.EventType = EDITOR_EVENT_TYPE;
@@ -234,6 +235,7 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
 	CreateWidgetTexture(_rend, "Resources/icons/Scroll.png", tex, *srcRect, *destRect, 0, SDL_FLIP_NONE);
 	btn = UI_Control();
+	btn.IsRepeatActive = true;
 	btn.UserData = ud;
 	btn.OnInit(_rend, tex);
 	btn.EventType = EDITOR_EVENT_TYPE;
@@ -282,6 +284,7 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
 	CreateWidgetTexture(_rend, "Resources/icons/Scroll.png", tex, *srcRect, *destRect, -90, SDL_FLIP_NONE);
 	btn = UI_Control();
+	btn.IsRepeatActive = true;
 	btn.UserData = ud;
 	btn.OnInit(_rend, tex);
 	btn.EventType = EDITOR_EVENT_TYPE;
@@ -298,6 +301,7 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
 	CreateWidgetTexture(_rend, "Resources/icons/Scroll.png", tex, *srcRect, *destRect, 90, SDL_FLIP_NONE);
 	btn = UI_Control();
+	btn.IsRepeatActive = true;
 	btn.UserData = ud;
 	btn.OnInit(_rend, tex);
 	btn.EventType = EDITOR_EVENT_TYPE;
@@ -380,7 +384,12 @@ void UI_Editor::OnLoop()
 	if (ConfigShown) _confScreen.OnLoop();
 	else
 	{
-		list<UI_Control>::iterator iter = Buttons.begin();
+		auto iter = Buttons.begin();
+		for (; iter != Buttons.end(); iter++)
+		{
+			iter->OnLoop();
+		}
+		iter = Buttons.begin();
 		advance(iter, 5);
 		iter->IsActive = _activeTool == UI_ACTION::DRAWMODE;
 		advance(iter, 1);

@@ -13,6 +13,9 @@ public:
 	bool IsActive;
 	bool IsVisible;
 	bool IsEnabled;
+	bool IsRepeatActive;
+	Uint16 RepeatStartDelay;
+	Uint16 RepeatDelay;
 	SDL_Event Event;
 	Uint32 EventType;
 	UI_ACTION ActionCode;
@@ -41,6 +44,7 @@ public:
 	virtual void OnRender();
 	virtual void OnCleanup();
 	virtual void OnMouseButtonDown(SDL_MouseButtonEvent button);
+	virtual void OnMouseButtonUp(SDL_MouseButtonEvent button);
 	virtual void OnMouseMove(SDL_MouseButtonEvent event);
 
 private:
@@ -49,7 +53,11 @@ protected:
 	SDL_Renderer* _rend;
 	SDL_Color _fillColor;
 	SDL_Color _borderColor;
-	
+   bool	_mouseIsDown;
+   Uint32 _repeatStartTimeCatch;
+   Uint32 _repeatTimeCatch;
+   Uint32 _repeatTime;
+   Uint32 _repeatTime_1n;
 };
 
 

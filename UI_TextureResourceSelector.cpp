@@ -176,6 +176,23 @@ void UI_TextureResourceSelector::OnEvent(SDL_Event* event)
 
 		}
 	}
+
+	if (event->type == SDL_MOUSEBUTTONDOWN)
+	{
+		int x = event->button.x;
+		int y = event->button.y;
+	
+		if (!(x >= DisplayRect.x && x <= DisplayRect.x + DisplayRect.w &&
+			y >= DisplayRect.y && y <= DisplayRect.y + DisplayRect.h))
+		{
+			SDL_Event Event;
+			SDL_zero(Event);
+			Event.type = EDITOR_EVENT_TYPE;
+			Event.user.code = (Sint32)UI_ACTION::CLOSE_EDITOR_CONFIG;;
+			Event.user.data1 = this;
+			SDL_PushEvent(&Event);
+		}
+	}
 }
 
 void UI_TextureResourceSelector::OnRender(void)
