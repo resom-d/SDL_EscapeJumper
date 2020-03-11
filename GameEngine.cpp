@@ -78,9 +78,9 @@ bool GameEngine::OnInit()
 	};
 	Editor.OnInit(AppWindow, Renderer, CharMap);
 
-	int r = Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+	/*int r = Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 	tune = Mix_LoadMUS("Resources/music/The impossible Mission.mp3");
-	Mix_PlayMusic(tune, -1);
+	Mix_PlayMusic(tune, -1);*/
 
 	_appIsRunning = true;
 	GameStatus = GameState::MainScreen;
@@ -186,8 +186,8 @@ void GameEngine::OnLoop()
 		int x = 0;
 		for (int l = 0; l < Map.ScrollSpeed; l++)
 		{
-			if (x++ % 4 == 0) Playfield.OnLoop();
-			if (x % 2 == 0) Playfield_slow.OnLoop();
+			if (x++ % 2 == 0) Playfield.OnLoop();
+			//if (x % 2 == 0) Playfield_slow.OnLoop();
 			Map.OnLoop();
 
 			for (int pl = 0; pl < Player.Speed; pl++)
@@ -245,8 +245,8 @@ void GameEngine::OnRender()
 	{
 		MainUI.OnRender("Zehnfinger", Player.Score, GameStatus == GameState::Running);
 		Playfield.OnRender();
-		Playfield_slow.OnRender();
 		Map.OnRender();
+		Playfield_slow.OnRender();
 	}
 
 	if (GameStatus == GameState::Running 
@@ -258,7 +258,7 @@ void GameEngine::OnRender()
 		GameUI.OnRender(GameStatus == GameState::GameOver, &Player);
 		
 		Playfield.OnRender();
-		Playfield_slow.OnRender();
+		//Playfield_slow.OnRender();
 		// Render Map
 		Map.OnRender();
 		// Render player(s)
