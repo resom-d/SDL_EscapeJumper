@@ -33,6 +33,8 @@ using namespace boost::filesystem;
 	
 	void CreateWidgetTexture(SDL_Renderer* rend, string filePath, SDL_Texture* destTex, SDL_Rect srcRect, SDL_Rect destRect, double rot, SDL_RendererFlip flip);
 
+	SDL_Texture* SDL_LoadTexture(SDL_Renderer* rend, path filename);
+
 	list<string> SplitString(string sourceString, const char splitter);
 
 	list<path> GetFilesInDirectory(path dir);

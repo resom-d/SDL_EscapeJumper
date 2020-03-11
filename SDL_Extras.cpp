@@ -196,6 +196,13 @@ void CreateWidgetTexture(SDL_Renderer* rend, string filePath, SDL_Texture* destT
 	SDL_SetRenderTarget(rend, orgTex);
 }
 
+SDL_Texture* SDL_LoadTexture(SDL_Renderer* rend, path filename)
+{	
+	SDL_Surface* surf = IMG_Load(filename.string().c_str());
+	if(surf == nullptr) return nullptr;
+	return SDL_CreateTextureFromSurface(rend, surf);
+}
+
 list<string> SplitString(string sourceString, const char splitter)
 {
 	stringstream ss(sourceString);

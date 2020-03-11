@@ -55,6 +55,12 @@ bool GameEngine::OnInit()
 	_font = TTF_OpenFont("Resources/fonts/NovaMono-Regular.ttf", 72);
 	CharMap = SDL_GetTexturesFromString(Renderer, " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜßabcdefghijklmnopqrstuvwxyzäöü,.;:*#-_|<>^°?=()!\"§$%&/()@€~", _font);
 
+	Playfield.DisplayRect = Map.Setup.DisplayRect;
+	Playfield.OnInit(Renderer, "Resources/bgnd/bgnd_001.png");
+
+	Playfield_slow.DisplayRect = Map.Setup.DisplayRect;
+	Playfield_slow.OnInit(Renderer, "Resources/bgnd/bgnd_002.png");
+
 	Player.OnInit(Renderer, &Map);
 	OnInitPlayer();
 
@@ -72,9 +78,9 @@ bool GameEngine::OnInit()
 	};
 	Editor.OnInit(AppWindow, Renderer, CharMap);
 
-	/*int r = Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+	int r = Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 	tune = Mix_LoadMUS("Resources/music/The impossible Mission.mp3");
-	Mix_PlayMusic(tune, -1);*/
+	Mix_PlayMusic(tune, -1);
 
 	_appIsRunning = true;
 	GameStatus = GameState::MainScreen;
@@ -169,13 +175,19 @@ void GameEngine::OnLoop()
 	if (GameStatus == GameState::MainScreen)
 	{
 		Map.OnLoop();
+		if(_scrollCntBgnd++ % 4 == 0) Playfield.OnLoop();
+		if (_scrollCntBgnd % 2 == 0) Playfield_slow.OnLoop();
+		
 	}
 
 	if (GameStatus == GameState::Running)
 	{
 		GameUI.OnLoop();
+		int x = 0;
 		for (int l = 0; l < Map.ScrollSpeed; l++)
 		{
+			if (x++ % 4 == 0) Playfield.OnLoop();
+			if (x % 2 == 0) Playfield_slow.OnLoop();
 			Map.OnLoop();
 
 			for (int pl = 0; pl < Player.Speed; pl++)
@@ -232,6 +244,8 @@ void GameEngine::OnRender()
 	if (GameStatus == GameState::MainScreen)
 	{
 		MainUI.OnRender("Zehnfinger", Player.Score, GameStatus == GameState::Running);
+		Playfield.OnRender();
+		Playfield_slow.OnRender();
 		Map.OnRender();
 	}
 
@@ -242,6 +256,9 @@ void GameEngine::OnRender()
 	{
 		// Render UI
 		GameUI.OnRender(GameStatus == GameState::GameOver, &Player);
+		
+		Playfield.OnRender();
+		Playfield_slow.OnRender();
 		// Render Map
 		Map.OnRender();
 		// Render player(s)
@@ -315,6 +332,7 @@ void GameEngine::OnPostRender()
 
 void GameEngine::OnCleanup()
 {
+	Playfield.OnCleanup();
 	SDL_free(_font);
 
 	for (auto item = GameItems.begin(); item != GameItems.end(); item++)

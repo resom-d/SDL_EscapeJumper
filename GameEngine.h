@@ -21,6 +21,7 @@
 #include "LevelEditor.h"
 #include "TextScroller.h"
 #include "SDL_Extras.h"
+#include "RenderPlay.h"
 
 using namespace std;
 using namespace boost::filesystem;
@@ -56,6 +57,7 @@ public:
 	GameState GameStatus = GameState::Running;
 	SDL_Window* AppWindow;
 	SDL_Renderer* Renderer;
+	SDL_Joystick* GamePad = NULL;
 	MainUI MainUI;
 	UI_Game GameUI;
 	LevelEditor Editor;
@@ -66,7 +68,8 @@ public:
 	list<path> TileTextureResources;
 	CharacterTextureMap CharMap;
 	unordered_map<string, SDL_Texture*> GameItems;
-	SDL_Joystick* GamePad = NULL;
+	RenderPlay Playfield;
+	RenderPlay Playfield_slow;
 
 	bool OnInit();
 	void OnEvent(SDL_Event* Event);
@@ -92,6 +95,7 @@ private:
 	Mix_Music* tune;
 	Uint16 _level;
 	int _timerCatch;
+	int _scrollCntBgnd;
 
 protected:
 

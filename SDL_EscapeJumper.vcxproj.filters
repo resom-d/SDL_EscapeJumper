@@ -93,6 +93,9 @@
     <ClCompile Include="UI_TextureResourceSelector.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="RenderPlay.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="zlib1.dll">
@@ -230,6 +233,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="UI_TextureResourceSelector.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPlay.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

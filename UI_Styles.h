@@ -8,13 +8,13 @@
 #define Control_BorderColorActive	 {0,255,0, 255}
 #define Control_BorderColorHover		{255, 204, 110, 255}
 
-#define UI_MainFill								{184, 255, 241, 255}
+#define UI_MainFill								{51, 19, 79, 255}
 #define UI_MainBorder						{100,100,100, 255}
 
-#define UI_GameFill							{184, 255, 241,255}
+#define UI_GameFill							{51, 19, 79,255}
 #define UI_GameBorder						{100,100,100, 255}
 
-#define UI_EditorFill							{184, 255, 241, 255}
+#define UI_EditorFill							{51, 19, 79, 255}
 #define UI_EditorBorder						{100,100,100, 255}
 
 #define UI_CreatePlayerFill					{184, 255, 241, 255}
