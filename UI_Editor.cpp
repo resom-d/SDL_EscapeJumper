@@ -156,6 +156,32 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	Buttons.push_back(btn);
 	dRect.x += w + gap;
 
+	// New map
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/NewMap.png", tex, *srcRect, *destRect, 0, SDL_FLIP_NONE);
+	btn = UI_Control();
+	btn.OnInit(_rend, tex);
+	btn.EventType = EDITOR_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::MAP_NEW;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	dRect.x += w + gap;
+
+	// Clear map
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/ClearMap.png", tex, *srcRect, *destRect, 0, SDL_FLIP_NONE);
+	btn = UI_Control();
+	btn.OnInit(_rend, tex);
+	btn.EventType = EDITOR_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::MAP_CLEAR;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+	dRect.x += w + gap;
+
 	// Save 
 	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
 	CreateWidgetTexture(_rend, "Resources/icons/FileSave.png", tex, *srcRect, *destRect, 0, SDL_FLIP_NONE);
@@ -195,6 +221,19 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	Buttons.push_back(btn);
 	dRect.x += w + gap;
 
+	// Grid toggle visible
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
+	CreateWidgetTexture(_rend, "Resources/icons/Grid.png", tex, *srcRect, *destRect, 0, SDL_FLIP_NONE);
+	btn = UI_Control();
+	btn.OnInit(_rend, tex);
+	btn.EventType = EDITOR_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::EDITOR_TOGGLEGRID;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	Buttons.push_back(btn);
+
+	dRect.x += w + gap;
 	// +/- 3 means scroll start,+/ -2 means scroll page, +/-1 mean scroll increment
 	// Scroll X Start
 	ud = Userdata();
@@ -390,10 +429,13 @@ void UI_Editor::OnLoop()
 			iter->OnLoop();
 		}
 		iter = Buttons.begin();
-		advance(iter, 5);
+		advance(iter, 7);
 		iter->IsActive = _activeTool == UI_ACTION::DRAWMODE;
 		advance(iter, 1);
 		iter->IsActive = _activeTool == UI_ACTION::BORDERDRAWMODE;
+		advance(iter, 1);
+		iter->IsActive = ShowGrid;
+
 		txtFilename.OnLoop();
 	}
 

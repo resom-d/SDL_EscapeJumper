@@ -11,6 +11,8 @@ int JumperPlayer::OnInit(SDL_Renderer* rend, GameMap* map)
 	Texture = SDL_CreateTextureFromSurface(_rend, surf);
 	SDL_FreeSurface(surf);
 
+	_sndLand = Mix_LoadWAV("Resources/sndfx/jumpland.wav");
+
 	return 0;
 }
 
@@ -22,7 +24,7 @@ int JumperPlayer::OnLoop()
 			if (DisplayRect.y > MaxPosition.y)
 			{
 				DisplayRect.y = MaxPosition.y;
-				Landed = true;
+				Landed = true;				
 			}
 		}
 
@@ -35,26 +37,7 @@ int JumperPlayer::OnLoop()
 				Landed = true;
 			}
 		}
-
-		/*if (MotionHor == MotionState::Minus)
-		{
-			DisplayRect.x --;
-			if (DisplayRect.x < MinPosition.x)
-			{
-				DisplayRect.x = MinPosition.x;
-			}
-		}
-
-		if (MotionHor == MotionState::Plus)
-		{
-			DisplayRect.x ++;
-			if (DisplayRect.x > MaxPosition.x)
-			{
-				DisplayRect.x = MaxPosition.x;
-			}
-
-		}*/
-
+		
 		OnCollisionCheck();
 
 		return 0;
@@ -177,6 +160,7 @@ void JumperPlayer::OnCollisionCheck()
 				TileType tt = next(_map->TextureResources.begin(), ri)->Type;
 				if (tt == TileType::Coin)
 				{
+					Mix_PlayChannel(-1, _sndLand, 0);
 					tile->InView = false;
 					Score++;
 				}
@@ -189,7 +173,7 @@ void JumperPlayer::OnCollisionCheck()
 						{
 							DisplayRect.y = rObst.y + _map->Setup.BlockSize;
 							Landed = true;
-						}							
+						}
 						else if (MotionVer == MotionState::Plus)
 						{
 							DisplayRect.y = rObst.y - _map->Setup.BlockSize;
@@ -203,6 +187,7 @@ void JumperPlayer::OnCollisionCheck()
 					}
 				}
 			}
+			
 		}
 	}
 }

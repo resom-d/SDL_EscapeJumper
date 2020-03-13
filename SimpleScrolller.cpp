@@ -1,6 +1,6 @@
-#include "RenderPlay.h"
+#include "SimpleScroller.h"
 
-void RenderPlay::OnInit(SDL_Renderer* rend, path image)
+void SimpleScroller::OnInit(SDL_Renderer* rend, path image)
 {
 	_rend = rend;
 
@@ -12,7 +12,7 @@ void RenderPlay::OnInit(SDL_Renderer* rend, path image)
 
 }
 
-void RenderPlay::OnLoop()
+void SimpleScroller::OnLoop()
 {
 	for (auto item = Items.begin(); item != Items.end(); item++)
 	{
@@ -22,7 +22,7 @@ void RenderPlay::OnLoop()
 
 }
 
-void RenderPlay::OnRender()
+void SimpleScroller::OnRender()
 {
 	SDL_Point ScreenSize = { DisplayRect.w, DisplayRect.h };
 
@@ -37,11 +37,11 @@ void RenderPlay::OnRender()
 
 }
 
-void RenderPlay::OnCleanup()
+void SimpleScroller::OnCleanup()
 {	
 		SDL_DestroyTexture(Tex);	
 }
 
-void RenderPlay::OnEvent(SDL_Event* event)
+void SimpleScroller::OnEvent(SDL_Event* event)
 {
 }

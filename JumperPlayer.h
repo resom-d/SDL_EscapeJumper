@@ -1,5 +1,6 @@
 #pragma once
 #include <SDL.h>
+#include <SDL_mixer.h>
 #include <string>
 #include "GameEvents.h"
 #include "GameTypes.h"
@@ -43,6 +44,7 @@ public:
 
 	int OnInit(SDL_Renderer* rend, GameMap* map);
 	int OnLoop();
+	void OnCollisionCheck();
 	void OnEvent(SDL_Event* Event);
 	int OnRender();
 	int OnCleanup();
@@ -51,6 +53,7 @@ public:
 
 private:
 	GameMap* _map;
-	void OnCollisionCheck();
+	Mix_Chunk* _sndLand;
+
 };
 

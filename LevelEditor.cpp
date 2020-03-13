@@ -3,9 +3,8 @@
 LevelEditor::LevelEditor()
 {}
 
-void LevelEditor::OnInit(SDL_Window* win, SDL_Renderer* rend, CharacterTextureMap charMap)
+void LevelEditor::OnInit(SDL_Renderer* rend, CharacterTextureMap charMap)
 {
-	_appWindow = win;
 	_rend = rend;
 	_charMap = charMap;
 	UI.ResourceIndex = 1;
@@ -13,7 +12,7 @@ void LevelEditor::OnInit(SDL_Window* win, SDL_Renderer* rend, CharacterTextureMa
 	_colorIndexFill = 2;
 	_blockdrawStart = { -1, -1 };
 	_blockdrawEnd = { -1, -1 };
-
+	
 	UI.DisplayRect = { DisplayRect.x, DisplayRect.y, DisplayRect.w, 200 };
 
 	// Assign active colors
@@ -22,7 +21,6 @@ void LevelEditor::OnInit(SDL_Window* win, SDL_Renderer* rend, CharacterTextureMa
 
 	Levels = GetFilesInDirectory("Resources/levels");
 	_level = 0;
-
 	OnLoadMap();
 }
 
@@ -43,24 +41,27 @@ void LevelEditor::OnRender()
 	Map.OnRender();
 
 	// Draw a grid
-	SDL_SetRenderDrawColor(_rend, 255, 255, 255, 255);
-	for (auto x = 0; x <= Map.Setup.DisplayRows; x++)
+	if (UI.ShowGrid)
 	{
-		SDL_RenderDrawLine(_rend,
-			Map.Setup.DisplayRect.x,
-			Map.Setup.DisplayRect.y + (x * (Map.Setup.BlockSize + Map.Setup.BlockSpacing)),
-			Map.Setup.DisplayRect.x + DisplayRect.w,
-			Map.Setup.DisplayRect.y + (x * (Map.Setup.BlockSize + Map.Setup.BlockSpacing))
-		);
-	}
-	for (auto y = 0; y <= Map.Setup.DisplayCols; y++)
-	{
-		SDL_RenderDrawLine(_rend,
-			Map.Setup.DisplayRect.x + (y * (Map.Setup.BlockSize + Map.Setup.BlockSpacing)),
-			Map.Setup.DisplayRect.y,
-			Map.Setup.DisplayRect.x + (y * (Map.Setup.BlockSize + Map.Setup.BlockSpacing)),
-			Map.Setup.DisplayRect.y + DisplayRect.h
-		);
+		SDL_SetRenderDrawColor(_rend, 255, 255, 255, 255);
+		for (auto x = 0; x <= Map.Setup.DisplayRows; x++)
+		{
+			SDL_RenderDrawLine(_rend,
+				Map.Setup.DisplayRect.x,
+				Map.Setup.DisplayRect.y + (x * (Map.Setup.BlockSize + Map.Setup.BlockSpacing)),
+				Map.Setup.DisplayRect.x + DisplayRect.w,
+				Map.Setup.DisplayRect.y + (x * (Map.Setup.BlockSize + Map.Setup.BlockSpacing))
+			);
+		}
+		for (auto y = 0; y <= Map.Setup.DisplayCols; y++)
+		{
+			SDL_RenderDrawLine(_rend,
+				Map.Setup.DisplayRect.x + (y * (Map.Setup.BlockSize + Map.Setup.BlockSpacing)),
+				Map.Setup.DisplayRect.y,
+				Map.Setup.DisplayRect.x + (y * (Map.Setup.BlockSize + Map.Setup.BlockSpacing)),
+				Map.Setup.DisplayRect.y + DisplayRect.h
+			);
+		}
 	}
 
 	// Draw borderselect-box
@@ -134,6 +135,14 @@ void LevelEditor::OnEvent(SDL_Event* event)
 
 		switch (event->user.code)
 		{
+		case (int)UI_ACTION::EDITOR_TOGGLEGRID:
+			UI.ShowGrid = !UI.ShowGrid;
+			break;
+
+		case (int)UI_ACTION::MAP_CLEAR:
+			Map.ClearMap();
+			break;
+
 		case (int)UI_ACTION::SAVEMAP:
 			OnSaveMap();
 			break;
@@ -306,6 +315,9 @@ void LevelEditor::OnEvent(SDL_Event* event)
 			tex = SDL_CreateTextureFromSurface(_rend, surf);
 			SDL_FreeSurface(surf);
 			tr.Texture = tex;
+
+			auto it = next(Map.TextureResources.begin(), UI.ResourceIndex - 1);
+			SDL_DestroyTexture(it->Texture);
 
 			auto tar = Map.TextureResources.erase(next(Map.TextureResources.begin(), UI.ResourceIndex - 1));
 			Map.TextureResources.insert(tar, tr);

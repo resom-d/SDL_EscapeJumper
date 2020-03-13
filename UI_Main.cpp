@@ -4,11 +4,10 @@
 MainUI::MainUI()
 {}
 
-void MainUI::OnInit(SDL_Renderer* renderer, CharacterTextureMap charMap)
+void MainUI::OnInit(SDL_Renderer* renderer)
 {
 	_rend = renderer;
-	_charMap = charMap;
-
+	
 	int screenWidth, screenHeight;
 	SDL_GetRendererOutputSize(_rend, &screenWidth, &screenHeight);
 	
@@ -65,10 +64,12 @@ void MainUI::OnInit(SDL_Renderer* renderer, CharacterTextureMap charMap)
 	btn.BorderWidth = bordW;
 	btn.Padding = pad;
 	Buttons.push_back(btn);
-	dRect.x += w + gap + 50;	
+	dRect.x += w + gap + 50;		
 
-	
+}
 
+void MainUI::OnLoop()
+{
 }
 
 void MainUI::OnEvent(SDL_Event* event)
@@ -85,16 +86,9 @@ void MainUI::OnRender(std::string playerName, int playerScore, bool gameOver)
 	if (_rend == nullptr) return;
 	
 	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
-	// Give us Background and a Border
-	SDL_RenderSetClipRect(_rend, &DisplayRect);
-	SDL_Color col = UI_EditorFill;
-	SDL_RenderSetDrawColor(_rend, col);
-	SDL_RenderFillRect(_rend, &DisplayRect);
-	col = UI_EditorBorder;
-	SDL_RenderSetDrawColor(_rend, col);
-	SDL_RenderDrawRect(_rend, &DisplayRect);
-
-	SDL_RenderStringAt(_rend, "ESCAPE JUMPER", { 150, 10 }, _charMap, 60, &DisplayRect);
+	
+	SDL_Rect rect = { 0,0, DisplayRect.w, DisplayRect.h };
+	SDL_RenderCopy(_rend, Texture, &rect, &rect);
 
 	for (auto iter = Buttons.begin(); iter != Buttons.end(); iter++)
 	{

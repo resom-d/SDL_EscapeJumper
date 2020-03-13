@@ -21,7 +21,7 @@
 #include "LevelEditor.h"
 #include "TextScroller.h"
 #include "SDL_Extras.h"
-#include "RenderPlay.h"
+#include "SimpleScroller.h"
 
 using namespace std;
 using namespace boost::filesystem;
@@ -68,8 +68,8 @@ public:
 	list<path> TileTextureResources;
 	CharacterTextureMap CharMap;
 	unordered_map<string, SDL_Texture*> GameItems;
-	RenderPlay Playfield;
-	RenderPlay Playfield_slow;
+	SimpleScroller Playfield;
+	SimpleScroller Playfield_Too;
 
 	bool OnInit();
 	void OnEvent(SDL_Event* Event);

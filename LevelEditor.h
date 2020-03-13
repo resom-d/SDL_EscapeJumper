@@ -31,7 +31,7 @@ public:
 	SDL_Point ScrollPosition = { 0,0 };
 	int ScrollSpeed = 1;
 	
-	void OnInit(SDL_Window* win, SDL_Renderer* rend, CharacterTextureMap charMap);
+	void OnInit(SDL_Renderer* rend, CharacterTextureMap charMap);
 
 	void OnLoop();
 
@@ -61,7 +61,7 @@ public:
 	void ScrollMap(SDL_Point p);
 
 private:
-	SDL_Window* _appWindow;
+	SDL_Window* _tilemapWindow;
 	SDL_Renderer* _rend;
 	CharacterTextureMap _charMap;
 	int _level = 0;
@@ -72,7 +72,7 @@ private:
 	bool _drawActive;
 	bool _eraseActive;
 	bool _mapScrollMidlleMouse;
-
+	
 	SDL_Point _mapScrollDiff;
 
 	SDL_Point _blockdrawStart;

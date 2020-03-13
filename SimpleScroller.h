@@ -1,7 +1,7 @@
 #pragma once
 #include "GameComponentBase.h"
 
-class RenderPlay : public GameComponentBase
+class SimpleScroller : public GameComponentBase
 {
 public:
 	list<SDL_Point> Items;

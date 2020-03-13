@@ -25,6 +25,7 @@ public:
 	int ResourceIndex_1n = 0;
 	int TileIndex = 0;
 	bool ConfigShown = false;
+	bool ShowGrid = true;
 
 	void OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap charMap, ColorPalette colors);
 	void ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect);

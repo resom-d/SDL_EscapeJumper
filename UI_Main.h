@@ -12,20 +12,22 @@ class MainUI
 {
 public:
 	MainUI();
+	
+	list<path> Avatars;
+	list<UI_Control> Buttons;
+	SDL_Texture* Texture;
+	SDL_Rect DisplayRect;
 
-	void OnInit(SDL_Renderer* renderer, CharacterTextureMap charMap);
+	void OnInit(SDL_Renderer* renderer);
 	void OnLoop();
 	void OnEvent(SDL_Event* event);
 	void OnRender(std::string  playerName, int playerScore, bool gameOver);
 	void OnPostRender();
 	void OnCleanup();
 
+private:
 	SDL_Renderer* _rend;
 	
-	CharacterTextureMap _charMap;
-	SDL_Rect DisplayRect;
-	list<UI_Control> Buttons;
-	list<path> Avatars;
 	
 };
 

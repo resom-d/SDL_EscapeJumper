@@ -10,6 +10,9 @@ class UI_Game : public GameComponentBase
 public:
 	UI_Game();
 	~UI_Game();
+
+	SDL_Texture* TexBackgnd;
+	
 	void OnInit(SDL_Renderer* rend, CharacterTextureMap* charMap);	
 	void OnLoop(void);
 	void OnEvent(SDL_Event* event);
@@ -17,8 +20,6 @@ public:
 	void OnRender(bool gameOver, JumperPlayer* player);
 
 private:
-	UI_Container _bbox;
-	SDL_Texture* _texHappy;
-	SDL_Texture* _texSad;
+	TTF_Font* _font;
 };
 

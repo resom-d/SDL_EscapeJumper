@@ -192,6 +192,22 @@ void GameMap::ResetInView(void)
 	}
 }
 
+void GameMap::ClearMap(void)
+{
+	for(auto x=0; x < Setup.Cols; x++)
+	{
+		for (auto y = 0; y < Setup.Rows; y++)
+		{
+			TileMap[x][y].Visible = false;
+			TileMap[x][y].BorderColor = 0;
+			TileMap[x][y].FillColor = 0;
+			TileMap[x][y].TileIndex = 0;
+			TileMap[x][y].ResourceIndex = 0;
+			TileMap[x][y].Type = TileType::None;
+		}
+	}
+}
+
 void GameMap::SaveMap(string filename)
 {
 	std::ofstream theFile;

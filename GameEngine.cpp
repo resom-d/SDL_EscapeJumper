@@ -14,6 +14,7 @@ bool GameEngine::OnInit()
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) 	return false;
 	if (TTF_Init() == -1) return false;
+	int r = Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 	if (SDL_NumJoysticks() > 0) GamePad = SDL_JoystickOpen(0);
 
 	UI_Height = 200;
@@ -58,17 +59,19 @@ bool GameEngine::OnInit()
 	Playfield.DisplayRect = Map.Setup.DisplayRect;
 	Playfield.OnInit(Renderer, "Resources/bgnd/bgnd_001.png");
 
-	Playfield_slow.DisplayRect = Map.Setup.DisplayRect;
-	Playfield_slow.OnInit(Renderer, "Resources/bgnd/bgnd_002.png");
+	Playfield_Too.DisplayRect = Map.Setup.DisplayRect;
+	Playfield_Too.OnInit(Renderer, "Resources/bgnd/bgnd_002.png");
 
 	Player.OnInit(Renderer, &Map);
 	OnInitPlayer();
 
 	MainUI.DisplayRect = { 0,0,Map.Setup.DisplayRect.w, UI_Height };
-	MainUI.OnInit(Renderer, CharMap);
+	MainUI.Texture = GameItems["MainUI"];
+	MainUI.OnInit(Renderer);
 
 	GameUI.DisplayRect = { 0,0,Map.Setup.DisplayRect.w, UI_Height };
 	GameUI.OnInit(Renderer, &CharMap);
+	GameUI.TexBackgnd = GameItems["GameUI"];
 
 	Editor.DisplayRect = {
 		0,
@@ -76,11 +79,10 @@ bool GameEngine::OnInit()
 		Map.Setup.DisplayRect.w,
 		Map.Setup.DisplayRect.w + UI_Height
 	};
-	Editor.OnInit(AppWindow, Renderer, CharMap);
+	Editor.OnInit(Renderer, CharMap);
 
-	/*int r = Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 	tune = Mix_LoadMUS("Resources/music/The impossible Mission.mp3");
-	Mix_PlayMusic(tune, -1);*/
+	//Mix_PlayMusic(tune, -1);
 
 	_appIsRunning = true;
 	GameStatus = GameState::MainScreen;
@@ -176,7 +178,7 @@ void GameEngine::OnLoop()
 	{
 		Map.OnLoop();
 		if(_scrollCntBgnd++ % 4 == 0) Playfield.OnLoop();
-		if (_scrollCntBgnd % 2 == 0) Playfield_slow.OnLoop();
+		if (_scrollCntBgnd % 2 == 0) Playfield_Too.OnLoop();
 		
 	}
 
@@ -246,7 +248,7 @@ void GameEngine::OnRender()
 		MainUI.OnRender("Zehnfinger", Player.Score, GameStatus == GameState::Running);
 		Playfield.OnRender();
 		Map.OnRender();
-		Playfield_slow.OnRender();
+		Playfield_Too.OnRender();
 	}
 
 	if (GameStatus == GameState::Running 

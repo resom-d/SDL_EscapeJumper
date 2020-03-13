@@ -39,6 +39,7 @@ public:
 	virtual void InitMap(void);
 	void ResetScroller(void);
 	void ResetInView(void);
+	void ClearMap(void);
 	virtual void SaveMap(string filename);
 	static GameMap LoadMap(SDL_Renderer* rend, string filename);
 	virtual void SetTileInMap(SDL_Point coords, TilemapTile settings);

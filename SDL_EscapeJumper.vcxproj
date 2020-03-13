@@ -195,7 +195,7 @@
     <ClCompile Include="MainApplication.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameEvents.cpp" />
-    <ClCompile Include="RenderPlay.cpp" />
+    <ClCompile Include="SimpleScrolller.cpp" />
     <ClCompile Include="UI_Game.cpp" />
     <ClCompile Include="UI_Main.cpp" />
     <ClCompile Include="SDL_Extras.cpp" />
@@ -223,7 +223,7 @@
     <ClInclude Include="HorizontalScoller.h" />
     <ClInclude Include="JumperPlayer.h" />
     <ClInclude Include="LevelEditor.h" />
-    <ClInclude Include="RenderPlay.h" />
+    <ClInclude Include="SimpleScroller.h" />
     <ClInclude Include="UI_Game.h" />
     <ClInclude Include="UI_Main.h" />
     <ClInclude Include="resource.h" />
