@@ -22,6 +22,7 @@
 #include "TextScroller.h"
 #include "SDL_Extras.h"
 #include "SimpleScroller.h"
+#include "MultiScroller.h"
 
 using namespace std;
 using namespace boost::filesystem;
@@ -31,14 +32,15 @@ enum class GameState
 	Idle,
 	MainScreen,
 	LevelEdit,
+	LevelEditTest,
 	PlayerEdit,
 	Running,
 	Paused,
 	Highscore,
 	GameOver,
 	LevelComplete
-
 };
+
 typedef struct GameProperties
 {
 	SDL_Rect WindowFrame;
@@ -70,6 +72,7 @@ public:
 	unordered_map<string, SDL_Texture*> GameItems;
 	SimpleScroller Playfield;
 	SimpleScroller Playfield_Too;
+	MultiScroller Credits;
 
 	bool OnInit();
 	void OnEvent(SDL_Event* Event);

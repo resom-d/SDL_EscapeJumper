@@ -175,7 +175,7 @@ void GameMap::InitMap()
 void GameMap::ResetScroller(void)
 {
 	BlockPosition.x = -Setup.DisplayCols + ScrollXInDelay;
-	ScrollPosition = { -1, 0 };
+	ScrollPosition = { 0, 0 };
 }
 
 void GameMap::ResetInView(void)
@@ -346,8 +346,8 @@ GameMap GameMap::LoadMap(SDL_Renderer* rend, string filename)
 				{
 					newMap.Setup.ScreenOffsX,
 					 200,
-					(newMap.Setup.BlockSize + newMap.Setup.BlockSpacing) * newMap.Setup.DisplayCols + 1,
-					(newMap.Setup.BlockSize + newMap.Setup.BlockSpacing) * newMap.Setup.DisplayRows + 1
+					(newMap.Setup.BlockSize + newMap.Setup.BlockSpacing) * newMap.Setup.DisplayCols,
+					(newMap.Setup.BlockSize + newMap.Setup.BlockSpacing) * newMap.Setup.DisplayRows
 				};
 
 			}

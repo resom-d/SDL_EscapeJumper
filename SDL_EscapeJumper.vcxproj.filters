@@ -96,6 +96,12 @@
     <ClCompile Include="SimpleScrolller.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="MultiScroller.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="UI_NewMapDialog.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="zlib1.dll">
@@ -236,6 +242,12 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="SimpleScroller.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="MultiScroller.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="UI_NewMapDialog.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

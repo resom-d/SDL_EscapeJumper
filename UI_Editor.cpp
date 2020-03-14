@@ -16,7 +16,8 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap
 	_activeTool = UI_ACTION::DRAWMODE;
 	_tileResourceDPoint = { 750,5 };
 
-	_confScreen.DisplayRect = { 800, 20, 375, 185 };
+	_newMapDialog.DisplayRect = { 200, 20, 410, 160 };
+	_confScreenDialog.DisplayRect = { 800, 20, 375, 185 };
 
 	SDL_Texture* orgTex = SDL_GetRenderTarget(_rend);
 
@@ -118,12 +119,15 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	dRect.x += w + gap;
 
 	// Game
+	ud = Userdata();
+	ud.NewMapName = &FilenameSave;
 	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect->w, destRect->h);
 	CreateWidgetTexture(_rend, "Resources/icons/Joypad.png", tex, *srcRect, *destRect, 0, SDL_FLIP_NONE);
 	btn = UI_Control();
+	btn.UserData = ud;
 	btn.OnInit(_rend, tex);
 	btn.EventType = GAME_EVENT_TYPE;
-	btn.ActionCode = UI_ACTION::GO_GAME;
+	btn.ActionCode = UI_ACTION::GO_EDITOR_TESTMODE;
 	btn.DisplayRect = dRect;
 	btn.BorderWidth = bordW;
 	btn.Padding = pad;
@@ -162,7 +166,7 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 	btn = UI_Control();
 	btn.OnInit(_rend, tex);
 	btn.EventType = EDITOR_EVENT_TYPE;
-	btn.ActionCode = UI_ACTION::MAP_NEW;
+	btn.ActionCode = UI_ACTION::GO_EDITOR_NEWMAP;
 	btn.DisplayRect = dRect;
 	btn.BorderWidth = bordW;
 	btn.Padding = pad;
@@ -420,7 +424,8 @@ void UI_Editor::ConfigureWidgets(SDL_Rect* srcRect, SDL_Rect* destRect)
 
 void UI_Editor::OnLoop()
 {
-	if (ConfigShown) _confScreen.OnLoop();
+	if (ConfigShown) _confScreenDialog.OnLoop();
+	else if (NewMapShown) _newMapDialog.OnLoop();
 	else
 	{
 		auto iter = Buttons.begin();
@@ -443,10 +448,18 @@ void UI_Editor::OnLoop()
 
 void UI_Editor::OnEvent(SDL_Event* event)
 {
+	Userdata ud;
+
 	if (event->type == EDITOR_EVENT_TYPE)
 	{
 		switch (event->user.code)
 		{
+		case (int)UI_ACTION::MAP_NEW:
+			ud = *(Userdata*)event->user.data2;
+			NewMapShown = false;
+			FilenameSave = *ud.NewMapName;
+			break;
+
 		case (Sint32)UI_ACTION::DRAWMODE:
 			_activeTool = (UI_ACTION)event->user.code;
 			break;
@@ -456,18 +469,29 @@ void UI_Editor::OnEvent(SDL_Event* event)
 			break;
 
 			case (Sint32)UI_ACTION::GO_EDITOR_CONFIG:
-				_confScreen.OnInit(_rend, &_charmap);
+				_confScreenDialog.OnInit(_rend, &_charmap);
 				ConfigShown = true;
 				break;
 
 			case (Sint32)UI_ACTION::CLOSE_EDITOR_CONFIG:
-				_confScreen.OnCleanup();
+				_confScreenDialog.OnCleanup();
 				ConfigShown = false;
+				break;
+		
+			case (Sint32)UI_ACTION::GO_EDITOR_NEWMAP:
+				_newMapDialog.OnInit(_rend);
+				NewMapShown = true;
+				break;
+
+			case (Sint32)UI_ACTION::CLOSE_EDITOR_NEW_MAP:
+				_newMapDialog.OnCleanup();
+				NewMapShown = false;
 				break;
 		}
 
 	}
-	if (ConfigShown) _confScreen.OnEvent(event);
+	if (ConfigShown) _confScreenDialog.OnEvent(event);
+	else if (NewMapShown) _newMapDialog.OnEvent(event);
 	else
 	{
 		txtFilename.OnEvent(event);
@@ -538,12 +562,13 @@ void UI_Editor::OnRender(Uint16 colPos, Uint16 rowPos)
 	BorderColorWidgets.OnRender();
 
 
-	SDL_RenderStringAt(_rend, "X " + to_string(colPos + 1) + "-" + to_string(colPos + 1 + _map->Setup.DisplayCols), { 10, 160 }, _charmap, 22, nullptr);
-	SDL_RenderStringAt(_rend, "Y " + to_string(rowPos + 1) + "-" + to_string(rowPos + 1 + _map->Setup.DisplayRows), { 10, 175 }, _charmap, 22, nullptr);
+	SDL_RenderStringAt(_rend, "X " + to_string(colPos + 1) + "-" + to_string(colPos + 1 + _map->Setup.DisplayCols), { 10, 152 }, _charmap, 22, nullptr);
+	SDL_RenderStringAt(_rend, "Y " + to_string(rowPos + 1) + "-" + to_string(rowPos + 1 + _map->Setup.DisplayRows), { 10, 172 }, _charmap, 22, nullptr);
 
 	RenderTileResource(ResourceIndex, _tileResourceDPoint);
 
-	if (ConfigShown) _confScreen.OnRender();
+	if (ConfigShown) _confScreenDialog.OnRender();
+	if (NewMapShown) _newMapDialog.OnRender();
 }
 
 void UI_Editor::OnPostRender()
@@ -565,7 +590,8 @@ void UI_Editor::OnCleanup()
 
 	Buttons.clear();
 
-	_confScreen.OnCleanup();
+	_confScreenDialog.OnCleanup();
+	_newMapDialog.OnCleanup();
 }
 
 void UI_Editor::RenderTileResource(Uint16 index, SDL_Point dispPoint)

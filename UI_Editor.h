@@ -5,6 +5,7 @@
 #include "UI_TextInput.h"
 #include "GameMap.h"
 #include "UI_TextureResourceSelector.h"
+#include "UI_NewMapDialog.h"
 using namespace std;
 
 
@@ -25,6 +26,7 @@ public:
 	int ResourceIndex_1n = 0;
 	int TileIndex = 0;
 	bool ConfigShown = false;
+	bool NewMapShown = false;
 	bool ShowGrid = true;
 
 	void OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap charMap, ColorPalette colors);
@@ -39,7 +41,8 @@ protected:
 	
 	
 private:
-	UI_TextureResourceSelector _confScreen;
+	UI_TextureResourceSelector _confScreenDialog;
+	UI_NewMapDialog _newMapDialog;
 	GameMap* _map;
 	CharacterTextureMap _charmap;
 	list<UI_Control>::iterator _widgetsIter;

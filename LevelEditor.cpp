@@ -139,6 +139,13 @@ void LevelEditor::OnEvent(SDL_Event* event)
 			UI.ShowGrid = !UI.ShowGrid;
 			break;
 
+		case (int)UI_ACTION::MAP_NEW:
+			ud = *(Userdata*)event->user.data2;
+			Map.Setup.Cols = ud.NewMapCols;
+			Map.OnInit(_rend);
+			Map.SaveMap("Resources/levels/" +  *ud.NewMapName + ".txt");
+			break;
+
 		case (int)UI_ACTION::MAP_CLEAR:
 			Map.ClearMap();
 			break;

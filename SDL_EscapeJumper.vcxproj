@@ -195,6 +195,7 @@
     <ClCompile Include="MainApplication.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameEvents.cpp" />
+    <ClCompile Include="MultiScroller.cpp" />
     <ClCompile Include="SimpleScrolller.cpp" />
     <ClCompile Include="UI_Game.cpp" />
     <ClCompile Include="UI_Main.cpp" />
@@ -208,6 +209,7 @@
     <ClCompile Include="UI_Editor.cpp" />
     <ClCompile Include="UI_GridContainer.cpp" />
     <ClCompile Include="UI_MapConfig.cpp" />
+    <ClCompile Include="UI_NewMapDialog.cpp" />
     <ClCompile Include="UI_TextInput.cpp" />
     <ClCompile Include="UI_TextureResourceSelector.cpp" />
     <ClCompile Include="UI_Types.cpp" />
@@ -223,6 +225,7 @@
     <ClInclude Include="HorizontalScoller.h" />
     <ClInclude Include="JumperPlayer.h" />
     <ClInclude Include="LevelEditor.h" />
+    <ClInclude Include="MultiScroller.h" />
     <ClInclude Include="SimpleScroller.h" />
     <ClInclude Include="UI_Game.h" />
     <ClInclude Include="UI_Main.h" />
@@ -237,6 +240,7 @@
     <ClInclude Include="UI_Editor.h" />
     <ClInclude Include="UI_GridContainer.h" />
     <ClInclude Include="UI_MapConfig.h" />
+    <ClInclude Include="UI_NewMapDialog.h" />
     <ClInclude Include="UI_Styles.h" />
     <ClInclude Include="UI_TextInput.h" />
     <ClInclude Include="UI_TextureResourceSelector.h" />

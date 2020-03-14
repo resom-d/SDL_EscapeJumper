@@ -23,19 +23,19 @@ void SDL_RenderStringAt(SDL_Renderer* rend, string text, SDL_Point p, CharacterT
 	SDL_Rect destRect{ p.x, p.y, 0,0 };
 	SDL_Rect srcRect = { 0,0,0,0 };
 
+	SDL_SetRenderDrawBlendMode(rend, SDL_BLENDMODE_BLEND);
 	SDL_RenderSetClipRect(rend, clipRect);
 	for (auto iter = text.begin(); iter != text.end(); iter++)
 	{
 		char c = *iter;
-		Uint32 f;
-		int a, w, h;
-		SDL_QueryTexture(chars[c], &f, &a, &w, &h);
-		destRect.w = size;
-		destRect.h = size;
+		int w, h;
+
+		SDL_QueryTexture(chars[c], nullptr, nullptr, &w, &h);
+		destRect.w = w;
+		destRect.h = h;
 		srcRect = { 0,0,w,h };
-		SDL_SetRenderDrawBlendMode(rend, SDL_BLENDMODE_BLEND);
 		SDL_RenderCopy(rend, chars[c], &srcRect, &destRect);
-		destRect.x += size;
+		destRect.x += w;
 	}
 	SDL_RenderSetClipRect(rend, nullptr);
 }
@@ -197,9 +197,9 @@ void CreateWidgetTexture(SDL_Renderer* rend, string filePath, SDL_Texture* destT
 }
 
 SDL_Texture* SDL_LoadTexture(SDL_Renderer* rend, path filename)
-{	
+{
 	SDL_Surface* surf = IMG_Load(filename.string().c_str());
-	if(surf == nullptr) return nullptr;
+	if (surf == nullptr) return nullptr;
 	return SDL_CreateTextureFromSurface(rend, surf);
 }
 

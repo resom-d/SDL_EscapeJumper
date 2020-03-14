@@ -53,7 +53,7 @@ bool GameEngine::OnInit()
 	}
 
 	// Create a texure map from a string 
-	_font = TTF_OpenFont("Resources/fonts/NovaMono-Regular.ttf", 72);
+	_font = TTF_OpenFont("Resources/fonts/arial.ttf", 24);
 	CharMap = SDL_GetTexturesFromString(Renderer, " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜßabcdefghijklmnopqrstuvwxyzäöü,.;:*#-_|<>^°?=()!\"§$%&/()@€~", _font);
 
 	Playfield.DisplayRect = Map.Setup.DisplayRect;
@@ -61,6 +61,9 @@ bool GameEngine::OnInit()
 
 	Playfield_Too.DisplayRect = Map.Setup.DisplayRect;
 	Playfield_Too.OnInit(Renderer, "Resources/bgnd/bgnd_002.png");
+	Credits.DisplayRect = Map.Setup.DisplayRect;
+	Credits.OnInit(Renderer);
+	Credits.RepeatPause = 10000;
 
 	Player.OnInit(Renderer, &Map);
 	OnInitPlayer();
@@ -129,8 +132,12 @@ int GameEngine::OnExecute()
 
 void GameEngine::OnEvent(SDL_Event* event)
 {
+
+	GameEvents::OnEvent(event);
+
 	if (event->type == GAME_EVENT_TYPE)
 	{
+		Userdata ud;
 		switch (event->user.code)
 		{
 		case (int)UI_ACTION::QUIT_GAME:
@@ -149,15 +156,28 @@ void GameEngine::OnEvent(SDL_Event* event)
 			GoGame();
 			break;
 
+		case (int)UI_ACTION::GO_EDITOR_TESTMODE:
+			ud = *(Userdata*)event->user.data2;
+			Map.OnCleanUp();
+			Map = GameMap::LoadMap(Renderer, "Resources/levels/" + *ud.NewMapName + ".txt");
+			Map.ViewMode = EngineViewMode::Game;
+			Map.ScrollSpeed = 4;
+			Map.ScrollXInDelay = 0;
+			Map.ScrollXOutDelay = 0;
+			Map.ResetScroller();
+			GameStatus = GameState::LevelEditTest;
+			OnInitPlayer();
+			break;
+
 		case (int)UI_ACTION::SET_PLAYER_AVATAR:
 			Player.Texture = ((Userdata*)event->user.data2)->Texture;
 			GoGame();
 			break;
 		}
 	}
-	GameEvents::OnEvent(event);
+
 	if (GameStatus == GameState::MainScreen) MainUI.OnEvent(event);
-	if (GameStatus == GameState::Running)
+	if (GameStatus == GameState::Running || GameStatus == GameState::LevelEditTest)
 	{
 		Player.OnEvent(event);
 		GameUI.OnEvent(event);
@@ -174,15 +194,17 @@ void GameEngine::OnEvent(SDL_Event* event)
 
 void GameEngine::OnLoop()
 {
+	Playfield.RepeatPauseMode = false;
 	if (GameStatus == GameState::MainScreen)
 	{
 		Map.OnLoop();
-		if(_scrollCntBgnd++ % 4 == 0) Playfield.OnLoop();
-		if (_scrollCntBgnd % 2 == 0) Playfield_Too.OnLoop();
-		
+		if (_scrollCntBgnd++ % 4 == 0) Playfield.OnLoop();
+		//if (_scrollCntBgnd % 2 == 0) Playfield_Too.OnLoop();
+		for (auto i = 0; i < 4; i++) Credits.OnLoop();
+
 	}
 
-	if (GameStatus == GameState::Running)
+	if (GameStatus == GameState::Running || GameStatus == GameState::LevelEditTest)
 	{
 		GameUI.OnLoop();
 		int x = 0;
@@ -200,24 +222,28 @@ void GameEngine::OnLoop()
 			if (Player.GameOver) break;
 		}
 
-		if (Player.GameOver) GameStatus = GameState::GameOver;
+		if (Player.GameOver && GameStatus != GameState::LevelEditTest) GameStatus = GameState::GameOver;
+		if (Player.GameOver && GameStatus == GameState::LevelEditTest) GameStatus = GameState::LevelEdit;
 
 		if (Map.LevelDone)
 		{
-			_level++;
-			if (_level > Levels.size() - 1) _level = 0;
-			Map.LevelDone = false;
-			Map.OnCleanUp();
-			Map = GameMap::LoadMap(Renderer, next(Levels.begin(), _level)->string());
-			Map.ViewMode = EngineViewMode::Game;
-			Map.ScrollSpeed = 4;
-			Map.ScrollXInDelay = 0;
-			Map.ScrollXOutDelay = 0;
+			if (GameStatus != GameState::LevelEditTest)
+			{
+				_level++;
+				if (_level > Levels.size() - 1) _level = 0;
+				Map.OnCleanUp();
+				Map = GameMap::LoadMap(Renderer, next(Levels.begin(), _level)->string());
+				Map.ViewMode = EngineViewMode::Game;
+				Map.ScrollSpeed = 4;
+				Map.ScrollXInDelay = 0;
+				Map.ScrollXOutDelay = 0;
+				GameStatus = GameState::LevelComplete;
+			}
 			Map.ResetScroller();
 			Map.ResetInView();
+			Map.LevelDone = false;
 
 			_timerCatch = SDL_GetTicks();
-			GameStatus = GameState::LevelComplete;
 		}
 	}
 
@@ -248,17 +274,19 @@ void GameEngine::OnRender()
 		MainUI.OnRender("Zehnfinger", Player.Score, GameStatus == GameState::Running);
 		Playfield.OnRender();
 		Map.OnRender();
-		Playfield_Too.OnRender();
+		//Playfield_Too.OnRender();
+		Credits.OnRender();
 	}
 
-	if (GameStatus == GameState::Running 
-		|| GameStatus == GameState::Paused 
+	if (GameStatus == GameState::Running
+		|| GameStatus == GameState::Paused
 		|| GameStatus == GameState::LevelComplete
-		|| GameStatus == GameState::GameOver)
+		|| GameStatus == GameState::GameOver
+		|| GameStatus == GameState::LevelEditTest)
 	{
 		// Render UI
 		GameUI.OnRender(GameStatus == GameState::GameOver, &Player);
-		
+
 		Playfield.OnRender();
 		//Playfield_slow.OnRender();
 		// Render Map
@@ -288,7 +316,7 @@ void GameEngine::OnRender()
 				GameItems["GameOver"],
 				&sRect,
 				&dRect
-			);			
+			);
 		}
 
 		if (GameStatus == GameState::LevelComplete)
@@ -348,6 +376,7 @@ void GameEngine::OnCleanup()
 	GameUI.OnCleanup();
 	Editor.OnCleanUp();
 	Player.OnCleanup();
+	Credits.OnCleanup();
 
 	Mix_CloseAudio();
 	Mix_FreeMusic(tune);
@@ -369,7 +398,7 @@ void GameEngine::OnInitPlayer()
 	Player.GameOver = false;
 	Player.Score = 0;
 	Player.Jumps = 0;
-	
+
 	Player.Speed = 3;
 	Player.MotionHor = MotionState::None;
 	Player.MotionVer = MotionState::Plus;
@@ -417,7 +446,23 @@ void GameEngine::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 		else if (GameStatus == GameState::Paused) GameStatus = GameState::Running;
 	}
 	if (sym == SDLK_F1) GoMainscreen();
-	if (sym == SDLK_F3) GoGame();
+	if (sym == SDLK_F3)
+	{
+		if (GameStatus == GameState::LevelEditTest)
+		{
+			Map.ViewMode = EngineViewMode::Game;
+			Map.ScrollSpeed = 4;
+			Map.ScrollXInDelay = 0;
+			Map.ScrollXOutDelay = 0;
+			Map.ResetScroller();
+			OnInitPlayer();
+		}
+		else 
+		{
+			GoGame();
+		}
+	}
+
 	if (sym == SDLK_F5) GoEditor();
 }
 

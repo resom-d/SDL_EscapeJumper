@@ -16,8 +16,13 @@ void SimpleScroller::OnLoop()
 {
 	for (auto item = Items.begin(); item != Items.end(); item++)
 	{
-		item->x--;
-		if (item->x <= -DisplayRect.w) item->x = DisplayRect.w;
+		if(SDL_GetTicks() - _repeatPauseTimeCatch > RepeatPause || !RepeatPauseMode) item->x--;
+		if (item->x <= -DisplayRect.w)
+		{
+			item->x = DisplayRect.w;
+			_repeatPauseTimeCatch = SDL_GetTicks();
+			continue;
+		}
 	}
 
 }

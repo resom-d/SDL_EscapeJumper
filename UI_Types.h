@@ -49,10 +49,13 @@ enum class UI_ACTION
 	NONE = 0,
 	QUIT_GAME,
 	GO_MAINSCREEN,
+	GO_GAME,
 	GO_EDITOR,
 	GO_EDITOR_CONFIG,
+	GO_EDITOR_NEWMAP,
+	GO_EDITOR_TESTMODE,
 	CLOSE_EDITOR_CONFIG,
-	GO_GAME,
+	CLOSE_EDITOR_NEW_MAP,
 	LOADMAP,
 	SAVEMAP,
 	EDIT_LOAD_PREV,
@@ -96,4 +99,7 @@ public:
 	SDL_Point Scrollposition;
 	SDL_Texture* Texture = nullptr;
 	TileMapTextureResource* TilemapResource = nullptr;
+	int NewMapCols;
+	int NewMapRows;
+	string* NewMapName;
 };
