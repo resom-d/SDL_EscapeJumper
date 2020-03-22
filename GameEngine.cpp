@@ -43,6 +43,7 @@ bool GameEngine::OnInit()
 	SDL_SetWindowSize(AppWindow, Map.Setup.DisplayRect.w, Map.Setup.DisplayRect.h + UI_Height);
 	SDL_ShowWindow(AppWindow);
 
+	Starter.DisplayRect = Map.Setup.DisplayRect;
 	// CreateMap of GameItems
 	list<path> items = GetFilesInDirectory("Resources/items");
 	for (auto item = items.begin(); item != items.end(); item++)
@@ -258,6 +259,8 @@ void GameEngine::OnLoop()
 	{
 		Editor.OnLoop();
 	}
+
+	if (GameStatus == GameState::Starting && Starter.Done) GameStatus = GameState::Running;
 };
 
 void GameEngine::OnRender()
@@ -268,6 +271,11 @@ void GameEngine::OnRender()
 	SDL_RenderSetClipRect(Renderer, nullptr);
 	SDL_RenderClear(Renderer);
 	SDL_RenderFillRect(Renderer, nullptr);
+
+	if (GameStatus == GameState::Starting)
+	{
+		Starter.OnRender();
+	}
 
 	if (GameStatus == GameState::MainScreen)
 	{
@@ -428,7 +436,9 @@ void GameEngine::OnGameRestart()
 
 	OnInitPlayer();
 
-	GameStatus = GameState::Running;
+	Starter.OnInit(Renderer);
+	Starter.Done = false;
+	GameStatus = GameState::Starting;
 }
 
 void GameEngine::OnExit()

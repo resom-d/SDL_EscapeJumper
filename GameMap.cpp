@@ -133,7 +133,7 @@ void GameMap::OnRender()
 
 void GameMap::OnLoop(void)
 {
-	if (ScrollPosition.x++ >= Setup.BlockSize + Setup.BlockSpacing-1)
+	if (ScrollPosition.x >= Setup.BlockSize)
 	{
 		ScrollPosition.x = 0;
 		if (++BlockPosition.x > Setup.Cols + ScrollXOutDelay)
@@ -142,6 +142,7 @@ void GameMap::OnLoop(void)
 			ResetScroller();
 		}
 	}
+	ScrollPosition.x++;
 }
 
 void GameMap::OnCleanUp()

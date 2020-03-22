@@ -188,6 +188,7 @@
     <ClCompile Include="GameComponentBase.cpp" />
     <ClCompile Include="GameMap.cpp" />
     <ClCompile Include="GamePlayer.cpp" />
+    <ClCompile Include="GameStart.cpp" />
     <ClCompile Include="GameTypes.cpp" />
     <ClCompile Include="HorizontalScroller.cpp" />
     <ClCompile Include="JumperPlayer.cpp" />
@@ -221,6 +222,7 @@
     <ClInclude Include="GamePlayer.h" />
     <ClInclude Include="GameEngine.h" />
     <ClInclude Include="GameEvents.h" />
+    <ClInclude Include="GameStart.h" />
     <ClInclude Include="GameTypes.h" />
     <ClInclude Include="HorizontalScoller.h" />
     <ClInclude Include="JumperPlayer.h" />

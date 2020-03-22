@@ -23,7 +23,7 @@
 #include "SDL_Extras.h"
 #include "SimpleScroller.h"
 #include "MultiScroller.h"
-
+#include "GameStart.h"
 using namespace std;
 using namespace boost::filesystem;
 
@@ -34,6 +34,7 @@ enum class GameState
 	LevelEdit,
 	LevelEditTest,
 	PlayerEdit,
+	Starting,
 	Running,
 	Paused,
 	Highscore,
@@ -73,6 +74,7 @@ public:
 	SimpleScroller Playfield;
 	SimpleScroller Playfield_Too;
 	MultiScroller Credits;
+	GameStart Starter;
 
 	bool OnInit();
 	void OnEvent(SDL_Event* Event);
