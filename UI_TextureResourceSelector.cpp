@@ -9,7 +9,7 @@ void UI_TextureResourceSelector::OnInit(SDL_Renderer* rend, CharacterTextureMap*
 	_resource.Cols = 3;
 	_resource.Rows = 3;
 	_resource.MaxIndex = 9;
-	_resource.Tilesize = { 35, 35 };
+	_resource.Tilesize = { 48, 48 };
 	_resource.Type = TileType::Background;
 
 	if (_tilemaps.size() > 0)
@@ -113,13 +113,37 @@ void UI_TextureResourceSelector::OnInit(SDL_Renderer* rend, CharacterTextureMap*
 	btn.Padding = pad;
 	_toolbar.AddChild(btn);
 
-	// background collision
+	// coin
 	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, dRect.w, dRect.h);
-	CreateWidgetTexture(_rend, "Resources/icons/Crown.png", tex, sRect, dRect, 0, SDL_FLIP_NONE);
+	CreateWidgetTexture(_rend, "Resources/icons/StarPlus.png", tex, sRect, dRect, 0, SDL_FLIP_NONE);
 	btn = UI_Control();
 	btn.OnInit(_rend, tex);;
 	btn.EventType = UI_EDITOR_EVENT_TYPE;
 	btn.ActionCode = UI_ACTION::SET_TILETYPE_COIN;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	_toolbar.AddChild(btn);
+
+	// Energy
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, dRect.w, dRect.h);
+	CreateWidgetTexture(_rend, "Resources/icons/Energy.png", tex, sRect, dRect, 0, SDL_FLIP_NONE);
+	btn = UI_Control();
+	btn.OnInit(_rend, tex);;
+	btn.EventType = UI_EDITOR_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::SET_TILETYPE_ENERGY;
+	btn.DisplayRect = dRect;
+	btn.BorderWidth = bordW;
+	btn.Padding = pad;
+	_toolbar.AddChild(btn);
+
+	// Damage
+	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, dRect.w, dRect.h);
+	CreateWidgetTexture(_rend, "Resources/icons/Damage.png", tex, sRect, dRect, 0, SDL_FLIP_NONE);
+	btn = UI_Control();
+	btn.OnInit(_rend, tex);;
+	btn.EventType = UI_EDITOR_EVENT_TYPE;
+	btn.ActionCode = UI_ACTION::SET_TILETYPE_DAMAGE;
 	btn.DisplayRect = dRect;
 	btn.BorderWidth = bordW;
 	btn.Padding = pad;
@@ -137,6 +161,8 @@ void UI_TextureResourceSelector::OnEvent(SDL_Event* event)
 	
 	next(_toolbar.Children.begin(), 5)->IsActive = _resource.Type == TileType::Background;
 	next(_toolbar.Children.begin(), 6)->IsActive = _resource.Type == TileType::Coin;
+	next(_toolbar.Children.begin(), 7)->IsActive = _resource.Type == TileType::Energy;
+	next(_toolbar.Children.begin(), 8)->IsActive = _resource.Type == TileType::Damage;
 
 	if (event->type == UI_EDITOR_EVENT_TYPE)
 	{
@@ -172,6 +198,14 @@ void UI_TextureResourceSelector::OnEvent(SDL_Event* event)
 
 		case (int)UI_ACTION::SET_TILETYPE_COIN:
 			_resource.Type = TileType::Coin;
+			break;
+		
+		case (int)UI_ACTION::SET_TILETYPE_ENERGY:
+			_resource.Type = TileType::Energy;
+			break;
+
+		case (int)UI_ACTION::SET_TILETYPE_DAMAGE:
+			_resource.Type = TileType::Damage;
 			break;
 
 		}

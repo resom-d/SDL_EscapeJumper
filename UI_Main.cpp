@@ -14,7 +14,7 @@ void MainUI::OnInit(SDL_Renderer* renderer, JumperPlayer* player)
 	_font = TTF_OpenFont("Resources/fonts/LuckiestGuy-Regular.ttf", 48);
 	_charMap = SDL_GetTexturesFromString(_rend, " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜßabcdefghijklmnopqrstuvwxyzäöü,.;:*#-_|<>^°?=()!\"§$%&/()@€~", _font, { 255,255,0, 255 });
 
-	txtPlayerName.DisplayRect = { 550, 15, 600, 50 };
+	txtPlayerName.DisplayRect = { 630, 30, 550, 50 };
 	txtPlayerName.Padding = 8;
 	txtPlayerName.TextBuffer = &_player->Name;
 	txtPlayerName.Vocabular = " ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜßabcdefghijklmnopqrstuvwxyz.-_@#ÄäöÖüÜß";
@@ -24,13 +24,13 @@ void MainUI::OnInit(SDL_Renderer* renderer, JumperPlayer* player)
 	UI_Control btn;
 	SDL_Texture* tex;
 	SDL_Rect srcRect = { 0,0,76,76 };
-	SDL_Rect destRect = { 0,0, 100, 100 };
+	SDL_Rect destRect = { 0,0, 96, 96 };
 	
-	int w = 100;
+	int w = 96;
 	int pad = 2;
 	int gap = 10;
 	int bordW = 2;
-	SDL_Rect dRect = {  10, DisplayRect.h - 110 , 100 , 100 };
+	SDL_Rect dRect = {  10, DisplayRect.h - 90 , 100 , 100 };
 	
 	Avatars = GetFilesInDirectory("Resources/sprites");
 	for (auto avatar = Avatars.begin(); avatar != Avatars.end(); avatar++)

@@ -228,11 +228,14 @@ void GameEngine::OnLoop()
 
 		if (Player.GameOver && GameStatus != GameState::LevelEditTest)
 		{
-			Highscore hs;
-			hs.Name = Player.Name;
-			hs.Score = Player.Score;
-			hs.Jumps = Player.Jumps;
-			HallOfFame.HighScores.push_back(hs);			
+			if (Player.Score > 0)
+			{
+				Highscore hs;
+				hs.Name = Player.Name;
+				hs.Score = Player.Score;
+				hs.Jumps = Player.Jumps;
+				HallOfFame.HighScores.push_back(hs);
+			}
 			GameStatus = GameState::GameOver;
 		}
 
@@ -260,7 +263,11 @@ void GameEngine::OnLoop()
 		}
 	}
 
-	if (GameStatus == GameState::LevelComplete && SDL_GetTicks() - _timerCatch > 2000) GameStatus = GameState::Running;
+	if (GameStatus == GameState::LevelComplete && SDL_GetTicks() - _timerCatch > 2000)
+	{
+		GameStatus = GameState::Running;
+		Player.Energy = JumperPlayer::MaxEnergy;
+	}
 
 	if (GameStatus == GameState::GameOver)
 	{
@@ -338,7 +345,7 @@ void GameEngine::OnRender()
 				GameItems["GameOver"],
 				&sRect,
 				&dRect
-			);
+				);
 		}
 
 		if (GameStatus == GameState::LevelComplete)
@@ -363,7 +370,7 @@ void GameEngine::OnRender()
 				GameItems["LevelComplete"],
 				&sRect,
 				&dRect
-			);
+				);
 		}
 	}
 
@@ -421,7 +428,7 @@ void GameEngine::OnInitPlayer()
 	Player.GameOver = false;
 	Player.Score = 0;
 	Player.Jumps = 0;
-
+	Player.Energy = JumperPlayer::MaxEnergy;
 	Player.Speed = 3;
 	Player.MotionHor = MotionState::None;
 	Player.MotionVer = MotionState::Plus;
@@ -482,7 +489,7 @@ void GameEngine::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 			Map.ResetScroller();
 			OnInitPlayer();
 		}
-		else 
+		else
 		{
 			GoGame();
 		}
@@ -494,7 +501,7 @@ void GameEngine::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 	{
 		HallOfFame.Restart();
 		GameStatus = GameState::Highscore;
-	
+
 	}
 
 }

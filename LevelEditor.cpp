@@ -44,7 +44,7 @@ void LevelEditor::OnRender()
 	if (UI.ShowGrid)
 	{
 		SDL_SetRenderDrawColor(_rend, 255, 255, 255, 255);
-		for (auto x = 0; x <= Map.Setup.DisplayRows; x++)
+		for (auto x = 1; x <= Map.Setup.DisplayRows; x++)
 		{
 			SDL_RenderDrawLine(_rend,
 				Map.Setup.DisplayRect.x,
@@ -53,7 +53,7 @@ void LevelEditor::OnRender()
 				Map.Setup.DisplayRect.y + (x * (Map.Setup.BlockSize + Map.Setup.BlockSpacing))
 			);
 		}
-		for (auto y = 0; y <= Map.Setup.DisplayCols; y++)
+		for (auto y = 1; y <= Map.Setup.DisplayCols; y++)
 		{
 			SDL_RenderDrawLine(_rend,
 				Map.Setup.DisplayRect.x + (y * (Map.Setup.BlockSize + Map.Setup.BlockSpacing)),
@@ -63,7 +63,7 @@ void LevelEditor::OnRender()
 			);
 		}
 	}
-
+	
 	// Draw borderselect-box
 	if (Mode == UI_ACTION::BORDERDRAWMODE && (_drawActive || _eraseActive))
 	{

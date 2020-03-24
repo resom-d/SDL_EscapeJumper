@@ -52,6 +52,12 @@ void UI_Game::OnRender(bool gameOver, JumperPlayer* player)
 	drect = { 190, 140, surf->w, surf->h };
 	SDL_RenderCopy(_rend, tex, &srect, &drect);
 
+	surf = TTF_RenderText_Solid(_font, to_string(player->Energy).c_str(), textCol);
+	tex = SDL_CreateTextureFromSurface(_rend, surf);
+	srect = { 0,0, surf->w, surf->h };
+	drect = { 740, 100, surf->w, surf->h };
+	SDL_RenderCopy(_rend, tex, &srect, &drect);
+
 	SDL_FreeSurface(surf);
 	SDL_DestroyTexture(tex);
 }

@@ -13,9 +13,13 @@ enum class MotionState
 	Minus
 };
 
+
+
 class JumperPlayer : GameEvents
 {
 public:
+	static const Uint16 MaxEnergy = 20;
+
 	std::string TextureSourcePath;
 
 	SDL_Renderer* _rend;
@@ -40,7 +44,7 @@ public:
 	Uint32 Score;
 	Uint32 Jumps;
 	Uint16 Continues;
-	Uint16 Energy;
+	Sint16 Energy;
 
 	int OnInit(SDL_Renderer* rend, GameMap* map);
 	int OnLoop();

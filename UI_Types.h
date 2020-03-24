@@ -21,7 +21,7 @@ enum class WIDGET_STATE
 	Visible = 1 << 1,
 	InputActive = 1 << 2
 };
-		  
+
 enum class WIDGET_ALIGNMENT
 {
 	TOP = 0,
@@ -31,19 +31,19 @@ enum class WIDGET_ALIGNMENT
 	CENTER
 
 };
-		  
+
 enum class WIDGET_STRETCHMODE
 {
 	FIT = 0,
 	KEEP
 };
-		  
+
 enum class WIDGET_ORIENTATION
 {
 	HORIZONTAL = 0,
 	VERTICAL
 };
-		  
+
 enum class UI_ACTION
 {
 	NONE = 0,
@@ -76,17 +76,19 @@ enum class UI_ACTION
 	ADD_TILEMAP,
 	SET_TILETYPE_BGND,
 	SET_TILETYPE_COIN,
+	SET_TILETYPE_ENERGY,
+	SET_TILETYPE_DAMAGE,
 	REPLACE_TILEMAP,
 	MAP_NEW,
 	MAP_CLEAR,
 	MAP_DELETE
 };
-		  
+
 enum class WIDGET_EVENT_TYPE
 {
 	Activate = 0,
 	MouseDown,
-	
+
 };
 
 class Userdata

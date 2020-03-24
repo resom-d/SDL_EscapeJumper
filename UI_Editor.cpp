@@ -17,7 +17,7 @@ void UI_Editor::OnInit(SDL_Renderer* renderer, GameMap* map, CharacterTextureMap
 	_tileResourceDPoint = { 750,5 };
 
 	_newMapDialog.DisplayRect = { 200, 20, 410, 160 };
-	_confScreenDialog.DisplayRect = { 800, 20, 375, 185 };
+	_confScreenDialog.DisplayRect = { 800, 20, 475, 220 };
 
 	SDL_Texture* orgTex = SDL_GetRenderTarget(_rend);
 

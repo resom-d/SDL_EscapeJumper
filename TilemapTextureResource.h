@@ -11,6 +11,8 @@ enum class TileType
 	None = 0,
 	Background,
 	Coin,
+	Energy,
+	Damage,
 	World,
 	Door,
 	Water,

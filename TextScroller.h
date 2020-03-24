@@ -32,11 +32,11 @@ private:
 
 protected:
 	string _theMessage;
+	Sint16 _speed;
 	CharacterTextureMap _charMap;
 	SDL_Renderer* _rend;
 	TTF_Font *_font;
 	SDL_Color _fontColor = { 0, 0, 0, 255 };
-	Uint16 _speed=1;
 	int _currentPosition=0;
 	list<CharItem> _screenItems;
 	Uint16 _lastItemWidth;

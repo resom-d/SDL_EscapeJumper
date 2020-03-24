@@ -41,6 +41,8 @@ int JumperPlayer::OnLoop()
 		
 		OnCollisionCheck();
 
+		if (Energy < 0) Energy = 0;
+
 		return 0;
 }
 
@@ -80,17 +82,19 @@ void JumperPlayer::OnEvent(SDL_Event* Event)
 void JumperPlayer::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 {
 	// player keys
-	if (sym == SDLK_UP && Landed)
+	if (sym == SDLK_UP && Landed && Energy > 0)
 	{
 		MotionVer = MotionState::Minus;
 		Landed = false;
 		Jumps++;
+		Energy--;
 	}
-	if (sym == SDLK_DOWN && Landed)
+	if (sym == SDLK_DOWN && Landed && Energy > 0)
 	{
 		MotionVer = MotionState::Plus;
 		Landed = false;
 		Jumps++;
+		Energy--;
 	}
 
 	if (sym == SDLK_LEFT)
@@ -165,7 +169,17 @@ void JumperPlayer::OnCollisionCheck()
 					tile->InView = false;
 					Score++;
 				}
-				else
+				else if(tt== TileType::Energy)
+				{
+					tile->InView = false;
+					Energy++;
+				}
+				else if (tt == TileType::Damage)
+				{
+					tile->InView = false;
+					Energy--;
+				}
+				else if (tt == TileType::Background)
 				{
 					double d = (double)_map->Setup.BlockSize * 0.5;
 					if ((result.w >= result.h || Landed) && (double)result.h < d)
