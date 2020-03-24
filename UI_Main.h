@@ -6,6 +6,7 @@
 #include "UI_GridContainer.h"
 #include "UI_TextInput.h"
 #include "SDL_Extras.h"
+#include "JumperPlayer.h"
 using namespace std;
 
 class MainUI
@@ -17,17 +18,19 @@ public:
 	list<UI_Control> Buttons;
 	SDL_Texture* Texture;
 	SDL_Rect DisplayRect;
+	UI_TextInput txtPlayerName;
 
-	void OnInit(SDL_Renderer* renderer);
+	void OnInit(SDL_Renderer* renderer, JumperPlayer* player);
 	void OnLoop();
 	void OnEvent(SDL_Event* event);
-	void OnRender(std::string  playerName, int playerScore, bool gameOver);
+	void OnRender(bool gameOver);
 	void OnPostRender();
 	void OnCleanup();
 
 private:
 	SDL_Renderer* _rend;
-	
-	
+	CharacterTextureMap _charMap;
+	TTF_Font* _font;
+	JumperPlayer* _player;
 };
 

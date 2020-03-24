@@ -1,6 +1,6 @@
 #include "SDL_Extras.h"
 
-CharacterTextureMap SDL_GetTexturesFromString(SDL_Renderer* rend, string aString, TTF_Font* font)
+CharacterTextureMap SDL_GetTexturesFromString(SDL_Renderer* rend, string aString, TTF_Font* font, SDL_Color color)
 {
 	unordered_map<char, SDL_Texture*> chars;
 
@@ -10,7 +10,7 @@ CharacterTextureMap SDL_GetTexturesFromString(SDL_Renderer* rend, string aString
 		char c = *iter;
 		char txt[2] = { c, '\0' };
 
-		SDL_Surface* surf = TTF_RenderText_Solid(font, txt, { 0,0,0, 255 });
+		SDL_Surface* surf = TTF_RenderText_Solid(font, txt, color);
 		SDL_Texture* tex = SDL_CreateTextureFromSurface(rend, surf);
 		chars.insert({ c, tex });
 	}
@@ -31,6 +31,7 @@ void SDL_RenderStringAt(SDL_Renderer* rend, string text, SDL_Point p, CharacterT
 		int w, h;
 
 		SDL_QueryTexture(chars[c], nullptr, nullptr, &w, &h);
+
 		destRect.w = w;
 		destRect.h = h;
 		srcRect = { 0,0,w,h };
@@ -38,6 +39,7 @@ void SDL_RenderStringAt(SDL_Renderer* rend, string text, SDL_Point p, CharacterT
 		destRect.x += w;
 	}
 	SDL_RenderSetClipRect(rend, nullptr);
+
 }
 
 void SDL_RenderSetPixel(SDL_Renderer* renderer, int x, int y, Uint8 red, Uint8 green, Uint8 blue, Uint8 alpha)

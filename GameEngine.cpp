@@ -55,7 +55,7 @@ bool GameEngine::OnInit()
 
 	// Create a texure map from a string 
 	_font = TTF_OpenFont("Resources/fonts/arial.ttf", 24);
-	CharMap = SDL_GetTexturesFromString(Renderer, " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜßabcdefghijklmnopqrstuvwxyzäöü,.;:*#-_|<>^°?=()!\"§$%&/()@€~", _font);
+	CharMap = SDL_GetTexturesFromString(Renderer, " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜßabcdefghijklmnopqrstuvwxyzäöü,.;:*#-_|<>^°?=()!\"§$%&/()@€~", _font, { 0,0,0, 255 });
 
 	Playfield.DisplayRect = Map.Setup.DisplayRect;
 	Playfield.OnInit(Renderer, "Resources/bgnd/bgnd_001.png");
@@ -71,7 +71,7 @@ bool GameEngine::OnInit()
 
 	MainUI.DisplayRect = { 0,0,Map.Setup.DisplayRect.w, UI_Height };
 	MainUI.Texture = GameItems["MainUI"];
-	MainUI.OnInit(Renderer);
+	MainUI.OnInit(Renderer, &Player);
 
 	GameUI.DisplayRect = { 0,0,Map.Setup.DisplayRect.w, UI_Height };
 	GameUI.OnInit(Renderer, &CharMap);
@@ -84,6 +84,9 @@ bool GameEngine::OnInit()
 		Map.Setup.DisplayRect.w + UI_Height
 	};
 	Editor.OnInit(Renderer, CharMap);
+
+	HallOfFame.DisplayRect = { 400, 300, 1000, 400 };
+	HallOfFame.OnInit(Renderer);
 
 	tune = Mix_LoadMUS("Resources/music/The impossible Mission.mp3");
 	//Mix_PlayMusic(tune, -1);
@@ -223,7 +226,16 @@ void GameEngine::OnLoop()
 			if (Player.GameOver) break;
 		}
 
-		if (Player.GameOver && GameStatus != GameState::LevelEditTest) GameStatus = GameState::GameOver;
+		if (Player.GameOver && GameStatus != GameState::LevelEditTest)
+		{
+			Highscore hs;
+			hs.Name = Player.Name;
+			hs.Score = Player.Score;
+			hs.Jumps = Player.Jumps;
+			HallOfFame.HighScores.push_back(hs);			
+			GameStatus = GameState::GameOver;
+		}
+
 		if (Player.GameOver && GameStatus == GameState::LevelEditTest) GameStatus = GameState::LevelEdit;
 
 		if (Map.LevelDone)
@@ -261,6 +273,8 @@ void GameEngine::OnLoop()
 	}
 
 	if (GameStatus == GameState::Starting && Starter.Done) GameStatus = GameState::Running;
+
+	if (GameStatus == GameState::Highscore) HallOfFame.OnLoop();
 };
 
 void GameEngine::OnRender()
@@ -279,7 +293,7 @@ void GameEngine::OnRender()
 
 	if (GameStatus == GameState::MainScreen)
 	{
-		MainUI.OnRender("Zehnfinger", Player.Score, GameStatus == GameState::Running);
+		MainUI.OnRender(GameStatus == GameState::Running);
 		Playfield.OnRender();
 		Map.OnRender();
 		//Playfield_Too.OnRender();
@@ -358,6 +372,8 @@ void GameEngine::OnRender()
 		Editor.OnRender();
 	}
 
+	if (GameStatus == GameState::Highscore) HallOfFame.OnRender();
+
 	// Hey, Renderer! Do it! Do it !
 	SDL_RenderPresent(Renderer);
 
@@ -385,7 +401,7 @@ void GameEngine::OnCleanup()
 	Editor.OnCleanUp();
 	Player.OnCleanup();
 	Credits.OnCleanup();
-
+	HallOfFame.OnCleanup();
 	Mix_CloseAudio();
 	Mix_FreeMusic(tune);
 
@@ -398,7 +414,6 @@ void GameEngine::OnCleanup()
 void GameEngine::OnInitPlayer()
 {
 	Player.AnimationRate = 40;		// t=1000/framesPerSecond e.g. 1000/25 = 40
-	Player.Name = "Mollmops";
 	Player.TextureSourcePath = "Resources/sprites/Block_001.png";
 	Player.HorizontalTiling = 6;
 	Player.VerticalTiling = 4;
@@ -474,6 +489,14 @@ void GameEngine::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 	}
 
 	if (sym == SDLK_F5) GoEditor();
+
+	if (sym == SDLK_F7)
+	{
+		HallOfFame.Restart();
+		GameStatus = GameState::Highscore;
+	
+	}
+
 }
 
 void GameEngine::OnKeyUp(SDL_Keycode sym, SDL_Keycode mod)

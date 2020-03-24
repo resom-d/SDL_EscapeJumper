@@ -4,6 +4,7 @@ int JumperPlayer::OnInit(SDL_Renderer* rend, GameMap* map)
 {
 	_rend = rend;
 	_map = map;
+	Name = "Niemand";
 	int screenWidth, screenHeight;
 	SDL_GetRendererOutputSize(_rend, &screenWidth, &screenHeight);
 
@@ -160,7 +161,7 @@ void JumperPlayer::OnCollisionCheck()
 				TileType tt = next(_map->TextureResources.begin(), ri)->Type;
 				if (tt == TileType::Coin)
 				{
-					Mix_PlayChannel(-1, _sndLand, 0);
+					//Mix_PlayChannel(-1, _sndLand, 0);
 					tile->InView = false;
 					Score++;
 				}

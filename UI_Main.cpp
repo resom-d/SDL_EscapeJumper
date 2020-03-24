@@ -4,13 +4,23 @@
 MainUI::MainUI()
 {}
 
-void MainUI::OnInit(SDL_Renderer* renderer)
+void MainUI::OnInit(SDL_Renderer* renderer, JumperPlayer* player)
 {
 	_rend = renderer;
-	
+	_player = player;
 	int screenWidth, screenHeight;
 	SDL_GetRendererOutputSize(_rend, &screenWidth, &screenHeight);
 	
+	_font = TTF_OpenFont("Resources/fonts/LuckiestGuy-Regular.ttf", 48);
+	_charMap = SDL_GetTexturesFromString(_rend, " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜßabcdefghijklmnopqrstuvwxyzäöü,.;:*#-_|<>^°?=()!\"§$%&/()@€~", _font, { 255,255,0, 255 });
+
+	txtPlayerName.DisplayRect = { 550, 15, 600, 50 };
+	txtPlayerName.Padding = 8;
+	txtPlayerName.TextBuffer = &_player->Name;
+	txtPlayerName.Vocabular = " ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜßabcdefghijklmnopqrstuvwxyz.-_@#ÄäöÖüÜß";
+	txtPlayerName.MaxSize = 20;
+	txtPlayerName.OnInit(_rend, _charMap);	
+
 	UI_Control btn;
 	SDL_Texture* tex;
 	SDL_Rect srcRect = { 0,0,76,76 };
@@ -70,6 +80,7 @@ void MainUI::OnInit(SDL_Renderer* renderer)
 
 void MainUI::OnLoop()
 {
+	txtPlayerName.OnLoop();
 }
 
 void MainUI::OnEvent(SDL_Event* event)
@@ -78,10 +89,10 @@ void MainUI::OnEvent(SDL_Event* event)
 	{
 		iter->OnEvent(event);
 	}
-
+	txtPlayerName.OnEvent(event);
 }
 
-void MainUI::OnRender(std::string playerName, int playerScore, bool gameOver)
+void MainUI::OnRender(bool gameOver)
 {
 	if (_rend == nullptr) return;
 	
@@ -94,6 +105,8 @@ void MainUI::OnRender(std::string playerName, int playerScore, bool gameOver)
 	{
 		iter->OnRender();
 	}
+
+	txtPlayerName.OnRender();
 }
 
 void MainUI::OnPostRender()
@@ -106,6 +119,6 @@ void MainUI::OnCleanup()
 	{
 		iter->OnCleanup();
 	}
-
+	txtPlayerName.OnCleanup();
 
 }

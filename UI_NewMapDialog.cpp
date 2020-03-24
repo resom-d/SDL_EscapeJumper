@@ -13,7 +13,7 @@ void UI_NewMapDialog::OnInit(SDL_Renderer* rend)
 	_rend = rend;
 
 	TTF_Font* font = TTF_OpenFont("Resources/fonts/arial.ttf", 24);
-	_charMap = SDL_GetTexturesFromString(_rend, " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜßabcdefghijklmnopqrstuvwxyzäöü,.;:*#-_|<>^°?=()!\"§$%&/()@€~", font);
+	_charMap = SDL_GetTexturesFromString(_rend, " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜßabcdefghijklmnopqrstuvwxyzäöü,.;:*#-_|<>^°?=()!\"§$%&/()@€~", font, { 0,0,0, 255 });
 
 	UI_Control btn;
 	SDL_Texture* tex;

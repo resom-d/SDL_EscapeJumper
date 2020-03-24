@@ -190,6 +190,7 @@
     <ClCompile Include="GamePlayer.cpp" />
     <ClCompile Include="GameStart.cpp" />
     <ClCompile Include="GameTypes.cpp" />
+    <ClCompile Include="Highscores.cpp" />
     <ClCompile Include="HorizontalScroller.cpp" />
     <ClCompile Include="JumperPlayer.cpp" />
     <ClCompile Include="LevelEditor.cpp" />
@@ -224,6 +225,7 @@
     <ClInclude Include="GameEvents.h" />
     <ClInclude Include="GameStart.h" />
     <ClInclude Include="GameTypes.h" />
+    <ClInclude Include="Highscores.h" />
     <ClInclude Include="HorizontalScoller.h" />
     <ClInclude Include="JumperPlayer.h" />
     <ClInclude Include="LevelEditor.h" />

@@ -13,71 +13,71 @@ void TextScroller::OnInit(SDL_Renderer* rend, string msg, TTF_Font* font, SDL_Co
 	_font = font;
 	_speed = speed;	
 	_fontColor = col;
-	_currentPosition = 0;
-
-	SDL_Surface* txtSurface = TTF_RenderText_Solid(_font, _theMessage.c_str(), _fontColor);
-	_texMessage = SDL_CreateTextureFromSurface(_rend, txtSurface);
-	
-	_surfaceSize.x = txtSurface->w;
-	_surfaceSize.y = txtSurface->h;
-	DestRect.h = txtSurface->h;
-
-	SDL_FreeSurface(txtSurface);
-		
+	_currentPosition = 0;		
 }
 
 void TextScroller::OnLoop()
 {
-	_currentPosition += _speed;
-	if (_currentPosition > DestRect.w + _surfaceSize.x) _currentPosition = 0;
+	if (++_currentPosition > _lastItemWidth)
+	{
+		_currentPosition = 0;
+		if (_charIndex < _theMessage.length())
+		{
+			CharItem item = CharItem();
+			item.Content = *next(_theMessage.begin(), _charIndex);
+			item.ScreenPos = { DisplayRect.x + DisplayRect.w + item.Width, DisplayRect.y };
+			SDL_Surface* surf = TTF_RenderText_Solid(_font, &item.Content, _fontColor);
+			SDL_Texture* tex = SDL_CreateTextureFromSurface(_rend, surf);
+			SDL_FreeSurface(surf);
+			item.Texture = tex;
+			int w, h;
+			SDL_QueryTexture(tex, nullptr, nullptr, &w, &h);
+			item.Width = w;
+			item.Height = h;
+			_lastItemWidth = w;
+			_screenItems.push_back(item);
+			_charIndex++;
+		}
+	}
+
+	for (auto item = _screenItems.begin(); item != _screenItems.end(); item++)
+	{
+		item->ScreenPos.x--;
+		if (item->ScreenPos.x < DisplayRect.x - item->Width)
+		{
+			SDL_DestroyTexture(item->Texture);
+			item = _screenItems.erase(item);
+		}
+		if (_screenItems.size() < 1) break;
+	}
+
+	if (_screenItems.size() < 1) _charIndex = 0;
+	
 }
 
 void TextScroller::OnRender()
 {
-	SDL_Rect sRect = { 0,0,0,0 };
-	SDL_Rect dRect = { 0,0,0,0 };
-
-	sRect.y = 0;
-	dRect.y = DestRect.y;
-	sRect.h = _surfaceSize.y;
-	dRect.h = _surfaceSize.y;
-	int remDist = (DestRect.w + _surfaceSize.x) - _currentPosition;
-
-	sRect.w = _currentPosition;
-	if (_currentPosition > DestRect.w)
+	SDL_RenderSetClipRect(_rend, &DisplayRect);
+	for (auto item = _screenItems.begin(); item != _screenItems.end(); item++)
 	{
-		sRect.w = DestRect.w;
+		SDL_Rect sRect = { 0,0, item->Width, item->Height };
+		SDL_Rect dRect = { item->ScreenPos.x, item->ScreenPos.y, item->Width, item->Height };
+		SDL_RenderCopy(_rend, item->Texture, &sRect, &dRect);
 	}
 
-	sRect.x = 0;
-	if (_currentPosition > DestRect.w) sRect.x = _currentPosition - DestRect.w;
-	if (remDist < DestRect.w)
-	{
-		sRect.w = remDist;
-		sRect.x = _surfaceSize.x - remDist;		
-	}
-	dRect.w = sRect.w;
-	dRect.x = (DestRect.x + DestRect.w) - _currentPosition;
-	if (dRect.x < DestRect.x)
-	{
-		dRect.x = DestRect.x;
-	}
-
-	SDL_SetRenderDrawBlendMode(_rend, SDL_BLENDMODE_BLEND);
-
-	SDL_RenderSetClipRect(_rend, &dRect);
-	SDL_RenderCopy(_rend, _texMessage, &sRect, &dRect);
-
-	SDL_RenderSetClipRect(_rend, nullptr);
+	
 	
 }
 
 void TextScroller::OnCleanUp()
 {
-	SDL_DestroyTexture(_texMessage);
+for (auto item = _screenItems.begin(); item != _screenItems.end(); item++)
+	{
+		SDL_DestroyTexture(item->Texture);
+	}
 }
 
 SDL_Point TextScroller::GetSurfaceSize()
 {
-	return _surfaceSize;
+	return SDL_Point();
 }

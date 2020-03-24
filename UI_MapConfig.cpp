@@ -4,7 +4,7 @@ void UI_MapConfig::OnInit(SDL_Renderer* rend)
 {
 	_rend = rend;
 	TTF_Font* font = TTF_OpenFont("Resources/fonts/ShareTechMono-Regular.ttf", 40);
-	_charMap = SDL_GetTexturesFromString(_rend, " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜßabcdefghijklmnopqrstuvwxyzäöü,.;:*#-_|<>^°?=()!\"§$%&/()@€~", font);
+	_charMap = SDL_GetTexturesFromString(_rend, " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜßabcdefghijklmnopqrstuvwxyzäöü,.;:*#-_|<>^°?=()!\"§$%&/()@€~", font, { 0,0,0, 255 });
 	_gridUpperLeft = { DisplayRect.x + 10, DisplayRect.y + 120 };
 
 	_bbox.DisplayRect = { 5, 5, 0, 80 };

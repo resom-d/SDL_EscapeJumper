@@ -105,6 +105,9 @@
     <ClCompile Include="GameStart.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="Highscores.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="zlib1.dll">
@@ -254,6 +257,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="GameStart.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Highscores.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

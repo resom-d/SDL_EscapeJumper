@@ -24,6 +24,7 @@
 #include "SimpleScroller.h"
 #include "MultiScroller.h"
 #include "GameStart.h"
+#include "Highscores.h"
 using namespace std;
 using namespace boost::filesystem;
 
@@ -75,7 +76,8 @@ public:
 	SimpleScroller Playfield_Too;
 	MultiScroller Credits;
 	GameStart Starter;
-
+	Highscores HallOfFame;
+	
 	bool OnInit();
 	void OnEvent(SDL_Event* Event);
 	int OnExecute();
