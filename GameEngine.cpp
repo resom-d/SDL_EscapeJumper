@@ -40,6 +40,7 @@ bool GameEngine::OnInit()
 	{
 		return false;
 	}
+
 	SDL_SetWindowSize(AppWindow, Map.Setup.DisplayRect.w, Map.Setup.DisplayRect.h + UI_Height);
 	SDL_ShowWindow(AppWindow);
 
@@ -92,8 +93,8 @@ bool GameEngine::OnInit()
 	//Mix_PlayMusic(tune, -1);
 
 	_appIsRunning = true;
-	GameStatus = GameState::MainScreen;
-
+	
+	GoMainscreen();
 
 	return true;
 };
@@ -205,7 +206,12 @@ void GameEngine::OnLoop()
 		if (_scrollCntBgnd++ % 4 == 0) Playfield.OnLoop();
 		//if (_scrollCntBgnd % 2 == 0) Playfield_Too.OnLoop();
 		for (auto i = 0; i < 4; i++) Credits.OnLoop();
-
+		if (!Credits.LoopDone) _timeCatchChangeScreens = SDL_GetTicks();
+		if (SDL_GetTicks() > _timeCatchChangeScreens + 8000)
+		{
+			GoHallOfFame();
+			Credits.LoopDone = false;
+		}
 	}
 
 	if (GameStatus == GameState::Running || GameStatus == GameState::LevelEditTest)
@@ -236,7 +242,7 @@ void GameEngine::OnLoop()
 				hs.Jumps = Player.Jumps;
 				HallOfFame.HighScores.push_back(hs);
 			}
-			GameStatus = GameState::GameOver;
+			GoGameOver();
 		}
 
 		if (Player.GameOver && GameStatus == GameState::LevelEditTest) GameStatus = GameState::LevelEdit;
@@ -259,11 +265,11 @@ void GameEngine::OnLoop()
 			Map.ResetInView();
 			Map.LevelDone = false;
 
-			_timerCatch = SDL_GetTicks();
+			_timerCatchLevelDone = SDL_GetTicks();
 		}
 	}
 
-	if (GameStatus == GameState::LevelComplete && SDL_GetTicks() - _timerCatch > 2000)
+	if (GameStatus == GameState::LevelComplete && SDL_GetTicks() - _timerCatchLevelDone > 2000)
 	{
 		GameStatus = GameState::Running;
 		Player.Energy = JumperPlayer::MaxEnergy;
@@ -272,6 +278,10 @@ void GameEngine::OnLoop()
 	if (GameStatus == GameState::GameOver)
 	{
 		GameUI.OnLoop();
+		if (SDL_GetTicks() > _timeCatchChangeScreens + 4000)
+		{
+			GoHallOfFame();
+		}
 	}
 
 	if (GameStatus == GameState::LevelEdit)
@@ -281,7 +291,15 @@ void GameEngine::OnLoop()
 
 	if (GameStatus == GameState::Starting && Starter.Done) GameStatus = GameState::Running;
 
-	if (GameStatus == GameState::Highscore) HallOfFame.OnLoop();
+	if (GameStatus == GameState::HallOfFame)
+	{
+		HallOfFame.OnLoop();
+		if (SDL_GetTicks() > _timeCatchChangeScreens + 30000)
+		{
+			_timeCatchChangeScreens = SDL_GetTicks();
+			GoMainscreen();
+		}
+	}
 };
 
 void GameEngine::OnRender()
@@ -295,6 +313,8 @@ void GameEngine::OnRender()
 
 	if (GameStatus == GameState::Starting)
 	{
+		GameUI.OnRender(false, &Player);
+		Playfield.OnRender();
 		Starter.OnRender();
 	}
 
@@ -379,7 +399,7 @@ void GameEngine::OnRender()
 		Editor.OnRender();
 	}
 
-	if (GameStatus == GameState::Highscore) HallOfFame.OnRender();
+	if (GameStatus == GameState::HallOfFame) HallOfFame.OnRender();
 
 	// Hey, Renderer! Do it! Do it !
 	SDL_RenderPresent(Renderer);
@@ -471,6 +491,7 @@ void GameEngine::OnExit()
 void GameEngine::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 {
 	// global keys
+	_timeCatchChangeScreens = SDL_GetTicks();
 	if (sym == SDLK_ESCAPE) _appIsRunning = false;
 	if (sym == SDLK_SPACE)
 	{
@@ -497,12 +518,7 @@ void GameEngine::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 
 	if (sym == SDLK_F5) GoEditor();
 
-	if (sym == SDLK_F7)
-	{
-		HallOfFame.Restart();
-		GameStatus = GameState::Highscore;
-
-	}
+	if (sym == SDLK_F7) GoHallOfFame();
 
 }
 
@@ -522,6 +538,8 @@ void GameEngine::GoMainscreen(void)
 	Map.ScrollSpeed = 1;
 	Map.ResetScroller();
 	Map.ViewMode = EngineViewMode::Editor;
+	Credits.OnReset();
+	_timeCatchChangeScreens = SDL_GetTicks();
 	GameStatus = GameState::MainScreen;
 }
 
@@ -535,6 +553,19 @@ void GameEngine::GoEditor(void)
 {
 	Map.ViewMode = EngineViewMode::Editor;
 	GameStatus = GameState::LevelEdit;
+}
+
+void GameEngine::GoHallOfFame(void)
+{
+	HallOfFame.Restart();
+	_timeCatchChangeScreens = SDL_GetTicks();
+	GameStatus = GameState::HallOfFame;
+}
+
+void GameEngine::GoGameOver(void)
+{
+	_timeCatchChangeScreens = SDL_GetTicks();
+	GameStatus = GameState::GameOver;
 }
 
 

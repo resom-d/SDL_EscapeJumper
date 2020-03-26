@@ -26,11 +26,11 @@ void MainUI::OnInit(SDL_Renderer* renderer, JumperPlayer* player)
 	SDL_Rect srcRect = { 0,0,76,76 };
 	SDL_Rect destRect = { 0,0, 96, 96 };
 	
-	int w = 96;
+	int w = 76;
 	int pad = 2;
 	int gap = 10;
 	int bordW = 2;
-	SDL_Rect dRect = {  10, DisplayRect.h - 90 , 100 , 100 };
+	SDL_Rect dRect = {  10, DisplayRect.h - 90 , w , w };
 	
 	Avatars = GetFilesInDirectory("Resources/sprites");
 	for (auto avatar = Avatars.begin(); avatar != Avatars.end(); avatar++)
@@ -51,7 +51,7 @@ void MainUI::OnInit(SDL_Renderer* renderer, JumperPlayer* player)
 		Buttons.push_back(ct);
 	}
 	
-	dRect = { DisplayRect.w - 220, 10 , 100 , 100 };
+	dRect = { DisplayRect.w - 180, 10 , w, w };
 	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect.w, destRect.h);
 	CreateWidgetTexture(_rend, "Resources/icons/Editor.png", tex, srcRect, destRect, 0, SDL_FLIP_NONE);
 	btn = UI_Control();
@@ -62,7 +62,7 @@ void MainUI::OnInit(SDL_Renderer* renderer, JumperPlayer* player)
 	btn.BorderWidth = bordW;
 	btn.Padding = pad;
 	Buttons.push_back(btn);
-	dRect.x += w + gap;
+	dRect.x += w + 10;
 
 	tex = SDL_CreateTexture(_rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, destRect.w, destRect.h);
 	CreateWidgetTexture(_rend, "Resources/icons/Close.png", tex, srcRect, destRect, 0, SDL_FLIP_NONE);

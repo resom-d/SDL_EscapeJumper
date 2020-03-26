@@ -12,7 +12,7 @@ void LevelEditor::OnInit(SDL_Renderer* rend, CharacterTextureMap charMap)
 	_colorIndexFill = 2;
 	_blockdrawStart = { -1, -1 };
 	_blockdrawEnd = { -1, -1 };
-	
+
 	UI.DisplayRect = { DisplayRect.x, DisplayRect.y, DisplayRect.w, 200 };
 
 	// Assign active colors
@@ -51,7 +51,7 @@ void LevelEditor::OnRender()
 				Map.Setup.DisplayRect.y + (x * (Map.Setup.BlockSize + Map.Setup.BlockSpacing)),
 				Map.Setup.DisplayRect.x + DisplayRect.w,
 				Map.Setup.DisplayRect.y + (x * (Map.Setup.BlockSize + Map.Setup.BlockSpacing))
-			);
+				);
 		}
 		for (auto y = 1; y <= Map.Setup.DisplayCols; y++)
 		{
@@ -60,10 +60,10 @@ void LevelEditor::OnRender()
 				Map.Setup.DisplayRect.y,
 				Map.Setup.DisplayRect.x + (y * (Map.Setup.BlockSize + Map.Setup.BlockSpacing)),
 				Map.Setup.DisplayRect.y + DisplayRect.h
-			);
+				);
 		}
 	}
-	
+
 	// Draw borderselect-box
 	if (Mode == UI_ACTION::BORDERDRAWMODE && (_drawActive || _eraseActive))
 	{
@@ -143,7 +143,7 @@ void LevelEditor::OnEvent(SDL_Event* event)
 			ud = *(Userdata*)event->user.data2;
 			Map.Setup.Cols = ud.NewMapCols;
 			Map.OnInit(_rend);
-			Map.SaveMap("Resources/levels/" +  *ud.NewMapName + ".txt");
+			Map.SaveMap("Resources/levels/" + *ud.NewMapName + ".txt");
 			break;
 
 		case (int)UI_ACTION::MAP_CLEAR:
@@ -176,7 +176,7 @@ void LevelEditor::OnEvent(SDL_Event* event)
 				{
 					for (int y = 0; y < Map.Setup.Cols; y++)
 					{
-						if (Map.TileMap[x][y].Visible && Map.TileMap[x][y].TileIndex== TileIndex && Map.TileMap[x][y].ResourceIndex == UI.ResourceIndex)
+						if (Map.TileMap[x][y].Visible && Map.TileMap[x][y].TileIndex == TileIndex && Map.TileMap[x][y].ResourceIndex == UI.ResourceIndex)
 						{
 							Map.TileMap[x][y].TileIndex = ud.TileIndex;
 						}
@@ -248,7 +248,7 @@ void LevelEditor::OnEvent(SDL_Event* event)
 					}
 				}
 			}
-			
+
 			_colorIndexFill = ud.ColorIndex;
 			TileIndex = 0;
 			break;
@@ -269,7 +269,7 @@ void LevelEditor::OnEvent(SDL_Event* event)
 					}
 				}
 			}
-			
+
 			_colorIndexBorder = ud.ColorIndex;
 			TileIndex = 0;
 			break;
@@ -415,6 +415,13 @@ void LevelEditor::OnKeyDown(SDL_Keycode sym, SDL_Keycode mod)
 		if (RowPosition > Map.Setup.Rows - Map.Setup.DisplayRows) RowPosition = Map.Setup.Rows - Map.Setup.DisplayRows;
 		break;
 
+	case SDLK_d:
+		Mode = UI_ACTION::DRAWMODE;
+		break;
+
+	case SDLK_b:
+		Mode = UI_ACTION::BORDERDRAWMODE;
+		break;
 
 	}
 }
@@ -447,7 +454,24 @@ void LevelEditor::OnLeftButtonDown(int mX, int mY)
 		tile.FillColor = _colorIndexFill;
 		tile.BorderColor = _colorIndexBorder;
 
-		Map.SetTileInMap({ ColumnPosition + x, RowPosition + y }, tile);
+		if (SDL_GetModState() & KMOD_SHIFT)
+		{
+			for (int ru = y; ru >= 0; ru--)
+			{
+				Map.SetTileInMap({ ColumnPosition + x, RowPosition + ru }, tile);
+
+			}
+		}
+		else if (SDL_GetModState() & KMOD_CTRL)
+		{
+			for (int ru = y; ru < Map.Setup.Rows; ru++)
+			{
+				Map.SetTileInMap({ ColumnPosition + x, RowPosition + ru }, tile);
+
+			}
+		}
+		else Map.SetTileInMap({ ColumnPosition + x, RowPosition + y }, tile);
+
 	}
 
 	if (Mode == UI_ACTION::BORDERDRAWMODE)
@@ -516,7 +540,23 @@ void LevelEditor::OnRightButtonDown(int mX, int mY)
 		tile.FillColor = 0;
 		tile.BorderColor = 0;
 
-		Map.SetTileInMap({ ColumnPosition + x, RowPosition + y }, tile);
+		if (SDL_GetModState() & KMOD_SHIFT)
+		{
+			for (int ru = y; ru >= 0; ru--)
+			{
+				Map.SetTileInMap({ ColumnPosition + x, RowPosition + ru }, tile);
+
+			}
+		}
+		else if (SDL_GetModState() & KMOD_CTRL)
+		{
+			for (int ru = y; ru < Map.Setup.Rows; ru++)
+			{
+				Map.SetTileInMap({ ColumnPosition + x, RowPosition + ru }, tile);
+
+			}
+		}
+		else Map.SetTileInMap({ ColumnPosition + x, RowPosition + y }, tile);
 	}
 
 	if (Mode == UI_ACTION::BORDERDRAWMODE)
@@ -606,7 +646,23 @@ void LevelEditor::OnMouseMove(int mX, int mY, int relX, int relY, bool Left, boo
 			tile.FillColor = _colorIndexFill;
 			tile.BorderColor = _colorIndexBorder;
 
-			Map.SetTileInMap({ ColumnPosition + x, RowPosition + y }, tile);
+			if (SDL_GetModState() & KMOD_SHIFT)
+			{
+				for (int ru = y; ru >= 0; ru--)
+				{
+					Map.SetTileInMap({ ColumnPosition + x, RowPosition + ru }, tile);
+
+				}
+			}
+			else if (SDL_GetModState() & KMOD_CTRL)
+			{
+				for (int ru = y; ru < Map.Setup.Rows; ru++)
+				{
+					Map.SetTileInMap({ ColumnPosition + x, RowPosition + ru }, tile);
+
+				}
+			}
+			else Map.SetTileInMap({ ColumnPosition + x, RowPosition + y }, tile);
 		}
 		if (_eraseActive)
 		{
@@ -617,7 +673,23 @@ void LevelEditor::OnMouseMove(int mX, int mY, int relX, int relY, bool Left, boo
 			tile.FillColor = 0;
 			tile.BorderColor = 0;
 
-			Map.SetTileInMap({ ColumnPosition + x, RowPosition + y }, tile);
+			if (SDL_GetModState() & KMOD_SHIFT)
+			{
+				for (int ru = y; ru >= 0; ru--)
+				{
+					Map.SetTileInMap({ ColumnPosition + x, RowPosition + ru }, tile);
+
+				}
+			}
+			else if (SDL_GetModState() & KMOD_CTRL)
+			{
+				for (int ru = y; ru < Map.Setup.Rows; ru++)
+				{
+					Map.SetTileInMap({ ColumnPosition + x, RowPosition + ru }, tile);
+
+				}
+			}
+			else Map.SetTileInMap({ ColumnPosition + x, RowPosition + y }, tile);
 		}
 	}
 

@@ -10,17 +10,17 @@ void UI_Game::OnInit(SDL_Renderer* rend, CharacterTextureMap* charMap)
 {
 	_rend = rend;
 	_charMap = charMap;
-	_font = TTF_OpenFont("Resources/fonts/LuckiestGuy-Regular.ttf", 40);	
+	_font = TTF_OpenFont("Resources/fonts/LuckiestGuy-Regular.ttf", 40);
 }
 
 void UI_Game::OnLoop(void)
 {
-	
+
 }
 
 void UI_Game::OnEvent(SDL_Event* event)
 {
-	
+
 }
 
 void UI_Game::OnCleanup(void)
@@ -34,14 +34,20 @@ void UI_Game::OnRender(bool gameOver, JumperPlayer* player)
 
 	int h, w;
 	SDL_QueryTexture(TexBackgnd, nullptr, nullptr, &w, &h);
-	SDL_Rect srect = {0,0, w, h};
+	SDL_Rect srect = { 0,0, w, h };
 	SDL_Rect drect = { 0,0, w, h };
-	SDL_RenderCopyEx(_rend, TexBackgnd, &srect, &drect, 0, nullptr, SDL_FLIP_NONE);	
+	SDL_RenderCopyEx(_rend, TexBackgnd, &srect, &drect, 0, nullptr, SDL_FLIP_NONE);
 
 	SDL_Color textCol = { 255,255,255,255 };
 
-	SDL_Surface* surf = TTF_RenderText_Solid(_font, to_string(player->Score).c_str(), textCol);
+	SDL_Surface* surf = TTF_RenderText_Solid(_font, player->Name.c_str(), textCol);
 	SDL_Texture* tex = SDL_CreateTextureFromSurface(_rend, surf);
+	srect = { 0,0, surf->w, surf->h };
+	drect = { 650, 10, surf->w << 1, surf->h << 1};
+	SDL_RenderCopy(_rend, tex, &srect, &drect);
+
+	surf = TTF_RenderText_Solid(_font, to_string(player->Score).c_str(), textCol);
+	tex = SDL_CreateTextureFromSurface(_rend, surf);
 	srect = { 0,0, surf->w, surf->h };
 	drect = { 190, 100, surf->w, surf->h };
 	SDL_RenderCopy(_rend, tex, &srect, &drect);

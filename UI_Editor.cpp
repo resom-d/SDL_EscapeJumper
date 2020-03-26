@@ -537,6 +537,20 @@ void UI_Editor::OnEvent(SDL_Event* event)
 		}
 	}
 	}
+
+	if (event->type == SDL_KEYDOWN)
+	{
+		switch (event->key.keysym.sym)
+		{
+		case SDLK_d:
+			_activeTool = UI_ACTION::DRAWMODE;
+			break;
+
+		case SDLK_b:
+			_activeTool = UI_ACTION::BORDERDRAWMODE;
+			break;
+		}
+	}
 }
 
 void UI_Editor::OnRender(Uint16 colPos, Uint16 rowPos)

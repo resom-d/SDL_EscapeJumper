@@ -38,7 +38,7 @@ enum class GameState
 	Starting,
 	Running,
 	Paused,
-	Highscore,
+	HallOfFame,
 	GameOver,
 	LevelComplete
 };
@@ -93,16 +93,16 @@ public:
 	void GoMainscreen(void);
 	void GoGame(void);
 	void GoEditor(void);
-
-	
-
+	void GoHallOfFame(void);
+	void GoGameOver(void);
 	
 private:
 	TTF_Font* _font;
 	Mix_Music* tune;
 	Uint16 _level;
-	int _timerCatch;
+	int _timerCatchLevelDone;
 	int _scrollCntBgnd;
+	Uint32 _timeCatchChangeScreens;
 
 protected:
 

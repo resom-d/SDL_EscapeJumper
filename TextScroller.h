@@ -23,10 +23,10 @@ public:
 	SDL_Rect DisplayRect;
 
 	void OnInit(SDL_Renderer* rend, string msg, TTF_Font* font, SDL_Color clr, Uint16 speed);
-	void OnLoop();
-	void OnRender();
-	void OnCleanUp();
-	SDL_Point GetSurfaceSize();
+	void OnLoop(void);
+	void OnRender(void);
+	void OnCleanUp(void);
+	void OnReset(void);
 
 private:
 

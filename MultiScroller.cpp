@@ -12,8 +12,8 @@ void MultiScroller::OnInit(SDL_Renderer* rend)
 		Textures.push_back(tex);
 	}
 
-	Items[0] = { 0, DisplayRect.y };
-	Items[1] = { DisplayRect.w, DisplayRect.y};
+	Items[0] = { DisplayRect.x, DisplayRect.y };
+	Items[1] = { DisplayRect.y + DisplayRect.w, DisplayRect.y};
 	_texDisplay[0] = *Textures.begin();
 	_texDisplay[1] = *next(Textures.begin(), 1);
 	_texturePointer = 1;
@@ -28,7 +28,11 @@ void MultiScroller::OnLoop()
 			Items[0].x = DisplayRect.w;
 			_repeatPauseTimeCatch = SDL_GetTicks();
 			_texturePointer++;
-			if (_texturePointer > Textures.size()-1) _texturePointer = 0;
+			if (_texturePointer > Textures.size() - 1)
+			{
+				_texturePointer = 0;
+				LoopDone = true;
+			}
 			_texDisplay[0] = *next(Textures.begin(), _texturePointer);
 		}
 
@@ -38,7 +42,11 @@ void MultiScroller::OnLoop()
 			Items[1].x = DisplayRect.w;
 			_repeatPauseTimeCatch = SDL_GetTicks();
 			_texturePointer++;
-			if (_texturePointer > Textures.size()-1) _texturePointer = 0;
+			if (_texturePointer > Textures.size() - 1)
+			{
+				_texturePointer = 0;
+				LoopDone = true;
+			}
 			_texDisplay[1] = *next(Textures.begin(), _texturePointer);
 		}
 	}
@@ -63,4 +71,14 @@ void MultiScroller::OnCleanup()
 	{
 		SDL_DestroyTexture(*tex);
 	}
+}
+
+void MultiScroller::OnReset(void)
+{
+	Items[0].x = DisplayRect.x;
+	Items[1].x = DisplayRect.w;
+	_texDisplay[0] = *Textures.begin();
+	_texDisplay[1] = *next(Textures.begin(), 1);
+	_texturePointer = 1;
+	_repeatPauseTimeCatch = SDL_GetTicks();
 }

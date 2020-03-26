@@ -20,7 +20,7 @@ void Highscores::OnInit(SDL_Renderer* rend)
 	_scrollerRect = { 560, 210, 800, 490 };
 	string s = "Spiel dir die Finger Wund um in die Hall of Fame zu kommen. Dein Name wird dann ewig leben und die Welt wird dir zu Füßen liegen. Gib alles!";
 	_msgScroller.DisplayRect = { 200, 810, 1130, 80 };
-	_msgScroller.OnInit(_rend, s, _font, { 85,0,255,255 }, 4);
+	_msgScroller.OnInit(_rend, s, _font, { 0, 4, 255, 255 }, 4);
 	
 
 }
@@ -134,5 +134,6 @@ void Highscores::Restart(void)
 	_itemsIndex = 0;
 	_loopCnt = 0;
 	_lastItemHeight = 0;
+	_msgScroller.OnReset();
 }
 

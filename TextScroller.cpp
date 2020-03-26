@@ -82,7 +82,11 @@ void TextScroller::OnCleanUp()
 	}
 }
 
-SDL_Point TextScroller::GetSurfaceSize()
+void TextScroller::OnReset(void)
 {
-	return SDL_Point();
+	_currentPosition = 0;
+	_screenItems.clear();
+	_lastItemWidth = 200;
+	_charIndex = 0;
 }
+

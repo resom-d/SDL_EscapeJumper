@@ -1,6 +1,12 @@
-HS:@Zehnfinger#:504:199
-HS:Wonderboy:137:41
 HS:Wonderboy:57:29
-HS:Niemand:0:1
-HS:Niemand:0:32
-HS:Niemand:0:3
+HS:Schnuti:19:33
+HS:Niemand:14:45
+HS:Dirk:13:28
+HS:Dirk:13:21
+HS:Schnuti:11:16
+HS:Schnuti:10:14
+HS:Schnuti:9:12
+HS:Schnuti:8:18
+HS:Schnuti:8:20
+HS:Schnuti:6:11
+HS:Schnuti:3:5
