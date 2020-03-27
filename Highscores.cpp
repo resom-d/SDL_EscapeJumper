@@ -17,10 +17,10 @@ void Highscores::OnInit(SDL_Renderer* rend)
 	SDL_Surface* surf = IMG_Load("Resources/bgnd/HighscoresBackground.png");
 	_background = SDL_CreateTextureFromSurface(_rend, surf);
 	SDL_FreeSurface(surf);
-	_scrollerRect = { 560, 210, 800, 490 };
+	_scrollerRect = { 110, 250, 1220, 500 };
 	string s = "Spiel dir die Finger Wund um in die Hall of Fame zu kommen. Dein Name wird dann ewig leben und die Welt wird dir zu Füßen liegen. Gib alles!";
-	_msgScroller.DisplayRect = { 200, 810, 1130, 80 };
-	_msgScroller.OnInit(_rend, s, _font, { 0, 4, 255, 255 }, 4);
+	_msgScroller.DisplayRect = { 100, 810, 1220, 80 };
+	_msgScroller.OnInit(_rend, s, _font, { 255, 255, 255, 255 }, 4);
 	
 
 }
@@ -35,7 +35,7 @@ void Highscores::OnLoop(void)
 			ScoreScreenItem si;
 			si.Item = *next(HighScores.begin(), _itemsIndex);
 			string st = to_string(_itemsIndex + 1) + ". " +  si.Item.Name + "   " + to_string(si.Item.Score);
-			SDL_Surface* surf = TTF_RenderText_Solid(_font, st.c_str(), { 80, 0, 255, 255 });
+			SDL_Surface* surf = TTF_RenderText_Solid(_font, st.c_str(), { 5, 98, 99, 255 });
 			SDL_Texture* tex = SDL_CreateTextureFromSurface(_rend, surf);
 			SDL_FreeSurface(surf);
 			si.Texture = tex;
@@ -43,7 +43,7 @@ void Highscores::OnLoop(void)
 			SDL_QueryTexture(tex, nullptr, nullptr, &w, &h);
 			si.Width = w;
 			si.Height = h;
-			si.Screenpos = { _scrollerRect.x, _scrollerRect.y + _scrollerRect.h + si.Height };
+			si.Screenpos = { _scrollerRect.x + (_scrollerRect.w - w)/2, _scrollerRect.y + _scrollerRect.h + si.Height };
 			_screenItems.push_back(si);
 			_lastItemHeight = h;
 			_itemsIndex++;
@@ -52,6 +52,7 @@ void Highscores::OnLoop(void)
 
 	for (auto item = _screenItems.begin(); item != _screenItems.end(); item++)
 	{
+		item->Width;
 		item->Screenpos.y--;
 		if (item->Screenpos.y < _scrollerRect.y - item->Height)
 		{

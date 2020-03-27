@@ -93,7 +93,7 @@ bool GameEngine::OnInit()
 	//Mix_PlayMusic(tune, -1);
 
 	_appIsRunning = true;
-	
+
 	GoMainscreen();
 
 	return true;
@@ -200,11 +200,11 @@ void GameEngine::OnEvent(SDL_Event* event)
 void GameEngine::OnLoop()
 {
 	Playfield.RepeatPauseMode = false;
+
 	if (GameStatus == GameState::MainScreen)
 	{
-		Map.OnLoop();
+		//Map.OnLoop();
 		if (_scrollCntBgnd++ % 4 == 0) Playfield.OnLoop();
-		//if (_scrollCntBgnd % 2 == 0) Playfield_Too.OnLoop();
 		for (auto i = 0; i < 4; i++) Credits.OnLoop();
 		if (!Credits.LoopDone) _timeCatchChangeScreens = SDL_GetTicks();
 		if (SDL_GetTicks() > _timeCatchChangeScreens + 8000)
@@ -236,17 +236,32 @@ void GameEngine::OnLoop()
 		{
 			if (Player.Score > 0)
 			{
-				Highscore hs;
-				hs.Name = Player.Name;
-				hs.Score = Player.Score;
-				hs.Jumps = Player.Jumps;
-				HallOfFame.HighScores.push_back(hs);
+				if (HallOfFame.HighScores.size() < 20)
+				{
+					Highscore hs;
+					hs.Name = Player.Name;
+					hs.Score = Player.Score;
+					hs.Jumps = Player.Jumps;
+					HallOfFame.HighScores.push_back(hs);
+				}
+				else
+				{
+					HallOfFame.HighScores.sort(ScoreComparator());
+					if (next(HallOfFame.HighScores.begin(), 19)->Score < Player.Score)
+					{
+						next(HallOfFame.HighScores.begin(), 19)->Name = Player.Name;
+						next(HallOfFame.HighScores.begin(), 19)->Score = Player.Score;
+						next(HallOfFame.HighScores.begin(), 19)->Jumps = Player.Jumps;
+					}
+					HallOfFame.SaveHighscores();
+				}
+				GoGameOver();
 			}
-			GoGameOver();
+
+			if (Player.GameOver && GameStatus == GameState::LevelEditTest) GoEditor();
+
 		}
-
-		if (Player.GameOver && GameStatus == GameState::LevelEditTest) GameStatus = GameState::LevelEdit;
-
+		
 		if (Map.LevelDone)
 		{
 			if (GameStatus != GameState::LevelEditTest)
@@ -322,8 +337,6 @@ void GameEngine::OnRender()
 	{
 		MainUI.OnRender(GameStatus == GameState::Running);
 		Playfield.OnRender();
-		Map.OnRender();
-		//Playfield_Too.OnRender();
 		Credits.OnRender();
 	}
 
@@ -336,10 +349,12 @@ void GameEngine::OnRender()
 		// Render UI
 		GameUI.OnRender(GameStatus == GameState::GameOver, &Player);
 
+		// Background scroller
 		Playfield.OnRender();
-		//Playfield_slow.OnRender();
+
 		// Render Map
 		Map.OnRender();
+
 		// Render player(s)
 		Player.OnRender();
 
@@ -347,24 +362,10 @@ void GameEngine::OnRender()
 		{
 			SDL_RenderSetClipRect(Renderer, &Map.Setup.DisplayRect);
 
-			SDL_Rect dRect = {
-					Map.Setup.DisplayRect.x + 100,
-					Map.Setup.DisplayRect.y + 200,
-					1200,
-					400
-			};
-
-			SDL_Rect sRect = {
-					0,
-					0,
-					1200,
-					400
-			};
-
 			SDL_RenderCopy(Renderer,
 				GameItems["GameOver"],
-				&sRect,
-				&dRect
+				nullptr,
+				&Map.Setup.DisplayRect
 				);
 		}
 

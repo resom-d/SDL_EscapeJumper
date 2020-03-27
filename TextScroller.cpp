@@ -66,7 +66,7 @@ void TextScroller::OnRender()
 	SDL_RenderSetClipRect(_rend, &r);
 	for (auto item = _screenItems.begin(); item != _screenItems.end(); item++)
 	{
-		auto a = item->ScreenPos.x / (DisplayRect.w / 720.0);
+		auto a = item->ScreenPos.x / (DisplayRect.w / 900.0);
 		auto y = (DisplayRect.y + DisplayRect.h - item->Height) + (sin(a * (M_PI / 180.0)) * 12.0);
 		SDL_Rect sRect = { 0,0, item->Width, item->Height };
 		SDL_Rect dRect = { item->ScreenPos.x, y, item->Width, item->Height };
